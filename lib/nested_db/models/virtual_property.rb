@@ -22,7 +22,7 @@ module NestedDb
       
       module InstanceMethods
         def field
-          Mongoid::Field.new(name, :type => self.data_type.classify.constantize)
+          ::Mongoid::Field.new(name, :type => self.data_type.classify.constantize)
         end
       end
     end

@@ -16,19 +16,17 @@ module NestedDb
       module InstanceMethods
         # allows for readers when the attribute hasn't been
         # physically defined yet
-        alias_method :old_method_missing, :method_missing
         def method_missing(method, *args)
           if taxonomy && taxonomy.has_property?(method)
             read_attribute(method)
           else
-            old_method_missing(method, args)
+            super(method, args)
           end
         end
         
         # allows for typecasting on the dynamic taxonomy fields
-        alias_method :old_fields, :fields
         def fields
-          old_fields.reverse_merge(taxonomy.try(:property_fields) || {})
+          super().reverse_merge(taxonomy.try(:property_fields) || {})
         end
         
         private
