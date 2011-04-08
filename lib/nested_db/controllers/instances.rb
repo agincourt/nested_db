@@ -1,3 +1,5 @@
+require 'nested_db/controllers/scoping'
+
 module NestedDb
   module Controllers
     module Instances
@@ -6,7 +8,8 @@ module NestedDb
           before_filter :load_taxonomy
           before_filter :load_instance, :except => [ :index, :new, :create ]
         end
-      
+        
+        base.send(:include, NestedDb::Controllers::Scoping)
         base.send(:include, InstanceMethods)
       end
     
@@ -42,7 +45,7 @@ module NestedDb
       
         protected
         def load_taxonomy
-          @taxonomy = (self.respond_to?(:taxonomy_scope) ? taxonomy_scope : Taxonomy).find(params[:taxonomy_id])
+          @taxonomy = taxonomy_scope.find(params[:taxonomy_id])
         rescue ActiveRecord::RecordNotFound => e
           Rails.logger.debug "#{e.class.name.to_s} => #{e.message}"
           head :not_found

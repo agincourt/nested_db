@@ -1,3 +1,5 @@
+require 'nested_db/controllers/scoping'
+
 module NestedDb
   module Controllers
     module Taxonomies
@@ -5,7 +7,8 @@ module NestedDb
         base.class_eval do
           before_filter :load_taxonomy, :except => [ :index, :new, :create ]
         end
-      
+        
+        base.send(:include, NestedDb::Controllers::Scoping)
         base.send(:include, InstanceMethods)
       end
     
