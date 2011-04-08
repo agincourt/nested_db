@@ -24,7 +24,7 @@ module NestedDb
         end
         
         def create
-          @taxonomy = taxonomy_scope.new(params[:taxonomy])
+          @taxonomy = taxonomy_scope.new(params[:nested_db_taxonomy])
           
           case params[:activity]
           when 'add_physical_property'
@@ -39,7 +39,7 @@ module NestedDb
         end
         
         def update
-          @taxonomy.write_attributes(params[:taxonomy])
+          @taxonomy.write_attributes(params[:nested_db_taxonomy])
           
           case params[:activity]
           when 'add_physical_property'

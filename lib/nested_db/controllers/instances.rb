@@ -29,7 +29,7 @@ module NestedDb
         end
         
         def create
-          respond_with(@instance = @taxonomy.instances.create(params[:instance])) do |wants|
+          respond_with(@instance = @taxonomy.instances.create(params[:nested_db_instance])) do |wants|
             wants.html {
               if @instance.persisted?
                 redirect_to(@taxonomy, :notice => "#{@taxonomy.name.titleize} created!")
@@ -41,7 +41,7 @@ module NestedDb
         end
         
         def update
-          @instance.update_attributes(params[:instance])
+          @instance.update_attributes(params[:nested_db_instance])
         
           respond_with(@instance) do |wants|
             wants.html { @instance.errors.empty? ? redirect_to(@taxonomy) : render(:edit) }
