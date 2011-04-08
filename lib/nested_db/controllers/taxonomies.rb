@@ -34,7 +34,7 @@ module NestedDb
           end
           
           respond_with(@taxonomy) do |wants|
-            wants.html { @taxonomy.persisted? ? redirect_to(:taxonomies) : render(:new) }
+            wants.html { @taxonomy.persisted? ? redirect_to({ :action => :index }, :notice => 'Taxonomy created.') : render(:new) }
           end
         end
         
@@ -49,13 +49,13 @@ module NestedDb
           end
           
           respond_with(@taxonomy) do |wants|
-            wants.html { @saved && @taxonomy.errors.empty? ? redirect_to(:taxonomies) : render(:edit) }
+            wants.html { @saved && @taxonomy.errors.empty? ? redirect_to({ :action => :index }, :notice => 'Taxonomy updated.') : render(:edit) }
           end
         end
         
         def destroy
           @taxonomy.try(:destroy)
-          redirect_to(:taxonomies)
+          redirect_to({ :action => :index }, :notice => 'Taxonomy deleted.')
         end
         
         protected

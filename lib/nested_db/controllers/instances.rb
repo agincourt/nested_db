@@ -32,7 +32,7 @@ module NestedDb
           respond_with(@instance = @taxonomy.instances.create(params[:nested_db_instance])) do |wants|
             wants.html {
               if @instance.persisted?
-                redirect_to(@taxonomy, :notice => "#{@taxonomy.name.titleize} created!")
+                redirect_to(url_for(@taxonomy), :notice => "#{@taxonomy.name.titleize} created!")
               else
                 render(:new)
               end
@@ -44,13 +44,13 @@ module NestedDb
           @instance.update_attributes(params[:nested_db_instance])
         
           respond_with(@instance) do |wants|
-            wants.html { @instance.errors.empty? ? redirect_to(@taxonomy) : render(:edit) }
+            wants.html { @instance.errors.empty? ? redirect_to(url_for(@taxonomy)) : render(:edit) }
           end
         end
         
         def destroy
           @instance.try(:destroy)
-          redirect_to(@taxonomy)
+          redirect_to(url_for(@taxonomy))
         end
         
         protected
