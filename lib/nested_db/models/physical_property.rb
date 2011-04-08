@@ -5,8 +5,11 @@ module NestedDb
   module Models
     module PhysicalProperty
       def self.included(base)
+        base.send(:include, ::Mongoid::Document)
         base.send(:include, NestedDb::DataTypes)
         base.send(:include, NestedDb::Models::Property)
+        base.send(:include, InstanceMethods)
+        
         base.class_eval do
           # fields
           field :required,      :type => Boolean
@@ -20,7 +23,6 @@ module NestedDb
           validates_inclusion_of :data_type,
             :in => available_data_types
         end
-        base.send(:include, InstanceMethods)
       end
       
       module InstanceMethods

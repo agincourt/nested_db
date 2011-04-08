@@ -2,6 +2,9 @@ module NestedDb
   module Models
     module Taxonomy
       def self.included(base)
+        base.send(:include, ::Mongoid::Document)
+        base.send(:include, InstanceMethods)
+        
         base.class_eval do
           # fields
           field :name,      :required => true
@@ -13,16 +16,15 @@ module NestedDb
             :message => 'may only contain lowercase letters, numbers, hyphons and underscores'
           
           # associations
-          embeds_many     :physical_properties
-          embeds_many     :virtual_properties
-          references_many :instances, :inverse_of => :taxonomy, :dependent => :destroy
+          embeds_many     :physical_properties, :class => NestedDb::PhysicalProperty
+          embeds_many     :virtual_properties, :class => NestedDb::VirtualProperty
+          references_many :instances, :class => NestedDb::Instance, :inverse_of => :taxonomy, :dependent => :destroy
           
           accepts_nested_attributes_for :physical_properties
           
           # callbacks
           before_validation :downcase_reference
         end
-        base.send(:include, InstanceMethods)
       end
       
       module InstanceMethods

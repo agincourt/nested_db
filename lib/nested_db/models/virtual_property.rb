@@ -4,7 +4,10 @@ module NestedDb
   module Models
     module VirtualProperty
       def self.included(base)
+        base.send(:include, ::Mongoid::Document)
         base.send(:include, NestedDb::Models::Property)
+        base.send(:include, InstanceMethods)
+        
         base.class_eval do
           # fields
           field :format
@@ -17,7 +20,6 @@ module NestedDb
           validates_inclusion_of :casing,
             :in => %w(downcase upcase titleize)
         end
-        base.send(:include, InstanceMethods)
       end
       
       module InstanceMethods
