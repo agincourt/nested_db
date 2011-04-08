@@ -1,3 +1,3 @@
 class Taxonomies::InstancesController < ApplicationController
-  include NestedDb::InstancesController
+  include NestedDb::Controllers::Instances
 end
