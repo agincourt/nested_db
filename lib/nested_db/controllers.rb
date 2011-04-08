@@ -1,2 +1,2 @@
-require 'controllers/instances'
-require 'controllers/taxonomies'
+require 'nested_db/controllers/instances'
+require 'nested_db/controllers/taxonomies'
