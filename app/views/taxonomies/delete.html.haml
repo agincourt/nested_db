@@ -1,4 +1,4 @@
-= form_for(@taxonomy, :html => { :method => :delete }) do |f|
+= form_for(@taxonomy, :url => url_for(:action => :destroy, :id => @taxonomy.id), :html => { :method => :delete }) do |f|
   %p Are you sure you want to delete this taxonomy?
   
   %p

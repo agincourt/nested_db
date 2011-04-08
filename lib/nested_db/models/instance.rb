@@ -8,7 +8,7 @@ module NestedDb
         
         base.class_eval do
           # associations
-          referenced_in :taxonomy, :inverse_of => :instances
+          referenced_in :taxonomy, :inverse_of => :instances, :class_name => "NestedDb::Taxonomy"
           
           # validation
           validates_presence_of :taxonomy
