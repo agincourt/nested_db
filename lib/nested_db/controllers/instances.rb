@@ -1,4 +1,5 @@
 require 'nested_db/controllers/scoping'
+require 'nested_db/controllers/views'
 
 module NestedDb
   module Controllers
@@ -10,14 +11,15 @@ module NestedDb
         end
         
         base.send(:include, NestedDb::Controllers::Scoping)
+        base.send(:include, NestedDb::Controllers::Views)
         base.send(:include, InstanceMethods)
       end
-    
+      
       module InstanceMethods
         def new
           @instance = @taxonomy.instances.build
         end
-      
+        
         def create
           respond_with(@instance = @taxonomy.instances.create(params[:instance])) do |wants|
             wants.html {
@@ -29,7 +31,7 @@ module NestedDb
             }
           end
         end
-      
+        
         def update
           @instance.update_attributes(params[:instance])
         
@@ -37,12 +39,12 @@ module NestedDb
             wants.html { @instance.errors.empty? ? redirect_to(@taxonomy) : render(:edit) }
           end
         end
-      
+        
         def destroy
           @instance.try(:destroy)
           redirect_to(@taxonomy)
         end
-      
+        
         protected
         def load_taxonomy
           @taxonomy = taxonomy_scope.find(params[:taxonomy_id])
@@ -50,7 +52,7 @@ module NestedDb
           Rails.logger.debug "#{e.class.name.to_s} => #{e.message}"
           head :not_found
         end
-  
+        
         def load_instance
           @instance = @taxonomy.instances.find(params[:id])
         rescue ActiveRecord::RecordNotFound => e

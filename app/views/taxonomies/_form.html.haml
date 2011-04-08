@@ -1,7 +1,6 @@
 %p= link_to 'Back to index', :action => :index
 
-= form_for(@taxonomy) do |f|
-  = f.error_messages
+= form_for(@taxonomy, :url => @taxonomy.new_record? ? url_for(:action => :create) : url_for(:action => :update, :id => @taxonomy)) do |f|
   
   %fieldset
     %legend Basics
@@ -34,7 +33,7 @@
           %tr.property
             %td= pp.text_field :index
             %td= pp.text_field :name
-            %td= pp.select :data_type, PhysicalProperty.available_data_types.map { |d| [d.titleize, d] }
+            %td= pp.select :data_type, f.object.physical_properties.model_name.constantize.available_data_types.map { |d| [d.titleize, d] }
             %td
               = pp.check_box :_destroy
               Remove
@@ -45,4 +44,6 @@
               = pp.check_box :required
               Required?
   
-  %button{ :type => 'submit' } Submit
+  %p
+    = link_to '« '
+    %button{ :type => 'submit' } Submit
