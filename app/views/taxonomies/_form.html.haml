@@ -45,5 +45,5 @@
               Required?
   
   %p
-    = link_to '« '
-    %button{ :type => 'submit' } Submit
+    = link_to '« Cancel', :action => :index
+    %button{ :type => 'submit' }= f.object.new_record? ? 'Create »' : 'Update »'

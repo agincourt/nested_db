@@ -11,7 +11,12 @@ module NestedDb
         end
         
         def default_views!
-          @@view_path_override = name.gsub(/^.*\:\:/, '').gsub(/Controller$/, '')
+          @@view_path_override = default_view_path
+        end
+        
+        private
+        def default_view_path
+          name.gsub(/^.*\:\:/, '').gsub(/Controller$/, '')
         end
       end
     end

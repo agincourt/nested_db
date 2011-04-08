@@ -12,7 +12,15 @@ module NestedDb
         
         base.send(:include, NestedDb::Controllers::Scoping)
         base.send(:include, NestedDb::Controllers::Views)
+        base.extend ClassMethods
         base.send(:include, InstanceMethods)
+      end
+      
+      module ClassMethods
+        private
+        def default_view_path
+          'taxonomies/instances'
+        end
       end
       
       module InstanceMethods
