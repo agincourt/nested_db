@@ -1,0 +1,48 @@
+%p= link_to 'Back to index', :action => :index
+
+= form_for(@taxonomy) do |f|
+  = f.error_messages
+  
+  %fieldset
+    %legend Basics
+    
+    .row
+      = f.label :name
+      = f.text_field :name
+    
+    .row
+      = f.label :reference
+      = f.text_field :reference
+      %p This is used in the templates to query the taxonomies. E.g. {{ taxonomies.reference_here.name }}
+  
+  %fieldset
+    %legend Properties
+    
+    %table
+      %thead
+        %tr
+          %th Order
+          %th Name
+          %th Data Type
+          %th Actions
+      %tfoot
+        %tr
+          %td{ :colspan => 3 }
+            %button{ :name => 'activity', :value => 'add_physical_property' } Add Another
+      %tbody
+        = f.fields_for :physical_properties, f.object.physical_properties.ordered do |pp|
+          %tr.property
+            %td= pp.text_field :index
+            %td= pp.text_field :name
+            %td= pp.select :data_type, PhysicalProperty.available_data_types.map { |d| [d.titleize, d] }
+            %td
+              = pp.check_box :_destroy
+              Remove
+          %tr.validation
+            %td{ :colspan => 3 }
+              = pp.check_box :table_display
+              Display in table?
+              = pp.check_box :required
+              Required?
+  
+  %button{ :type => 'submit' } Submit

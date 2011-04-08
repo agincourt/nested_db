@@ -1,0 +1,6 @@
+= form_for(@taxonomy, :html => { :method => :delete }) do |f|
+  %p Are you sure you want to delete this taxonomy?
+  
+  %p
+    = link_to 'No', :action => 'index'
+    %button{ :type => 'submit' } Yes!

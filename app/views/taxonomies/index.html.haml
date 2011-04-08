@@ -1,0 +1,50 @@
+%h1 Taxonomies
+
+%p= link_to 'Create New', :action => :new
+
+%table
+  %thead
+    %tr
+      %th Name
+      %th Action
+  %tbody
+    - for taxonomy in @taxonomies
+      %tr{ :id => "taxononmy-#{taxonomy.id}" }
+        %th= link_to taxonomy.name, taxonomy
+        %td
+          = link_to 'Edit', ['edit', taxonomy]
+          = link_to 'Delete', ['delete', taxonomy]
+
+%h1 Test Liquid Code:
+
+= form_tag(liquid_tests_path, :method => :post)
+
+= text_area_tag :body, '', :rows => 5, :cols => 40
+
+%br
+
+%button{ :type => 'submit' } Process »
+
+%br
+%br
+
+= '</form>'.html_safe
+
+%textarea#result{ :rows => 5, :cols => 40 }
+
+:javascript
+  $(document).ready(function() {
+    $('form').submit(function(event) {
+      var $this = $(this)
+      event.preventDefault()
+      
+      $.ajax({
+        url: $this.attr('action'),
+        type: $this.attr('method').toUpperCase(),
+        data: $this.serialize(),
+        success: function(data) {
+          $('#result').val(data)
+        }
+      });
+    })
+  })

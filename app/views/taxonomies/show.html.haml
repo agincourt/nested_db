@@ -1,0 +1,44 @@
+%h1= @taxonomy.name
+
+%p
+  = link_to 'Back to index', :action => :index
+  |
+  = link_to 'Edit', :action => :edit
+
+%h2= pluralize(@taxonomy.physical_properties.ordered.count, 'Property')
+
+%table
+  %thead
+    %tr
+      %th Name
+      %th Type
+      %th Required?
+      %th Display in table?
+  
+  %tbody
+    - for property in @taxonomy.physical_properties.ordered
+      %tr
+        %td= property.name
+        %td= property.data_type
+        %td= property.required?
+        %td= property.table_display?
+
+%h2= pluralize(@taxonomy.instances.count, 'Instance')
+
+%p= link_to 'New', ['new', @taxonomy, 'instance']
+
+%table
+  %thead
+    %tr
+      - for property in @taxonomy.physical_properties.indexed.ordered
+        %th= property.name
+      %th Actions
+  
+  %tbody
+    - for instance in @taxonomy.instances
+      %tr
+        - for property in @taxonomy.physical_properties.indexed
+          %td= instance.send(property.name)
+        %td
+          = link_to 'Edit', ['edit', @taxonomy, instance]
+          = link_to 'Delete', [@taxonomy, instance], :method => :delete, :confirm => "Are you sure?"

@@ -1,0 +1,14 @@
+%p= link_to 'Back to index', :action => :index
+
+= form_for([@taxonomy, @instance]) do |f|
+  = f.error_messages
+  
+  %fieldset
+    %legend Properties
+    
+    - for property in @taxonomy.physical_properties.ordered do
+      .row
+        = f.label property.name
+        = f.text_field property.name
+  
+  %button{ :type => 'submit' } Submit
