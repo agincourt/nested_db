@@ -1,6 +1,6 @@
 %p= link_to 'Back to index', :action => :index
 
-= form_for([@taxonomy, @instance]) do |f|
+= form_for([@taxonomy, @instance], :url => @instance.new_record? ? url_for(:action => :create, :taxonomy_id => @taxonomy.id) : url_for(:action => :update, :taxonomy_id => @taxonomy.id, :id => @instance.id)) do |f|
   = f.error_messages
   
   %fieldset
