@@ -1,4 +1,4 @@
-%p= link_to "Back to #{@taxonomy.name}", params[:action] == 'new' ? '../' : '../../'
+%p= link_to "Back to #{@taxonomy.name}", request.url.gsub(/\/instances\/new\/?$/, '').gsub(/\/instances\/\w{24}\/edit/, '')
 
 = form_for([@taxonomy, @instance], :url => @instance.new_record? ? url_for(:action => :create, :taxonomy_id => @taxonomy.id) : url_for(:action => :update, :taxonomy_id => @taxonomy.id, :id => @instance.id)) do |f|
   
