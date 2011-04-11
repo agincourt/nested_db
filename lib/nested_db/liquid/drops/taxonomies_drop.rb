@@ -1,5 +1,5 @@
 module NestedDb
-  class TaxonomiesDrop < Liquid::Drop
+  class TaxonomiesDrop < ::Liquid::Drop
     def initialize(scope = nil)
       @scope = scope || Taxonomy.all
       # loop through each taxonomy

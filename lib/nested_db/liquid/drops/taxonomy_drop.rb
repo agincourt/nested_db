@@ -1,5 +1,5 @@
 module NestedDb
-  class TaxonomyDrop < Liquid::Drop
+  class TaxonomyDrop < ::Liquid::Drop
     def initialize(taxonomy)
       @taxonomy = taxonomy
     end
