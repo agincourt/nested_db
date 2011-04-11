@@ -44,7 +44,7 @@ module NestedDb
           
           case params[:activity]
           when 'add_physical_property'
-            @taxonomy.physical_properties.build
+            @taxonomy.physical_properties.build(:index => (@taxonomy.physical_properties.try(:last).try(:index) || -1) + 1)
           else
             @saved = @taxonomy.save
           end
