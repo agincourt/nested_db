@@ -33,7 +33,7 @@ module NestedDb
         
         # allows for typecasting on the dynamic taxonomy fields
         def fields
-          self.class.fields.reverse_merge(taxonomy.property_fields)
+          self.class.fields.reverse_merge(taxonomy.try(:property_fields) || {})
         end
         
         private
