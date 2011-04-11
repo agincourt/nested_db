@@ -5,22 +5,16 @@ module NestedDb
         base.send(:include, ::Mongoid::Document)
         base.send(:include, ::Mongoid::MultiParameterAttributes)
         base.send(:include, InstanceMethods)
-        base.extend ClassMethods
         
         base.class_eval do
+          delegate :fields, :to => "self"
+          
           # associations
           referenced_in :taxonomy, :inverse_of => :instances, :class_name => "NestedDb::Taxonomy"
           
           # validation
           validates_presence_of :taxonomy
           validate :validate_against_taxonomy, :if => proc { |obj| obj.taxonomy.present? }
-        end
-      end
-      
-      module ClassMethods
-        # allows for typecasting on the dynamic taxonomy fields
-        def fields
-          super.reverse_merge(taxonomy.property_fields)
         end
       end
       
@@ -33,6 +27,11 @@ module NestedDb
           else
             super(method, args)
           end
+        end
+        
+        # allows for typecasting on the dynamic taxonomy fields
+        def fields
+          self.class.fields.reverse_merge(taxonomy.property_fields)
         end
         
         private
