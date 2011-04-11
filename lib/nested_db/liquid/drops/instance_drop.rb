@@ -8,13 +8,9 @@ module NestedDb
       self.taxonomy_drop = taxonomy_drop if taxonomy_drop
     
       # loop through fields
-      instance.fields.keys.each { |k|
-        puts "Defining: #{k}"
+      self.instance.fields.keys.each { |k|
         self.class.send(:define_method, k.to_sym) do
-          puts "Running: #{k}"
-          result = instance.send(k)
-          puts "Result: #{result}"
-          result
+          self.instance.read_attribute(k)
         end                                                                                                                                                                        
       }
     end
