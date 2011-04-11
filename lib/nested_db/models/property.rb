@@ -20,8 +20,11 @@ module NestedDb
           validates_uniqueness_of :name,
             :scope => :taxonomy
           validates_format_of     :name,
-            :with    => /^[a-z]+[a-z0-9]*$/i,
-            :message => 'can only contain letters and digits (must not start with a digit)'
+            :with    => /^[a-z0-9\-\_]*$/i,
+            :message => 'can only contain letters, digits, hyphons and underscores'
+          validates_format_of     :name,
+            :with    => /^[a-z]+/i,
+            :message => 'must start with an alphabetic letter'
           validates_presence_of   :data_type
           
           # callbacks
