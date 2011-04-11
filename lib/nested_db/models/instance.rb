@@ -29,6 +29,8 @@ module NestedDb
         
         # allows for typecasting on the dynamic taxonomy fields
         def fields
+          Rails.logger.debug "FIELDS CALLED"
+          puts "FIELDS CALLED"
           taxonomy ? super.reverse_merge(taxonomy.property_fields) : super
         end
         
