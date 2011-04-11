@@ -10,7 +10,8 @@ module NestedDb
       # loop through fields
       taxonomy_instance.fields.keys.each { |k|
         self.class.send(:define_method, k.to_sym) do
-          taxonomy_instance.read_attribute(k)
+          #taxonomy_instance.read_attribute(k)
+          "TEST"
         end                                                                                                                                                                        
       }
     end
