@@ -13,6 +13,10 @@ module NestedDb
         InstanceDrop.new(i)
       }
     end
+    
+    def count
+      @taxonomy.instances.count
+    end
   
     def fields
       @taxonomy.instances.build.fields.keys
