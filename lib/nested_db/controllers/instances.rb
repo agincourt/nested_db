@@ -1,7 +1,3 @@
-require 'nested_db/controllers/scoping'
-require 'nested_db/controllers/routing'
-require 'nested_db/controllers/views'
-
 module NestedDb
   module Controllers
     module Instances
