@@ -10,11 +10,11 @@ module FindOneFilter
 end
 
 module FindAllFilter
-  def find_all_by(taxonomy_drop, attribute, value)
+  def find_all_by(taxonomy_drop, attribute, value, limit = 100)
     # ensure the taxonomy has the property
     return nil unless taxonomy_drop.taxonomy.has_property?(attribute)
     # try to load some results
-    taxonomy_drop.taxonomy.instances.where({ attribute => value }).limit(100).map { |result|
+    taxonomy_drop.taxonomy.instances.where({ attribute => value }).limit([100, limit].min).map { |result|
       # transform each result into drop
       InstanceDrop.new(result, taxonomy_drop)
     }
