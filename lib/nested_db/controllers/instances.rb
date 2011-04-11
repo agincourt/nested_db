@@ -50,6 +50,9 @@ module NestedDb
           end
         end
         
+        def edit; end
+        def delete; end
+        
         def destroy
           @instance.try(:destroy)
           redirect_to(taxonomy_relative_to_instance_url)

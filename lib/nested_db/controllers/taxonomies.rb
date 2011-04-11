@@ -25,6 +25,9 @@ module NestedDb
           @taxonomy.physical_properties.build
         end
         
+        def edit; end
+        def delete; end
+        
         def create
           @taxonomy = taxonomy_scope.new(params[:nested_db_taxonomy])
           
