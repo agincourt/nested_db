@@ -4,10 +4,10 @@ module NestedDb
       def self.included(base)
         base.send(:include, ::Mongoid::Document)
         base.send(:include, ::Mongoid::MultiParameterAttributes)
-        base.send(:include, InstanceMethods)
         
         base.class_eval do
-          delegate :fields, :to => "self"
+          # we don't want the delegation method
+          remove_method :fields
           
           # associations
           referenced_in :taxonomy, :inverse_of => :instances, :class_name => "NestedDb::Taxonomy"
@@ -16,6 +16,8 @@ module NestedDb
           validates_presence_of :taxonomy
           validate :validate_against_taxonomy, :if => proc { |obj| obj.taxonomy.present? }
         end
+        
+        base.send(:include, InstanceMethods)
       end
       
       module InstanceMethods
