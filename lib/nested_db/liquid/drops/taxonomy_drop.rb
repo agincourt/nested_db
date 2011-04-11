@@ -10,7 +10,7 @@ module NestedDb
   
     def all
       @taxonomy.instances.limit(100).map { |i|
-        InstanceDrop.new(i)
+        InstanceDrop.new(i, self)
       }
     end
     
