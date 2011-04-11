@@ -25,7 +25,7 @@
 
 %h2= pluralize(@taxonomy.instances.count, 'Instance')
 
-%p= link_to 'New', 'instances/new'
+%p= link_to 'New', "#{@taxonomy.id}/instances/new"
 
 %table
   %thead
