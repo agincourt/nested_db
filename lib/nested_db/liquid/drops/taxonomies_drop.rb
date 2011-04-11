@@ -14,5 +14,9 @@ module NestedDb
     def count
       @scope.count
     end
+    
+    def all
+      @scope.map { |t| TaxonomyDrop.new(t) }
+    end
   end
 end
