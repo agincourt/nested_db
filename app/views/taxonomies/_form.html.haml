@@ -48,6 +48,12 @@
               Display in table?
               = pp.check_box :required
               Required?
+          - if pp.errors.any?
+            %tr.errors
+              %td{ :colspan => 3 }
+                %ul
+                  - for error in f.object.errors.full_messages do
+                    %li= error
   
   %p
     = link_to '« Cancel', :action => :index
