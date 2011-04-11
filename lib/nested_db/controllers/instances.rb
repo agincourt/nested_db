@@ -6,6 +6,7 @@ module NestedDb
     module Instances
       def self.included(base)
         base.class_eval do
+          helper        NestedDbRoutingHelper
           before_filter :load_taxonomy
           before_filter :load_instance, :except => [ :index, :new, :create ]
         end

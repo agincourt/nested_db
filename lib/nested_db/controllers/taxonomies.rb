@@ -6,6 +6,7 @@ module NestedDb
     module Taxonomies
       def self.included(base)
         base.class_eval do
+          helper        NestedDbRoutingHelper
           before_filter :load_taxonomy, :except => [ :index, :new, :create ]
         end
         base.send(:include, NestedDb::Controllers::Scoping)
