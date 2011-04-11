@@ -14,7 +14,7 @@ module FindAllFilter
     # ensure the taxonomy has the property
     return nil unless taxonomy_drop.taxonomy.has_property?(attribute)
     # try to load some results
-    taxonomy_drop.taxonomy.instances.where({ attribute => value }).limit([100, limit].min).map { |result|
+    taxonomy_drop.taxonomy.instances.where({ attribute => value }).limit([100, limit.to_i].min).map { |result|
       # transform each result into drop
       InstanceDrop.new(result, taxonomy_drop)
     }
