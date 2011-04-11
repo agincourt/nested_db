@@ -1,6 +1,6 @@
 module NestedDbRoutingHelper
   def taxonomy_relative_to_instance_path
-    request.path.gsub(/\/instances\/.*?$/, '')
+    request.path.gsub(/\/instances$|\/instances\/.*?$/, '')
   end
   
   def instance_relative_to_taxonomy_path(instance, action = nil)
