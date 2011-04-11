@@ -3,17 +3,18 @@ module NestedDb
     attr_accessor :taxonomy_instance
     attr_accessor :taxonomy_drop
     
+    delegate :read_attribute, :to => "taxonomy_instance"
+    
     def initialize(instance, taxonomy_drop = nil)
       self.taxonomy_instance = instance
       self.taxonomy_drop     = taxonomy_drop if taxonomy_drop
     
       # loop through fields
-      taxonomy_instance.fields.keys.each { |k|
+      fields.each do |k|
         self.class.send(:define_method, k.to_sym) do
-          #taxonomy_instance.read_attribute(k)
-          "TEST"
+          read_attribute(k)
         end                                                                                                                                                                        
-      }
+      end
     end
     
     def fields
