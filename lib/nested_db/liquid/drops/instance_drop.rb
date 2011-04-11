@@ -9,11 +9,13 @@ module NestedDb
     
       # loop through fields
       instance.fields.keys.each { |k|
-        Rails.logger.debug "Defining method: #{k}"
+        puts "Defining: #{k}"
         self.class.send(:define_method, k.to_sym) do
-          Rails.logger.debug "Running method: #{k}"
-          instance.send(k)
-        end
+          puts "Running: #{k}"
+          result = instance.send(k)
+          puts "Result: #{result}"
+          result
+        end                                                                                                                                                                        
       }
     end
     
