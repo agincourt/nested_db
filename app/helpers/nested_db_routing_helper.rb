@@ -10,7 +10,7 @@ module NestedDbRoutingHelper
   end
   
   def instances_relative_to_taxonomy_path(action = nil)
-    path  = request.path.gsub(/(\/taxonomies\/\w{24}).*?$/, "\1/instances")
+    path  = request.path.gsub(/(\/taxonomies\/\w{24}).*?$/, '\1/instances')
     path += "/#{action}" if action
     path
   end
