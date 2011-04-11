@@ -48,11 +48,11 @@
               Display in table?
               = pp.check_box :required
               Required?
-          - if pp.errors.any?
+          - if pp.object.errors.any?
             %tr.errors
               %td{ :colspan => 3 }
                 %ul
-                  - for error in f.object.errors.full_messages do
+                  - for error in pp.object.errors.full_messages do
                     %li= error
   
   %p
