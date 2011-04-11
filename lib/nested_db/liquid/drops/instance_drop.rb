@@ -1,22 +1,26 @@
 module NestedDb
   class InstanceDrop < ::Liquid::Drop
-    def initialize(instance, taxonomy = nil)
-      @instance = instance
+    attr_accessor :instance
+    attr_accessor :taxonomy_drop
+    
+    def initialize(instance, taxonomy_drop = nil)
+      self.instance      = instance
+      self.taxonomy_drop = taxonomy_drop if taxonomy_drop
     
       # loop through fields
-      @instance.fields.keys.each { |k|
+      instance.fields.keys.each { |k|
         self.class.send(:define_method, k.to_sym) do
-          @instance.read_attribute(k)
+          instance.read_attribute(k)
         end
       }
     end
     
     def fields
-      @instance.fields.keys
+      instance.fields.keys
     end
     
     def taxonomy
-      @taxonomy_drop ||= TaxonomyDrop.new(@instance.taxonomy)
+      self.taxonomy_drop ||= TaxonomyDrop.new(instance.taxonomy)
     end
   end
 end
