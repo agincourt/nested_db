@@ -2,6 +2,11 @@
 
 = form_for([@taxonomy, @instance], :url => @instance.new_record? ? url_for(:action => :create, :taxonomy_id => @taxonomy.id) : url_for(:action => :update, :taxonomy_id => @taxonomy.id, :id => @instance.id)) do |f|
   
+  - if f.object.errors.any?
+    %ul.errors
+      - for error in f.object.errors.full_mesages do
+        %li= error
+  
   %fieldset
     %legend Properties
     
