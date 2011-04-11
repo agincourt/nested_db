@@ -1,4 +1,5 @@
 require 'nested_db/controllers/scoping'
+require 'nested_db/controllers/routing'
 require 'nested_db/controllers/views'
 
 module NestedDb
@@ -6,12 +7,12 @@ module NestedDb
     module Instances
       def self.included(base)
         base.class_eval do
-          helper        NestedDbRoutingHelper
           before_filter :load_taxonomy
           before_filter :load_instance, :except => [ :index, :new, :create ]
         end
         
         base.send(:include, NestedDb::Controllers::Scoping)
+        base.send(:include, NestedDb::Controllers::Routing)
         base.send(:include, NestedDb::Controllers::Views)
         base.extend ClassMethods
         base.send(:include, InstanceMethods)
