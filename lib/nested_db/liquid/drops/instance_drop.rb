@@ -24,5 +24,12 @@ module NestedDb
     def taxonomy
       self.taxonomy_drop ||= TaxonomyDrop.new(taxonomy_instance.taxonomy)
     end
+    
+    def to_liquid
+      {
+        'fields'   => fields,
+        'taxonomy' => taxonomy
+      }.merge(fields.inject({}) { |hash, f| hash.merge!(f => read_attribute(f)) })
+    end
   end
 end
