@@ -4,6 +4,7 @@ module ErrorFilter
     unless input
       raise StandardError, "Fail: #{status_code}, #{status_message}"
     end
+    input
   end
 end
 
