@@ -1,6 +1,6 @@
 module AttributeFilter
   def call(input, attribute)
-    input.send(attribute)
+    input.try(attribute.to_sym)
   end
 end
 
