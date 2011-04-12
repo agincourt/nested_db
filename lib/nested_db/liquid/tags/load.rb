@@ -1,17 +1,20 @@
 module Liquid
   class Load < Tag
-    Syntax = /^(one|all)\s(.*?)\sas\s(.*?)(\swhere\s(.*?)\s*==\s*(.*?))?(\slimit\sto\s(.*?))?$/
+    Syntax = /(one|all)\s(.*?)\sas\s(#{QuotedFragment}+)/
     
-    def initialize(tag_name, markup, tokens)          
+    def initialize(tag_name, markup, tokens)
       if markup =~ Syntax
+        @attributes = {}
+        markup.scan(TagAttributes) do |key, value|
+          @attributes[key] = value
+        end
+        
         @quantity   = $1
         @reference  = $2
         @var_name   = $3
-        @column     = $5
-        @value      = $6
-        @limit      = [[($8 || 100).to_i, 100].min, 0].max
+        @limit      = [[(@attributes['limit'] || 100).to_i, 100].min, 0].max
       else
-        raise SyntaxError.new("Syntax Error in 'load' - Valid syntax: load <one|all> <reference> as <variable_name> [where <field> == <value>] [limit to <quantity>]")
+        raise SyntaxError.new("Syntax Error in 'load' - Valid syntax: load <one|all> <reference> as <variable_name> [where: '<field> < ==|>|< > <value>'] [limit: <quantity>]")
       end
       
       super
@@ -27,22 +30,22 @@ module Liquid
       # load the taxonomy instances relation
       instances = taxonomy(context).instances
       # if we have conditions, enforce them
-      instances = instances.where(@column => value(context)) unless @column.blank?
+      instances = instances.where(conditions(context)) if conditions?
       # if we only want one
       if @quantity == 'one'
         # load the first
         instance = instances.find(:first)
         # if we found it, return it
         return NestedDb::InstanceDrop.new(instance, taxonomy_drop(context)) if instance
+        # otherwise return nil
+        nil
       # if we want many
       else
         # return an array of instances found
-        return instances.find(:all).map { |instance|
+        return instances.limit(@limit).map { |instance|
           NestedDb::InstanceDrop.new(instance, taxonomy_drop(context))
         }
       end
-      # failing anything, return nil
-      nil
     end
     
     # load the value from the context
@@ -58,6 +61,25 @@ module Liquid
     # load the taxonomy drop based on the reference
     def taxonomy_drop(context)
       context["taxonomies.#{@reference}"]
+    end
+    
+    def conditions?
+      @attributes.has_key?('where')
+    end
+    
+    def conditions(context)
+      if @attributes['where'] =~ /^(.*)\s(==|>|<)\s(.*)$/i
+        case $2
+        when '=='
+          { $1.to_sym => context[$3] }
+        when '>'
+          { $1.to_sym.gt => context[$3] }
+        when '<'
+          { $1.to_sym.lt => context[$3] }
+        end
+      else
+        {}
+      end
     end
   end
   
