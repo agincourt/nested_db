@@ -37,7 +37,7 @@ module Liquid
       # if we want many
       else
         # return an array of instances found
-        return instances.limit(@limit).find(:all).map { |instance|
+        return instances.find(:all).map { |instance|
           NestedDb::InstanceDrop.new(instance, taxonomy_drop(context))
         }
       end
