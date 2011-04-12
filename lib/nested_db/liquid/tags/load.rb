@@ -45,7 +45,7 @@ module Liquid
     
     # load the taxonomy drop based on the reference
     def taxonomy_drop(context)
-      context.scopes.last["taxonomies.#{@reference}"]
+      context["taxonomies.#{@reference}"]
     end
   end
   
