@@ -1,6 +1,6 @@
 module Liquid
   class Load < Tag
-    Syntax = /(one|all)\s(.*?)\sas\s(#{QuotedFragment}+)/
+    Syntax = /(one|all)\s([^\s]+)\sas\s([^\s]+)/
     
     def initialize(tag_name, markup, tokens)
       if markup =~ Syntax
@@ -60,7 +60,8 @@ module Liquid
     
     # load the taxonomy drop based on the reference
     def taxonomy_drop(context)
-      context["taxonomies.#{@reference}"]
+      context["taxonomies.#{@reference}"] ||
+      raise StandardError, "No taxonomy found with reference: #{@reference}"
     end
     
     def conditions?
