@@ -6,7 +6,7 @@ module Liquid
       if markup =~ Syntax
         @quantity   = $1
         @reference  = $2
-        @var_name = $3
+        @var_name   = $3
         @column     = $5
         @value      = $6
         @limit      = [[($8 || 100).to_i, 100].min, 0].max
@@ -37,7 +37,7 @@ module Liquid
       # if we want many
       else
         # return an array of instances found
-        return instances.limit(@limit).map { |instance|
+        return instances.limit(@limit).find(:all).map { |instance|
           NestedDb::InstanceDrop.new(instance, taxonomy_drop(context))
         }
       end
