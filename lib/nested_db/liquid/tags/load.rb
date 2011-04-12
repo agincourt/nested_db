@@ -5,14 +5,13 @@ module Liquid
     def initialize(tag_name, markup, tokens)
       if markup =~ Syntax
         @attributes = {}
-        markup.scan(TagAttributes) do |key, value|
-          @attributes[key] = value
-        end
-        
         @quantity   = $1
         @reference  = $2
         @var_name   = $3
-        @limit      = [[(@attributes['limit'] || 100).to_i, 100].min, 0].max
+        markup.scan(TagAttributes) do |key, value|
+          @attributes[key] = value
+        end
+        @limit = [[(@attributes['limit'] || 100).to_i, 100].min, 0].max
       else
         raise SyntaxError.new("Syntax Error in 'load' - Valid syntax: load <one|all> <reference> as <variable_name> [where: '<field> < ==|>|< > <value>'] [limit: <quantity>]")
       end
