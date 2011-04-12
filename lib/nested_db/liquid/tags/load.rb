@@ -17,34 +17,34 @@ module Liquid
     end
     
     def render(context)
-      context.scopes.last[@var_name] = var_value
+      context.scopes.last[@var_name] = var_value(context)
       ''
     end
     
     private
-    def var_value
+    def var_value(context)
       if @quantity == 'one'
-        instance = taxonomy.instances.where(@column => context_value).find(:first)
-        InstanceDrop.new(instance, taxonomy_drop) if instance
+        instance = taxonomy(context).instances.where(@column => value(context)).find(:first)
+        InstanceDrop.new(instance, taxonomy_drop(context)) if instance
       else
-        taxonomy.instances.where(@column => context_value).limit(100).map { |instance|
-          InstanceDrop.new(instance, taxonomy_drop)
+        taxonomy(context).instances.where(@column => value(context)).limit(100).map { |instance|
+          InstanceDrop.new(instance, taxonomy_drop(context))
         }
       end
     end
     
     # load the value from the context
-    def context_value
+    def value(context)
       context.scopes.last[@value]
     end
     
     # load the taxonomy from it's drop
-    def taxonomy
-      taxonomy_drop.taxonomy
+    def taxonomy(context)
+      taxonomy_drop(context).taxonomy
     end
     
     # load the taxonomy drop based on the reference
-    def taxonomy_drop
+    def taxonomy_drop(context)
       context.scopes.last["taxonomies.#{@reference}"]
     end
   end
