@@ -71,7 +71,7 @@ module Liquid
     end
     
     def conditions(context)
-      if @attributes['where'] =~ /^(.*)\s(==|>|<)\s(.*)$/i
+      if @attributes['where'] =~ /^['|"](.*)\s(==|>|<)\s(.*)['|"]$/i
         case $2
         when '=='
           { $1.to_sym => context[$3] }
