@@ -25,17 +25,18 @@ module Liquid
     def var_value(context)
       if @quantity == 'one'
         instance = taxonomy(context).instances.where(@column => value(context)).find(:first)
-        InstanceDrop.new(instance, taxonomy_drop(context)) if instance
+        return InstanceDrop.new(instance, taxonomy_drop(context)) if instance
       else
-        taxonomy(context).instances.where(@column => value(context)).limit(100).map { |instance|
+        return taxonomy(context).instances.where(@column => value(context)).limit(100).map { |instance|
           InstanceDrop.new(instance, taxonomy_drop(context))
         }
       end
+      nil
     end
     
     # load the value from the context
     def value(context)
-      context.scopes.last[@value]
+      context[@value]
     end
     
     # load the taxonomy from it's drop
