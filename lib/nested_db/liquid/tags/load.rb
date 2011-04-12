@@ -25,10 +25,10 @@ module Liquid
     def var_value(context)
       if @quantity == 'one'
         instance = taxonomy(context).instances.where(@column => value(context)).find(:first)
-        return InstanceDrop.new(instance, taxonomy_drop(context)) if instance
+        return NestedDb::InstanceDrop.new(instance, taxonomy_drop(context)) if instance
       else
         return taxonomy(context).instances.where(@column => value(context)).limit(100).map { |instance|
-          InstanceDrop.new(instance, taxonomy_drop(context))
+          NestedDb::InstanceDrop.new(instance, taxonomy_drop(context))
         }
       end
       nil
