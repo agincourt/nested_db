@@ -1,24 +1,24 @@
 module FindOneFilter
-  def find_one_by(taxonomy_drop, attribute, value)
+  def find_one_by(input, attribute, value)
     # ensure the taxonomy has the property
-    return false unless taxonomy_drop.taxonomy.has_property?(attribute)
+    return false unless input.taxonomy.has_property?(attribute)
     # try to load a result
-    result = taxonomy_drop.taxonomy.instances.where({ attribute => value }).find(:first)
+    result = input.taxonomy.instances.where({ attribute => value }).find(:first)
     # if we have a result transform into drop
-    return InstanceDrop.new(result, taxonomy_drop) if result
+    return NestedDb::InstanceDrop.new(result, input) if result
     # if no result
     return false
   end
 end
 
 module FindAllFilter
-  def find_all_by(taxonomy_drop, attribute, value, limit = 100)
+  def find_all_by(input, attribute, value, limit = 100)
     # ensure the taxonomy has the property
-    return false unless taxonomy_drop.taxonomy.has_property?(attribute)
+    return false unless input.taxonomy.has_property?(attribute)
     # try to load some results
-    taxonomy_drop.taxonomy.instances.where({ attribute => value }).limit([100, limit.to_i].min).map { |result|
+    input.taxonomy.instances.where({ attribute => value }).limit([100, limit.to_i].min).map { |result|
       # transform each result into drop
-      InstanceDrop.new(result, taxonomy_drop)
+      NestedDb::InstanceDrop.new(result, input)
     }
   end
 end
