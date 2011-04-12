@@ -17,7 +17,7 @@ module Liquid
     end
     
     def render(context)
-      context.scopes.last[@var_name] = var_value(context)
+      context[@var_name] = var_value(context)
       ''
     end
     
