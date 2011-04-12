@@ -1,16 +1,17 @@
 module Liquid
   class Load < Tag
-    Syntax = /^(one|all)\s(.*?)\sas\s(.*?)\swhere\s(.*?)\s*==\s*(.*?)$/
+    Syntax = /^(one|all)\s(.*?)\sas\s(.*?)(\swhere\s(.*?)\s*==\s*(.*?))?(\slimit\sto\s(.*?))?$/
     
     def initialize(tag_name, markup, tokens)          
       if markup =~ Syntax
         @quantity   = $1
         @reference  = $2
         @var_name = $3
-        @column     = $4
-        @value      = $5
+        @column     = $5
+        @value      = $6
+        @limit      = [[[$8 || 100].to_i, 100].min, 0].max
       else
-        raise SyntaxError.new("Syntax Error in 'load' - Valid syntax: load [one|all] [taxonomy.reference] as [variable] where [field] == [value]")
+        raise SyntaxError.new("Syntax Error in 'load' - Valid syntax: load <one|all> <reference> as <variable_name> [where <field> == <value>] [limit to <quantity>]")
       end
       
       super
@@ -27,7 +28,7 @@ module Liquid
         instance = taxonomy(context).instances.where(@column => value(context)).find(:first)
         return NestedDb::InstanceDrop.new(instance, taxonomy_drop(context)) if instance
       else
-        return taxonomy(context).instances.where(@column => value(context)).limit(100).map { |instance|
+        return taxonomy(context).instances.where(@column => value(context)).limit(@limit).map { |instance|
           NestedDb::InstanceDrop.new(instance, taxonomy_drop(context))
         }
       end
