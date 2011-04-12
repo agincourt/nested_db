@@ -24,17 +24,24 @@ module Liquid
     
     private
     def var_value(context)
+      # load the taxonomy instances relation
       instances = taxonomy(context).instances
+      # if we have conditions, enforce them
       instances = instances.where(@column => value(context)) unless @column.blank?
-      
+      # if we only want one
       if @quantity == 'one'
+        # load the first
         instance = instances.find(:first)
+        # if we found it, return it
         return NestedDb::InstanceDrop.new(instance, taxonomy_drop(context)) if instance
+      # if we want many
       else
+        # return an array of instances found
         return instances.limit(@limit).map { |instance|
           NestedDb::InstanceDrop.new(instance, taxonomy_drop(context))
         }
       end
+      # failing anything, return nil
       nil
     end
     
