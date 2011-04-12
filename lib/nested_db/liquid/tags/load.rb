@@ -9,7 +9,7 @@ module Liquid
         @var_name = $3
         @column     = $5
         @value      = $6
-        @limit      = [[[$8 || 100].to_i, 100].min, 0].max
+        @limit      = [[($8 || 100).to_i, 100].min, 0].max
       else
         raise SyntaxError.new("Syntax Error in 'load' - Valid syntax: load <one|all> <reference> as <variable_name> [where <field> == <value>] [limit to <quantity>]")
       end
