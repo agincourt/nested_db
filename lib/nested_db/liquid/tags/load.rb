@@ -59,8 +59,11 @@ module Liquid
     
     # load the taxonomy drop based on the reference
     def taxonomy_drop(context)
-      context["taxonomies.#{@reference}"] ||
-      raise StandardError, "No taxonomy found with reference: #{@reference}"
+      drop = context["taxonomies.#{@reference}"]
+      unless drop
+        raise StandardError, "No taxonomy found with reference: #{@reference}"
+      end
+      drop
     end
     
     def conditions?
