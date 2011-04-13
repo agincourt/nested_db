@@ -7,7 +7,7 @@ module NestedDb
       
       module ClassMethods
         def controller_path
-          @@view_path_override || super
+          defined?(@@view_path_override) ? @@view_path_override : super
         end
         
         def default_views!
