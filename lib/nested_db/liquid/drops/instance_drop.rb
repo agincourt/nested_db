@@ -12,7 +12,7 @@ module NestedDb
       # loop through fields
       fields.each do |k|
         self.class.send(:define_method, k.to_sym) do
-          read_attribute(k)
+          instance.respond_to?("#{k.to_s}_rich_text_processed") ? read_attribute("#{k.to_s}_rich_text_processed") : read_attribute(k)
         end                                                                                                                                                                        
       end
     end

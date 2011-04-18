@@ -15,6 +15,9 @@ module NestedDb
           # validation
           validates_presence_of :taxonomy
           validate :validate_against_taxonomy, :if => proc { |obj| obj.taxonomy.present? }
+          
+          # callbacks
+          after_validation :process_rich_text
         end
         
         base.send(:include, InstanceMethods)
@@ -37,6 +40,15 @@ module NestedDb
         end
         
         private
+        # process the rich text fields into HTML
+        def process_rich_text
+          taxonomy.physical_properties.where(:data_type => 'rich_text').each do |pp|
+            if self.send(pp.name).present?
+              self.send("#{pp.name}_rich_text_processed=", RedCloth.new(self.send(pp.name)).to_html)
+            end
+          end
+        end
+        
         def validate_against_taxonomy
           taxonomy.validate_instance(self)
         end
