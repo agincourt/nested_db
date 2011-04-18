@@ -13,6 +13,6 @@
     - for property in @taxonomy.physical_properties.ordered do
       .row
         = f.label property.name
-        = f.text_field property.name
+        = taxonomy_field(f, property)
   
   %button{ :type => 'submit' } Submit

@@ -13,13 +13,10 @@ module NestedDb
           :boolean    => Boolean,
           :date       => Date,
           :datetime   => DateTime,
-          :hash       => Hash,
           :integer    => Integer,
           :string     => String,
-          :time       => Time,
-          :has_many   => nil,
-          :has_one    => nil,
-          :belongs_to => BSON::ObjectId
+          :text       => String,
+          :time       => Time
         }
       end
       
