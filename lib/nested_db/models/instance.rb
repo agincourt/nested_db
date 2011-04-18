@@ -44,7 +44,7 @@ module NestedDb
         def process_rich_text
           taxonomy.physical_properties.where(:data_type => 'rich_text').each do |pp|
             if self.send(pp.name).present?
-              write_attribute("#{pp.name}_rich_text_processed=", RedCloth.new(self.send(pp.name)).to_html)
+              write_attribute("#{pp.name}_rich_text_processed", RedCloth.new(self.send(pp.name)).to_html)
             end
           end
         end
