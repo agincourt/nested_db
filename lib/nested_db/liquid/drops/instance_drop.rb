@@ -3,7 +3,8 @@ module NestedDb
     attr_accessor :instance
     attr_accessor :taxonomy_drop
     
-    delegate :read_attribute, :to => "instance"
+    delegate :read_attribute,     :to => "instance"
+    delegate :attribute_present?, :to => "instance"
     
     def initialize(instance, taxonomy_drop = nil)
       self.instance      = instance
@@ -12,7 +13,7 @@ module NestedDb
       # loop through fields
       fields.each do |k|
         self.class.send(:define_method, k.to_sym) do
-          instance.respond_to?("#{k.to_s}_rich_text_processed") ? read_attribute("#{k.to_s}_rich_text_processed") : read_attribute(k)
+          attribute_present?("#{k.to_s}_rich_text_processed") ? read_attribute("#{k.to_s}_rich_text_processed") : read_attribute(k)
         end                                                                                                                                                                        
       end
     end
