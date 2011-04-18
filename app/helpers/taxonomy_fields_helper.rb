@@ -2,7 +2,11 @@ module TaxonomyFieldsHelper
   def taxonomy_field(builder, property)
     case property.data_type
     when 'date'
-      builder.date_select property.name
+      builder.date_select property.name, :order => [:day, :month, :year]
+    when 'datetime'
+      builder.datetime_select property.name, :order => [:day, :month, :year]
+    when 'time'
+      builder.time_select property.name, :order => [:hours, :minutes], :ignore_date => true
     when 'text'
       builder.text_area property.name
     else

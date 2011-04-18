@@ -20,7 +20,7 @@ module NestedDb
           embeds_many     :virtual_properties, :class_name => "NestedDb::VirtualProperty"
           references_many :instances, :class_name => "NestedDb::Instance", :inverse_of => :taxonomy, :dependent => :destroy
           
-          accepts_nested_attributes_for :physical_properties
+          accepts_nested_attributes_for :physical_properties, :allow_destroy => true
           
           # callbacks
           before_validation :downcase_reference
