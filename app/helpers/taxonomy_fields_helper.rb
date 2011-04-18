@@ -7,7 +7,9 @@ module TaxonomyFieldsHelper
       builder.datetime_select property.name, :order => [:day, :month, :year]
     when 'time'
       builder.time_select property.name, :order => [:hours, :minutes], :ignore_date => true
-    when 'text'
+    when 'rich_text'
+      builder.text_area property.name, :class => 'rich'
+    when 'plain_text'
       builder.text_area property.name
     else
       builder.text_field property.name
