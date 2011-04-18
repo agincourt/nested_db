@@ -49,8 +49,8 @@ module NestedDb
           end
           
           define_method("#{ref}=") do |value|
-            self.scoped_id   = ref.id
-            self.scoped_type = ref.class.name
+            self.scoped_id   = value.id
+            self.scoped_type = value.class.name
           end
         end
       end
