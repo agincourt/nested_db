@@ -6,14 +6,22 @@ module NestedDb
         base.send(:include, InstanceMethods)
         
         base.class_eval do
+          cattr_accessor :scoped_to
+          
           # fields
           field :name,      :required => true
           field :reference, :required => true
+          field :scoped_type
+          field :scoped_id
           
           # validation
           validates_format_of :reference,
             :with    => /^[\w\-]+$/,
             :message => 'may only contain lowercase letters, numbers, hyphons and underscores'
+          validates_uniqueness_of :reference,
+            :scope => [:scoped_type, :scoped_id]
+          validates_presence_of :scoped_id,   :if => proc { |obj| obj.class.scoped? }
+          validates_presence_of :scoped_type, :if => proc { |obj| obj.class.scoped? }
           
           # associations
           embeds_many     :physical_properties, :class_name => "NestedDb::PhysicalProperty"
@@ -27,7 +35,30 @@ module NestedDb
         end
       end
       
+      module ClassMethods
+        def scoped?
+          !!scoped_to
+        end
+        
+        def scope_to(ref)
+          self.scoped_to = ref
+          
+          define_method(ref) do
+            scoped_object
+          end
+          
+          define_method("#{ref}=") do |value|
+            self.scoped_id   = ref.id
+            self.scoped_type = ref.class.name
+          end
+        end
+      end
+      
       module InstanceMethods
+        def scoped_object
+          scoped_type.classify.constantize.find(scoped_id)
+        end
+        
         def has_property?(name)
           physical_properties.where(:name => name.to_s).count > 0
         end
