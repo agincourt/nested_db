@@ -3,6 +3,7 @@ module NestedDb
     module Taxonomy
       def self.included(base)
         base.send(:include, ::Mongoid::Document)
+        base.extend ClassMethods
         base.send(:include, InstanceMethods)
         
         base.class_eval do
