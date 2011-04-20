@@ -26,6 +26,9 @@ module NestedDb
         
         def create
           @taxonomy = taxonomy_scope.new(params[:nested_db_taxonomy])
+          if @taxonomy.class.scoped?
+            @taxonomy.send("#{@taxonomy.class.scoped_to.to_s}=", scope_parent)
+          end
           
           case params[:activity]
           when 'add_physical_property'
