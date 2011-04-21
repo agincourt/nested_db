@@ -17,7 +17,8 @@ module NestedDb
           :string     => String,
           :rich_text  => String,
           :plain_text => String,
-          :time       => Time
+          :time       => Time,
+          :file       => String
         }
       end
       

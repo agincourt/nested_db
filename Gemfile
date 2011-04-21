@@ -10,7 +10,12 @@ gem 'mongoid',  '>= 2.0.0'
 # Templating
 gem 'haml',     '>= 3.1.0.alpha.147'
 gem 'liquid',   '>= 2.2.2'
-gem 'RedCloth', '4.2.7', :require => 'redcloth'
+gem 'RedCloth', '>= 4.2.7', :require => 'redcloth'
+
+# File uploads
+gem 'carrierwave', '>= 0.5.3'
+gem 'mini_magick', '>= 3.2'
+gem 'fog',         '>= 0.7.2'
 
 # Testing
 group :test do
