@@ -38,7 +38,7 @@ module NestedDb
           end
           
           respond_with(@taxonomy) do |wants|
-            wants.html { @taxonomy.persisted? ? redirect_to({ :action => :index }, :notice => 'Taxonomy created.') : render(:new) }
+            wants.html { @taxonomy.persisted? ? redirect_to({ :action => :show, :id => @taxonomy.id }, :notice => 'Taxonomy created.') : render(:new) }
           end
         end
         
