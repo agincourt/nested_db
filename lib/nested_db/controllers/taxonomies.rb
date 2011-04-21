@@ -27,7 +27,11 @@ module NestedDb
         def create
           @taxonomy = taxonomy_scope.new(params[:nested_db_taxonomy])
           if @taxonomy.class.scoped?
+            Rails.logger.debug "TAXONOMY SCOPED"
+            Rails.logger.debug "Setting #{@taxonomy.class.scoped_to.to_s}= to #{scope_parent.class.name.to_s} #{scope_parent.id}"
             @taxonomy.send("#{@taxonomy.class.scoped_to.to_s}=", scope_parent)
+          else
+            Rails.logger.debug "TAXONOMY NOT SCOPED"
           end
           
           case params[:activity]

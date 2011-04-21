@@ -49,15 +49,18 @@ module NestedDb
           end
           
           define_method("#{ref}=") do |value|
-            self.scoped_id   = value.id
-            self.scoped_type = value.class.name
+            # only allow setting of scope on new records
+            if new_record?
+              self.scoped_id   = value.id
+              self.scoped_type = value.class.name
+            end
           end
         end
       end
       
       module InstanceMethods
         def scoped_object
-          scoped_type.classify.constantize.find(scoped_id)
+          scoped_type.classify.constantize.find(scoped_id) if self.class.scoped?
         end
         
         def has_property?(name)
