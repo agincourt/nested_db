@@ -6,9 +6,9 @@ Gem::Specification.new do |s|
   s.version = "0.0.1"
   s.authors = ['Ryan Townsend']
   
-  s.add_dependency("mongo",    ["= 1.2.4"])
-  s.add_dependency("bson_ext", ["= 1.2.4"])
-  s.add_dependency("mongoid",  ["= 2.0.0"])
+  s.add_dependency("mongo",    ["= 1.3.0"])
+  s.add_dependency("bson_ext", ["= 1.3.0"])
+  s.add_dependency("mongoid",  ["= 2.0.1"])
                                  
   s.add_dependency("haml",     ["= 3.1.0.alpha.147"])
   s.add_dependency("liquid",   ["= 2.2.2"])
