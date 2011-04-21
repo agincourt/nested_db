@@ -33,7 +33,8 @@ module NestedDb
           if taxonomy && taxonomy.has_property?(method)
             read_attribute(method)
           elsif taxonomy && method.to_s =~ /^(.*)\=$/ && taxonomy.has_file_property?($1)
-            write_file_attribute($1, args.first)
+            puts "FILE PROPERTY: #{$1}"
+            #write_file_attribute($1, args.first)
           else
             super(method, args)
           end
