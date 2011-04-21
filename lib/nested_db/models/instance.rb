@@ -43,7 +43,7 @@ module NestedDb
           @pending_files ||= {}
           @pending_files.merge!(name => value)
           # write the value
-          write_attribute(name, value)
+          write_attribute(name, File.basename(value.path))
         end
         
         # allows for typecasting on the dynamic taxonomy fields
