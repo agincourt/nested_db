@@ -32,9 +32,6 @@ module NestedDb
         def method_missing(method, *args)
           if taxonomy && taxonomy.has_property?(method)
             read_attribute(method)
-          elsif taxonomy && method.to_s =~ /^(.*)\=$/ && taxonomy.has_file_property?($1)
-            puts "FILE PROPERTY: #{$1}"
-            #write_file_attribute($1, args.first)
           else
             super(method, args)
           end
@@ -55,6 +52,15 @@ module NestedDb
         end
         
         private
+        # overwrite process attribute to allow for non-typical file types
+        def process_attribute(name, value)
+          if taxonomy && taxonomy.has_file_property?(name)
+            write_file_attribute(name, value)
+          else
+            super(name, value)
+          end
+        end
+        
         # process the rich text fields into HTML
         def process_rich_text
           taxonomy.physical_properties.where(:data_type => 'rich_text').each do |pp|
