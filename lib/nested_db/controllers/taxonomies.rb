@@ -53,7 +53,7 @@ module NestedDb
           end
           
           respond_with(@taxonomy) do |wants|
-            wants.html { @saved && @taxonomy.errors.empty? ? redirect_to({ :action => :index }, :notice => 'Taxonomy updated.') : render(:edit) }
+            wants.html { @saved && @taxonomy.errors.empty? ? redirect_to({ :action => :show, :id => @taxonomy.id }, :notice => 'Taxonomy updated.') : render(:edit) }
           end
         end
         
