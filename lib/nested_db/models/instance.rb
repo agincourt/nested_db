@@ -65,11 +65,11 @@ module NestedDb
         
         # process the uploaded files
         def process_file_uploads
-          @pending_files.each do |name,file|
+          (@pending_files || {}).each do |name,file|
             uploader = NestedDb::InstanceFileUploader.new(self, name)
             uploader.store!(file)
             write_attribute(name, uploader.url)
-          end if @pending_files
+          end
         end
         
         def validate_against_taxonomy
