@@ -27,7 +27,11 @@ module NestedDb
         end
         
         def create
-          respond_with(@instance = @taxonomy.instances.create(params[:nested_db_instance])) do |wants|
+          @instance            = @taxonomy.instances.build
+          @instance.attributes = params[:nested_db_instance]
+          @instance.save
+          
+          respond_with(@instance) do |wants|
             wants.html {
               if @instance.persisted?
                 redirect_to(taxonomy_relative_to_instance_url, :notice => "#{@taxonomy.name.titleize} created!")
