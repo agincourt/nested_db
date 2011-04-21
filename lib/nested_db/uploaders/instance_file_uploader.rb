@@ -1,4 +1,6 @@
 # encoding: utf-8
+require 'carrierwave'
+require 'mini_magick'
 
 class NestedDb::InstanceFileUploader < CarrierWave::Uploader::Base
   include CarrierWave::MiniMagick
