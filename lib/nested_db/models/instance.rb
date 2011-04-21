@@ -20,6 +20,7 @@ module NestedDb
           
           # callbacks
           after_validation :process_rich_text
+          after_validation :process_file_uploads
         end
         
         base.send(:include, InstanceMethods)
@@ -31,9 +32,20 @@ module NestedDb
         def method_missing(method, *args)
           if taxonomy && taxonomy.has_property?(method)
             read_attribute(method)
+          elsif taxonomy && method.to_s =~ /^(.*)\=$/ && taxonomy.has_file_property?($1)
+            write_file_attribute($1, args.first)
           else
             super(method, args)
           end
+        end
+        
+        # stores files temporarily for processing
+        def write_file_attribute(name, value)
+          # store the file
+          @pending_files ||= {}
+          @pending_files.merge!(name => value)
+          # write the value
+          write_attribute(name, value)
         end
         
         # allows for typecasting on the dynamic taxonomy fields
@@ -48,6 +60,15 @@ module NestedDb
             if self.send(pp.name).present?
               write_attribute("#{pp.name}_rich_text_processed", RedCloth.new(self.send(pp.name)).to_html)
             end
+          end
+        end
+        
+        # process the uploaded files
+        def process_file_uploads
+          @pending_files.each do |name,file|
+            uploader = NestedDb::InstanceFileUploader.new(self, name)
+            uploader.store!(file)
+            write_attribute(name, uploader.url)
           end
         end
         

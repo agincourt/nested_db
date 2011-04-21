@@ -66,6 +66,10 @@ module NestedDb
         def has_property?(name)
           physical_properties.where(:name => name.to_s).count > 0
         end
+        
+        def has_file_property?(name)
+          physical_properties.where(:name => name.to_s, :data_type => 'file').count > 0
+        end
   
         def property_fields
           (
