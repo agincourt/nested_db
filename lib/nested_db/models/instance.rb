@@ -69,7 +69,7 @@ module NestedDb
             uploader = NestedDb::InstanceFileUploader.new(self, name)
             uploader.store!(file)
             write_attribute(name, uploader.url)
-          end
+          end if @pending_files
         end
         
         def validate_against_taxonomy
