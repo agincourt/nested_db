@@ -73,10 +73,14 @@ module NestedDb
           property = taxonomy.physical_properties.where(:name => property).first
           # if we found a property and it's a belongs_to one
           if property && property.data_type == 'belongs_to'
-            value = taxonomy.global_scope.where(:reference => property.association_taxonomy).find(value)
+            t = taxonomy.global_scope.where(:reference => property.association_taxonomy).first
+            value = t.instances.find(value) if t
           end
           # return the value
           value
+        rescue Mongoid::Errors::DocumentNotFound => e
+          Rails.logger.debug "#{e.class.name.to_s} => #{e.message}"
+          nil
         end
         
         # overwrite process attribute to allow for non-typical file types
