@@ -30,7 +30,7 @@ module NestedDb
       
       module ClassMethods
         def image_variation(input, variation = nil)
-          input.gsub(/^(.*)\/(.*?)$/, "\\1/#{variation.to_s}_\\2") if variation
+          input.gsub(/^(.*)\/(.*?)(\?\d+)?$/, "\\1/#{variation.to_s}_\\2") if variation
           input
         end
       end
