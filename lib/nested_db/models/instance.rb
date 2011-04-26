@@ -23,7 +23,15 @@ module NestedDb
           after_validation :process_file_uploads
         end
         
+        base.extend ClassMethods
         base.send(:include, InstanceMethods)
+      end
+      
+      module ClassMethods
+        def image_variation(input, variation = nil)
+          input.gsub(/^(.*)\/(.*?)$/, "\\1/#{variation.to_s}_\\2") if variation
+          input
+        end
       end
       
       module InstanceMethods
