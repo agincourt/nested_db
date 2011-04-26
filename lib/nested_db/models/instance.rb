@@ -8,6 +8,8 @@ module NestedDb
         base.send(:include, ::Mongoid::MultiParameterAttributes)
         
         base.class_eval do
+          extend ClassMethods
+          
           # we don't want the delegation method
           remove_method :fields
           
@@ -23,7 +25,6 @@ module NestedDb
           after_validation :process_file_uploads
         end
         
-        base.extend ClassMethods
         base.send(:include, InstanceMethods)
       end
       
