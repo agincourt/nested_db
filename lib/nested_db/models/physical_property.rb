@@ -48,7 +48,7 @@ module NestedDb
                     taxonomy.scoped_object.taxonomies.map(&:reference) :
                     NestedDb::Taxonomy.all.map(&:reference)
           Rails.logger.debug "Choices: #{choices.join(", ")}"
-          Rails.logger.deubg "Association taxonomy: #{association_taxonomy}"
+          Rails.logger.debug "Association taxonomy: #{association_taxonomy}"
           self.errors.add(:association_taxonomy, "must be selected") unless choices.include?(association_taxonomy)
         end
       end
