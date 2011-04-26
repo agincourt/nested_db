@@ -40,12 +40,17 @@ module NestedDb
         # physically defined yet
         def method_missing(method, *args)
           if taxonomy && taxonomy.has_property?(method)
-            value = read_attribute(method)
-            value = load_belongs_to_association(method, value) if value.kind_of?(BSON::ObjectId)
-            value
+            read_attribute(method)
           else
             super(method, args)
           end
+        end
+        
+        # loads associated attribute
+        def read_association(method)
+          value = read_attribute(method)
+          value = load_belongs_to_association(method, value) if value.kind_of?(BSON::ObjectId)
+          value
         end
         
         # stores files temporarily for processing
