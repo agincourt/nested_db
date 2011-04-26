@@ -3,6 +3,9 @@ module NestedDb
     module Scoping
       def self.included(base)
         base.send(:include, InstanceMethods)
+        base.class_eval do
+          helper_method :taxonomy_scope
+        end
       end
     end
     
