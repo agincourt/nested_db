@@ -24,7 +24,7 @@ module NestedDb
           validates_inclusion_of :data_type,
             :in => available_data_types
           validate :validate_inclusion_of_association_taxonomy_in_taxonomies,
-            :if => proc { |obj| 'belongs_to' == obj.data_type && obj.taxonomy }
+            :if => proc { |obj| 'belongs_to' == obj.data_type }
         end
       end
       
@@ -47,6 +47,8 @@ module NestedDb
                     taxonomy.scoped_object ?
                     taxonomy.scoped_object.taxonomies.map(&:reference) :
                     NestedDb::Taxonomy.all.map(&:reference)
+          Rails.logger.debug "Choices: #{choices.join(", ")}"
+          Rails.logger.deubg "Association taxonomy: #{association_taxonomy}"
           self.errors.add(:association_taxonomy, "must be selected") unless choices.include?(association_taxonomy)
         end
       end
