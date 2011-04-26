@@ -49,7 +49,8 @@
               = pp.check_box :required
               Required?
               - if 'belongs_to' == pp.object.data_type
-                = pp.select :association_taxonomy, taxonomy_scope.order(:name).map { |t| [t.id, t.name] }
+                Associated to:
+                = pp.select :association_taxonomy, taxonomy_scope.order_by(:name.asc).map { |t| [t.id, t.name] }
           - if pp.object.errors.any?
             %tr.errors
               %td{ :colspan => 3 }
