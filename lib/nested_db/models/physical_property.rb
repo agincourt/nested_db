@@ -16,6 +16,7 @@ module NestedDb
           field :table_display,        :type => Boolean, :default => true
           field :index,                :type => Integer, :default => 0, :required => true
           field :association_taxonomy, :type => String
+          field :association_property, :type => String
           
           # scopes
           scope :indexed, where(:table_display => true)
@@ -25,6 +26,8 @@ module NestedDb
             :in => available_data_types
           validate :validate_inclusion_of_association_taxonomy_in_taxonomies,
             :if => proc { |obj| 'belongs_to' == obj.data_type }
+          validate :validate_association_property_in_association_taxonomy,
+            :if => proc { |obj| obj.association_taxonomy.present? }
         end
       end
       
@@ -43,13 +46,21 @@ module NestedDb
         
         private
         def validate_inclusion_of_association_taxonomy_in_taxonomies
-          choices = taxonomy.respond_to?(:scoped_object) &&
-                    taxonomy.scoped_object ?
+          choices = taxonomy.respond_to?(:scoped_object) ?
                     taxonomy.scoped_object.taxonomies.map(&:reference) :
                     NestedDb::Taxonomy.all.map(&:reference)
-          Rails.logger.debug "Choices: #{choices.join(", ")}"
-          Rails.logger.debug "Association taxonomy: #{association_taxonomy}"
+          # check the taxonomy is available
           self.errors.add(:association_taxonomy, "must be selected") unless choices.include?(association_taxonomy)
+        end
+        
+        def validate_association_property_in_association_taxonomy
+          choices = taxonomy.respond_to?(:scoped_object) ?
+                    taxonomy.scoped_object.taxonomies.where(:reference => association_taxonomy).first.try(:physical_properties) :
+                    NestedDb::Taxonomy.where(:reference => association_taxonomy).first.try(:physical_properties)
+          # pull in names
+          choices = (choices || []).map(&:name)
+          # check property is in choices
+          self.errors.add(:association_property, "must be chosen from: #{choices.join(', ')}") unless choices.include?(association_taxonomy)
         end
       end
     end

@@ -38,7 +38,10 @@
           %tr.property
             %td= pp.text_field :index
             %td= pp.text_field :name
-            %td= pp.select :data_type, f.object.physical_properties.model_name.constantize.available_data_types.map { |d| [d.titleize, d] }
+            %td
+              = pp.select :data_type, f.object.physical_properties.model_name.constantize.available_data_types.map { |d| [d.titleize, d] }
+              = pp.select :association_taxonomy, taxonomy_scope.where(:_id.ne => f.object.id).order_by(:name.asc).map { |t| [t.name.titleize, t.reference] }, { :include_blank => '- Select One -' }, :class => "association_taxonomy #{'belongs_to' == pp.object.data_type ? '' : 'hide'}"
+              = pp.text_field :association_property, :class => "association_taxonomy #{'belongs_to' == pp.object.data_type ? '' : 'hide'}"
             %td
               = pp.check_box :_destroy
               Remove
@@ -48,9 +51,6 @@
               Display in table?
               = pp.check_box :required
               Required?
-              - if 'belongs_to' == pp.object.data_type
-                Associated to:
-                = pp.select :association_taxonomy, taxonomy_scope.order_by(:name.asc).map { |t| [t.id, t.name] }
           - if pp.object.errors.any?
             %tr.errors
               %td{ :colspan => 3 }
