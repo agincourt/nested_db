@@ -21,7 +21,7 @@ class NestedDb::InstanceFileUploader < CarrierWave::Uploader::Base
   
   def fog_directory
     if s3_cnamed
-      model.taxonomy.scope_object.nested_db_bucket
+      model.taxonomy.scoped_object.nested_db_bucket
     else
       super
     end
@@ -30,7 +30,7 @@ class NestedDb::InstanceFileUploader < CarrierWave::Uploader::Base
   
   def s3_cnamed
     model.taxonomy.class.scoped? &&
-    model.taxonomy.scope_object.respond_to?(:nested_db_bucket) &&
-    model.taxonomy.scope_object.nested_db_bucket
+    model.taxonomy.scoped_object.respond_to?(:nested_db_bucket) &&
+    model.taxonomy.scoped_object.nested_db_bucket
   end
 end
