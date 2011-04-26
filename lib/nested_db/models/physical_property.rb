@@ -60,7 +60,7 @@ module NestedDb
           # pull in names
           choices = (choices || []).map(&:name)
           # check property is in choices
-          self.errors.add(:association_property, "must be chosen from: #{choices.join(', ')}") unless choices.include?(association_taxonomy)
+          self.errors.add(:association_property, "must be chosen from: #{choices.join(', ')}") unless choices.include?(association_property)
         end
       end
     end
