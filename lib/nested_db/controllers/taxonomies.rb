@@ -22,7 +22,6 @@ module NestedDb
         end
         
         def edit; end
-        def delete; end
         
         def create
           @taxonomy = taxonomy_scope.new(params[:nested_db_taxonomy])
@@ -55,6 +54,10 @@ module NestedDb
           respond_with(@taxonomy) do |wants|
             wants.html { @saved && @taxonomy.errors.empty? ? redirect_to({ :action => :show, :id => @taxonomy.id }, :notice => 'Taxonomy updated.') : render(:edit) }
           end
+        end
+        
+        def delete
+          destroy && return if 'DELETE' == request.method
         end
         
         def destroy

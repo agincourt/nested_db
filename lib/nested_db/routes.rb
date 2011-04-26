@@ -2,9 +2,9 @@ module ActionDispatch::Routing
   class Mapper
     def nested_db(options = {})
       resources :taxonomies, :controller => options[:taxonomies_controller] || 'taxonomies' do
-        get :delete, :on => :member
+        match :delete, :on => :member, :via => [:get, :delete]
         resources :instances, :controller => options[:instances_controller] || 'taxonomies/instances' do
-          get :delete, :on => :member
+          match :delete, :on => :member, :via => [:get, :delete]
         end
       end
     end

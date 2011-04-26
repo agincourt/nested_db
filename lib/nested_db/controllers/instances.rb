@@ -26,6 +26,8 @@ module NestedDb
           @instance = @taxonomy.instances.build
         end
         
+        def edit; end
+        
         def create
           @instance            = @taxonomy.instances.build
           @instance.attributes = params[:nested_db_instance]
@@ -50,8 +52,9 @@ module NestedDb
           end
         end
         
-        def edit; end
-        def delete; end
+        def delete
+          destroy && return if 'DELETE' == request.method
+        end
         
         def destroy
           @instance.try(:destroy)
