@@ -46,17 +46,15 @@ module NestedDb
         
         private
         def validate_inclusion_of_association_taxonomy_in_taxonomies
-          choices = taxonomy.respond_to?(:scoped_object) ?
-                    taxonomy.scoped_object.taxonomies.map(&:reference) :
-                    NestedDb::Taxonomy.all.map(&:reference)
+          # load the available taxonomies
+          choices = taxonomy.global_scope.map(&:reference)
           # check the taxonomy is available
           self.errors.add(:association_taxonomy, "must be selected") unless choices.include?(association_taxonomy)
         end
         
         def validate_association_property_in_association_taxonomy
-          choices = taxonomy.respond_to?(:scoped_object) ?
-                    taxonomy.scoped_object.taxonomies.where(:reference => association_taxonomy).first.try(:physical_properties) :
-                    NestedDb::Taxonomy.where(:reference => association_taxonomy).first.try(:physical_properties)
+          # load the properties of the taxonomy
+          choices = taxonomy.global_scope.where(:reference => association_taxonomy).first.try(:physical_properties)
           # pull in names
           choices = (choices || []).map(&:name)
           # check property is in choices

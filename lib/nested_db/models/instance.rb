@@ -40,7 +40,9 @@ module NestedDb
         # physically defined yet
         def method_missing(method, *args)
           if taxonomy && taxonomy.has_property?(method)
-            read_attribute(method)
+            value = read_attribute(method)
+            value = load_belongs_to_association(method, value) if value.kind_of?(BSON::ObjectId)
+            value
           else
             super(method, args)
           end
@@ -61,6 +63,17 @@ module NestedDb
         end
         
         private
+        def load_belongs_to_association(property, value)
+          # load the property
+          property = taxonomy.physical_properties.where(:name => property).first
+          # if we found a property and it's a belongs_to one
+          if property && property.data_type == 'belongs_to'
+            value = taxonomy.global_scope.where(:reference => property.association_taxonomy).find(value)
+          end
+          # return the value
+          value
+        end
+        
         # overwrite process attribute to allow for non-typical file types
         def process_attribute(name, value)
           if taxonomy && taxonomy.has_file_property?(name)
