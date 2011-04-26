@@ -18,7 +18,8 @@ module NestedDb
           :rich_text  => String,
           :plain_text => String,
           :time       => Time,
-          :file       => String
+          :file       => String,
+          :belongs_to => BSON::ObjectId
         }
       end
       

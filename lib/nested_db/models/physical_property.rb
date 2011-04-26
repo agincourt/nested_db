@@ -12,9 +12,10 @@ module NestedDb
         
         base.class_eval do
           # fields
-          field :required,      :type => Boolean
-          field :table_display, :type => Boolean, :default => true
-          field :index,         :type => Integer, :default => 0, :required => true
+          field :required,             :type => Boolean
+          field :table_display,        :type => Boolean, :default => true
+          field :index,                :type => Integer, :default => 0, :required => true
+          field :association_taxonomy, :type => String
           
           # scopes
           scope :indexed, where(:table_display => true)
@@ -22,6 +23,14 @@ module NestedDb
           # validation
           validates_inclusion_of :data_type,
             :in => available_data_types
+          validates_inclusion_of :association_taxonomy,
+            :in => proc { |obj|
+              obj.taxonomy.respond_to?(:scoped_object) &&
+              obj.taxonomy.scoped_object ?
+              obj.taxonomy.scoped_object.taxonomies.map(&:reference) :
+              NestedDb::Taxonomy.all.map(&:reference)
+            },
+            :if => proc { |obj| 'belongs_to' == obj.data_type }
         end
       end
       
