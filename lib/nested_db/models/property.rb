@@ -9,9 +9,6 @@ module NestedDb
           field :label
           field :index, :type => Integer, :default => 0, :required => true
           
-          # associations
-          embedded_in :taxonomy, :inverse_of => name.underscore.pluralize
-          
           # scopes
           scope :ordered, order_by(:index.asc, :name.asc)
           

@@ -18,6 +18,9 @@ module NestedDb
           field :association_taxonomy, :type => String
           field :association_property, :type => String
           
+          # associations
+          embedded_in :taxonomy, :inverse_of => :physical_properties
+          
           # scopes
           scope :indexed, where(:table_display => true)
           
@@ -47,14 +50,14 @@ module NestedDb
         private
         def validate_inclusion_of_association_taxonomy_in_taxonomies
           # load the available taxonomies
-          choices = taxonomy.global_scope.map(&:reference)
+          choices = self.taxonomy.global_scope.map(&:reference)
           # check the taxonomy is available
           self.errors.add(:association_taxonomy, "must be selected") unless choices.include?(association_taxonomy)
         end
         
         def validate_association_property_in_association_taxonomy
           # load the properties of the taxonomy
-          choices = taxonomy.global_scope.where(:reference => association_taxonomy).first.try(:physical_properties)
+          choices = self.taxonomy.global_scope.where(:reference => association_taxonomy).first.try(:physical_properties)
           # pull in names
           choices = (choices || []).map(&:name)
           # check property is in choices

@@ -12,6 +12,9 @@ module NestedDb
           # fields
           field :format
           field :casing
+          
+          # associations
+          embedded_in :taxonomy, :inverse_of => :virtual_properties
   
           # validation
           validates_presence_of  :format
