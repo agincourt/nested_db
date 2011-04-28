@@ -52,7 +52,7 @@ module NestedDb
         end
         
         def foreign_taxonomy
-          taxonomy.global_scope.find_by_reference(association_taxonomy)
+          taxonomy.global_scope.where(:reference => association_taxonomy).first
         end
         
         def foreign_key

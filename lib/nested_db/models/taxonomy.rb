@@ -61,7 +61,7 @@ module NestedDb
       module InstanceMethods
         # returns a scope for finding taxonomies
         def global_scope
-          respond_to?(:scoped_object) && scoped_object ? scoped_object.taxonomies : NestedDb::Taxonomy.all
+          respond_to?(:scoped_object) && scoped_object ? scoped_object.taxonomies : NestedDb::Taxonomy
         end
         
         def scoped_object
