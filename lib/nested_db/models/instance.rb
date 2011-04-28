@@ -21,8 +21,9 @@ module NestedDb
           validate :validate_against_taxonomy, :if => proc { |obj| obj.taxonomy.present? }
           
           # callbacks
-          after_validation :process_rich_text
-          after_validation :process_file_uploads
+          before_validation :process_has_many_associations
+          after_validation  :process_rich_text
+          after_validation  :process_file_uploads
         end
         
         base.send(:include, InstanceMethods)
@@ -81,6 +82,13 @@ module NestedDb
         rescue Mongoid::Errors::DocumentNotFound => e
           Rails.logger.debug "#{e.class.name.to_s} => #{e.message}"
           nil
+        end
+        
+        # 
+        def process_has_many_associations
+          #taxonomy.physical_properties.where(:data_type => 'has_many').each do |pp|
+          #  
+          #end
         end
         
         # overwrite process attribute to allow for non-typical file types

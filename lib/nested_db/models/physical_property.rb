@@ -30,9 +30,11 @@ module NestedDb
           validates_inclusion_of :data_type,
             :in => available_data_types
           validate :validate_inclusion_of_association_taxonomy_in_taxonomies,
-            :if => proc { |obj| 'belongs_to' == obj.data_type }
+            :if => proc { |obj| ['belongs_to', 'has_many'].include?(obj.data_type) }
           validate :validate_association_property_in_association_taxonomy,
-            :if => proc { |obj| obj.association_taxonomy.present? }
+            :if => proc { |obj| obj.association_taxonomy.present? && 'belongs_to' == obj.data_type }
+          validate :validate_association_property_in_association_taxonomy_belongs_to,
+            :if => proc { |obj| obj.association_taxonomy.present? && 'has_many' == obj.data_type }
         end
       end
       
@@ -60,6 +62,15 @@ module NestedDb
         def validate_association_property_in_association_taxonomy
           # load the properties of the taxonomy
           choices = self.taxonomy.global_scope.where(:reference => association_taxonomy).first.try(:physical_properties)
+          # pull in names
+          choices = (choices || []).map(&:name)
+          # check property is in choices
+          self.errors.add(:association_property, "must be chosen from: #{choices.join(', ')}") unless choices.include?(association_property)
+        end
+        
+        def validate_association_property_in_association_taxonomy_belongs_to
+          # load the belongs to properties of the taxonomy
+          choices = self.taxonomy.global_scope.where(:reference => association_taxonomy).first.try(:physical_properties).try(:where, :data_type => 'belongs_to')
           # pull in names
           choices = (choices || []).map(&:name)
           # check property is in choices

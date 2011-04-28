@@ -19,7 +19,8 @@ module NestedDb
           :plain_text => String,
           :time       => Time,
           :file       => String,
-          :belongs_to => BSON::ObjectId
+          :belongs_to => BSON::ObjectId,
+          :has_many   => Hash
         }
       end
       
