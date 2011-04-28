@@ -70,9 +70,9 @@ module NestedDb
         
         def validate_association_property_in_association_taxonomy_belongs_to
           # load the belongs to properties of the taxonomy
-          choices = self.taxonomy.global_scope.where(:reference => association_taxonomy).first.try(:physical_properties).try(:where, :data_type => 'belongs_to')
+          choices = self.taxonomy.global_scope.where(:reference => association_taxonomy).first.try(:physical_properties)
           # pull in names
-          choices = (choices || []).map(&:name)
+          choices = (choices || []).select { |p| 'belongs_to' == p.data_type }.map(&:name)
           # check property is in choices
           self.errors.add(:association_property, "must be chosen from: #{choices.join(', ')}") unless choices.include?(association_property)
         end
