@@ -6,6 +6,7 @@ module NestedDb
         base.send(:include, ::Mongoid::Timestamps)
         base.send(:include, ::Mongoid::Paranoia)
         base.send(:include, ::Mongoid::MultiParameterAttributes)
+        base.send(:include, ::NestedDb::DynamicAttributes)
         
         base.class_eval do
           extend ClassMethods
@@ -37,36 +38,6 @@ module NestedDb
       end
       
       module InstanceMethods
-        # allows for readers when the attribute hasn't been
-        # physically defined yet
-        def method_missing(method, *args)
-          if taxonomy && taxonomy.has_property?(method)
-            read_attribute(method)
-          else
-            super(method, args)
-          end
-        end
-        
-        # loads associated attribute
-        def read_association(method)
-          # try to load the property
-          property = taxonomy.properties[method]
-          
-          case property.try(:data_type)
-          # if it's a belongs_to associations
-          when 'belongs_to'
-            # find the singular instance based on the input ID
-            property.foreign_taxonomy.instances.find(read_attribute(method))
-          # if it's a has_many association
-          when 'has_many'
-            # find all the instances which have this object as their 'belongs_to' value
-            property.foreign_taxonomy.instances.where(property.foreign_key => id)
-          end
-        rescue Mongoid::Errors::DocumentNotFound => e
-          Rails.logger.debug "#{e.class.name.to_s} => #{e.message}"
-          nil
-        end
-        
         # stores files temporarily for processing
         def write_file_attribute(name, value)
           # store the file
