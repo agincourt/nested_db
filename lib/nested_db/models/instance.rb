@@ -6,7 +6,6 @@ module NestedDb
         base.send(:include, ::Mongoid::Timestamps)
         base.send(:include, ::Mongoid::Paranoia)
         base.send(:include, ::Mongoid::MultiParameterAttributes)
-        base.send(:include, ::NestedDb::DynamicAttributes)
         
         base.class_eval do
           extend ClassMethods
@@ -28,6 +27,7 @@ module NestedDb
         end
         
         base.send(:include, InstanceMethods)
+        base.send(:include, DynamicAttributes)
       end
       
       module ClassMethods
