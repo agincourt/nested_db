@@ -37,31 +37,8 @@ module NestedDb
         end
       end
       
-      module InstanceMethods
-        # stores files temporarily for processing
-        def write_file_attribute(name, value)
-          # store the file
-          @pending_files ||= {}
-          @pending_files.merge!(name => value)
-          # write the value
-          write_attribute(name, File.basename(value.path))
-        end
-        
-        # allows for typecasting on the dynamic taxonomy fields
-        def fields
-          self.class.fields.reverse_merge(taxonomy.try(:property_fields) || {})
-        end
-        
+      module InstanceMethod
         private
-        # overwrite process attribute to allow for non-typical file types
-        def process_attribute(name, value)
-          if taxonomy && taxonomy.has_file_property?(name)
-            write_file_attribute(name, value)
-          else
-            super(name, value)
-          end
-        end
-        
         # process the rich text fields into HTML
         def process_rich_text
           taxonomy.physical_properties.where(:data_type => 'rich_text').each do |pp|
