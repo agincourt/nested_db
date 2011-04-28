@@ -49,9 +49,22 @@ module NestedDb
         
         # loads associated attribute
         def read_association(method)
-          value = read_attribute(method)
-          value = load_belongs_to_association(method, value) if value.kind_of?(BSON::ObjectId)
-          value
+          # try to load the property
+          property = taxonomy.properties[method]
+          
+          case property.try(:data_type)
+          # if it's a belongs_to associations
+          when 'belongs_to'
+            # find the singular instance based on the input ID
+            property.foreign_taxonomy.instances.find(read_attribute(method))
+          # if it's a has_many association
+          when 'has_many'
+            # find all the instances which have this object as their 'belongs_to' value
+            property.foreign_taxonomy.instances.where(property.foreign_key => id)
+          end
+        rescue Mongoid::Errors::DocumentNotFound => e
+          Rails.logger.debug "#{e.class.name.to_s} => #{e.message}"
+          nil
         end
         
         # stores files temporarily for processing
@@ -69,28 +82,6 @@ module NestedDb
         end
         
         private
-        def load_belongs_to_association(property, value)
-          # load the property
-          property = taxonomy.physical_properties.where(:name => property).first
-          # if we found a property and it's a belongs_to one
-          if property && property.data_type == 'belongs_to'
-            t = taxonomy.global_scope.where(:reference => property.association_taxonomy).first
-            value = t.instances.find(value) if t
-          end
-          # return the value
-          value
-        rescue Mongoid::Errors::DocumentNotFound => e
-          Rails.logger.debug "#{e.class.name.to_s} => #{e.message}"
-          nil
-        end
-        
-        # 
-        def process_has_many_associations
-          #taxonomy.physical_properties.where(:data_type => 'has_many').each do |pp|
-          #  
-          #end
-        end
-        
         # overwrite process attribute to allow for non-typical file types
         def process_attribute(name, value)
           if taxonomy && taxonomy.has_file_property?(name)

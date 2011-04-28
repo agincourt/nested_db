@@ -69,7 +69,7 @@ module NestedDb
         end
         
         def has_property?(name)
-          physical_properties.where(:name => name.to_s).count > 0
+          !!properties[name.to_s]
         end
         
         def has_file_property?(name)
@@ -87,6 +87,13 @@ module NestedDb
           physical_properties.each { |p|
             p.validate_instance(instance)
           }
+        end
+        
+        def properties
+          (
+            Array(physical_properties) +
+            Array(virtual_properties)
+          ).inject({}) { |hash,p| hash.reverse_merge(p.name => p) }
         end
   
         private

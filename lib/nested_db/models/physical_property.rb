@@ -51,6 +51,14 @@ module NestedDb
           Mongoid::Field.new(name, :type => self.class.data_types[data_type.to_sym], :required => required?)
         end
         
+        def foreign_taxonomy
+          taxonomy.global_scope.find_by_reference(association_taxonomy)
+        end
+        
+        def foreign_key
+          association_property
+        end
+        
         private
         def validate_inclusion_of_association_taxonomy_in_taxonomies
           # load the available taxonomies
