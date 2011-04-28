@@ -19,7 +19,9 @@ module NestedDb
           field :association_property, :type => String
           
           # associations
-          embedded_in :taxonomy, :inverse_of => :physical_properties
+          embedded_in :taxonomy,
+            :inverse_of => :physical_properties,
+            :class_name => "NestedDb::Taxonomy"
           
           # scopes
           scope :indexed, where(:table_display => true)

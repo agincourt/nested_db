@@ -14,7 +14,9 @@ module NestedDb
           field :casing
           
           # associations
-          embedded_in :taxonomy, :inverse_of => :virtual_properties
+          embedded_in :taxonomy,
+            :inverse_of => :physical_properties,
+            :class_name => "NestedDb::Taxonomy"
   
           # validation
           validates_presence_of  :format
