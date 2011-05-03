@@ -2,15 +2,17 @@
 module Mongoid #:nodoc:
   module Relations #:nodoc:
     class Many < Proxy
-      # simply processes a callback
-      def build_with_callback
-        run_callbacks(:build) { self }
+      include Mongoid::Extensions::BuildCallbacks
+    end
+  end
+  
+  module Extensions
+    module BuildCallbacks
+      def build(attributes = {}, type = nil, &block)
+        item = super
+        item.run_callbacks(:build)
+        item
       end
-      
-      # call build_callback after build
-      alias_method_chain :build, :callback
-      
-      define_model_callbacks :build, :only => :after
     end
   end
 end
