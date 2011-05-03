@@ -12,6 +12,7 @@ module NestedDb
       
       # intercept read_attribute and check for associations
       def read_attribute(method)
+        Rails.logger.debug "Read Attribute: #{method}"
         # try to load the property
         property = taxonomy.properties[method]
         # if we found one, check it's data type (nil defaults to else)
