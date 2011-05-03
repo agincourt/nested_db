@@ -31,6 +31,10 @@ module NestedDb
       end
       
       module InstanceMethods
+        def field_type
+          NestedDb::DataTypes.data_types[data_type]
+        end
+        
         def label
           read_attribute(:label) || read_attribute(:name)
         end

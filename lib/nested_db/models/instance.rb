@@ -21,14 +21,11 @@ module NestedDb
           validate :validate_against_taxonomy, :if => proc { |obj| obj.taxonomy.present? }
           
           # callbacks
-          before_validation :process_has_many_associations
           after_validation  :process_rich_text
-          after_validation  :process_file_uploads
         end
         
         base.send(:include, InstanceMethods)
         base.send(:include, DynamicAttributes)
-        base.send(:include, DynamicAssociations)
       end
       
       module ClassMethods
