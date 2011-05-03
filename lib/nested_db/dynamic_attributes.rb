@@ -2,15 +2,23 @@ module NestedDb
   module DynamicAttributes
     def self.included(base)
       base.send(:include, InstanceMethods)
+      # setup our callbacks
       base.class_eval do
-        after_build      :extend_based_on_taxonomy
-        after_initialize :extend_based_on_taxonomy,
-          :if => proc { |obj| obj.taxonomy }
+        
+        after_build do
+          extend_based_on_taxonomy
+        end
+        
+        after_initialize do
+          extend_based_on_taxonomy if taxonomy
+        end
+        
       end
     end
     
     module InstanceMethods
       protected
+      # dynamically adds fields for each of the taxonomy's properties
       def extend_based_on_taxonomy
         
         # load the metaclass
