@@ -10,8 +10,6 @@ module NestedDb
     module InstanceMethods
       protected
       def extend_based_on_taxonomy
-        # setup a blank array to store append strings
-        appends = []
         # load the metaclass
         metaclass = class << self; self; end
         # loop through each property
@@ -19,23 +17,34 @@ module NestedDb
           case property.data_type
           # if it's a has_many property
           when 'has_many'
-            appends << "has_many :#{property.name}, :class_name  => 'NestedDb::Instance', :foreign_key => :#{property.association_property}"
+            metaclass.class_eval <<-END
+              has_many :#{property.name},
+                :class_name  => 'NestedDb::Instance',
+                :foreign_key => :#{property.association_property}
+            END
           # if it's a belongs_to property
           when 'belongs_to'
-            appends << "belongs_to :#{property.name}, :class_name => 'NestedDb::Instance', :required   => #{property.required? ? 'true' : 'false'}"
+            metaclass.class_eval <<-END
+              belongs_to :#{property.name},
+                :class_name => 'NestedDb::Instance',
+                :required   => #{property.required? ? 'true' : 'false'}
+            END
           # if it's a file property
           when 'file'
             # mount carrierwave
-            appends << "mount_uploader :#{property.name}, NestedDb::InstanceFileUploader"
+            metaclass.class_eval <<-END
+              mount_uploader :#{property.name}, NestedDb::InstanceFileUploader
+            END
           # if it's a normal property (string etc)
           else
-            appends << "field :#{property.name}, :type => #{property.field_type.name}, :required => #{property.required? ? 'true' : 'false'}"
+            metaclass.class_eval <<-END
+              field :#{property.name},
+                :type     => #{property.field_type.name},
+                :required => #{property.required? ? 'true' : 'false'}
+            END
           end
+          Rails.logger.debug "Appending field name: #{property.name}"
         end
-        
-        metaclass.class_eval appends.join("\n")
-        
-        return appends.join("\n")
       end
     end
   end
