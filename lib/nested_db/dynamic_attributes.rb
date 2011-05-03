@@ -10,6 +10,8 @@ module NestedDb
     module InstanceMethods
       protected
       def extend_based_on_taxonomy
+        # setup a blank array to store append strings
+        appends = []
         # load the metaclass
         metaclass = class << self; self; end
         # loop through each property
@@ -17,20 +19,23 @@ module NestedDb
           case property.data_type
           # if it's a has_many property
           when 'has_many'
-            metaclass.class_eval "has_many :#{property.name}, :class_name  => 'NestedDb::Instance', :foreign_key => :#{property.association_property}"
+            appends << "has_many :#{property.name}, :class_name  => 'NestedDb::Instance', :foreign_key => :#{property.association_property}"
           # if it's a belongs_to property
           when 'belongs_to'
-            metaclass.class_eval "belongs_to :#{property.name}, :class_name => 'NestedDb::Instance', :required   => #{property.required? ? 'true' : 'false'}"
+            appends << "belongs_to :#{property.name}, :class_name => 'NestedDb::Instance', :required   => #{property.required? ? 'true' : 'false'}"
           # if it's a file property
           when 'file'
             # mount carrierwave
-            metaclass.class_eval "mount_uploader :#{property.name}, NestedDb::InstanceFileUploader"
+            appends << "mount_uploader :#{property.name}, NestedDb::InstanceFileUploader"
           # if it's a normal property (string etc)
           else
-            metaclass.class_eval "field :#{property.name}, :type => #{property.field_type.name}, :required => #{property.required? ? 'true' : 'false'}"
+            appends << "field :#{property.name}, :type => #{property.field_type.name}, :required => #{property.required? ? 'true' : 'false'}"
           end
         end
         
+        metaclass.class_eval appends.join("\n")
+        
+        return appends.join("\n")
       end
     end
   end
