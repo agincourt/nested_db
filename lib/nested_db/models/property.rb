@@ -32,7 +32,7 @@ module NestedDb
       
       module InstanceMethods
         def field_type
-          self.class.data_types[data_type]
+          self.class.data_types[data_type.to_sym] || String
         end
         
         def label
