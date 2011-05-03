@@ -28,6 +28,7 @@ module NestedDb
         
         base.send(:include, InstanceMethods)
         base.send(:include, DynamicAttributes)
+        base.send(:include, DynamicAssociations)
       end
       
       module ClassMethods
