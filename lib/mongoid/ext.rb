@@ -15,4 +15,10 @@ module Mongoid #:nodoc:
       include Mongoid::Extensions::BuildCallbacks
     end
   end
+  
+  module Callbacks
+    included do
+      define_model_callbacks :build
+    end
+  end
 end
