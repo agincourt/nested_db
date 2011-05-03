@@ -24,7 +24,6 @@ module NestedDb
       module InstanceMethods
         def new
           @instance = @taxonomy.instances.build
-          @instance.send(:extend_based_on_taxonomy)
         end
         
         def edit; end
