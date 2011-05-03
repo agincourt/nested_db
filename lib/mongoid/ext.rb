@@ -4,7 +4,7 @@ module Mongoid #:nodoc:
     module BuildCallbacks
       def build(attributes = {}, type = nil, &block)
         doc = super
-        doc.run_callbacks(:build) { item }
+        doc.run_callbacks(:build) { doc }
         doc
       end
     end
