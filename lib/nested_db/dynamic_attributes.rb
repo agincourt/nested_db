@@ -27,7 +27,7 @@ module NestedDb
             metaclass.class_eval "mount_uploader :#{property.name}, NestedDb::InstanceFileUploader"
           # if it's a normal property (string etc)
           else
-            metaclass.class_eval "field :#{property.name}, :type => #{property.field_type}, :required => #{property.required? ? 'true' : 'false'}"
+            metaclass.class_eval "field :#{property.name}, :type => #{property.field_type.name}, :required => #{property.required? ? 'true' : 'false'}"
           end
         end
         
