@@ -10,12 +10,6 @@ module NestedDb
     module InstanceMethods
       protected
       def extend_based_on_taxonomy
-        if taxonomy
-          Rails.logger.debug "after_build: Taxonomy found"
-        else
-          Rails.logger.debug "after_build: Taxonomy not found"
-          return nil
-        end
         # load the metaclass
         metaclass = class << self; self; end
         # loop through each property

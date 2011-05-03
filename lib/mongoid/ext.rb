@@ -3,9 +3,9 @@ module Mongoid #:nodoc:
   module Extensions
     module BuildCallbacks
       def build(attributes = {}, type = nil, &block)
-        item = super
-        item.run_callbacks(:build)
-        item
+        doc = super
+        doc.run_callbacks(:build) { item }
+        doc
       end
     end
   end
@@ -20,7 +20,7 @@ module Mongoid #:nodoc:
     def self.included(base)
       super
       base.class_eval do
-        define_model_callbacks :build
+        define_model_callbacks :build, :only => :after
       end
     end
   end
