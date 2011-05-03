@@ -12,11 +12,11 @@ module NestedDb
     module InstanceMethods
       # allows for typecasting on the dynamic taxonomy fields
       def fields
-        super.merge(dynamic_associations.inject({}) { |hash,name,metadata|
+        super().merge(dynamic_associations.inject({}) { |fields,name,metadata|
           if metadata.relation.stores_foreign_key?
-            hash.merge!(name => Mongoid::Field.new(name, :identity => true, :metadata => metadata, :default => metadata.foreign_key_default, :required => property.required?))
+            fields.merge!(name => Mongoid::Field.new(name, :identity => true, :metadata => metadata, :default => metadata.foreign_key_default, :required => property.required?))
           end
-          hash
+          fields
         })
       end
       
