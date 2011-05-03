@@ -2,6 +2,7 @@
 module Mongoid #:nodoc:
   module Extensions
     module BuildCallbacks
+      # patches the build method to include running the after_build callback
       def build(attributes = {}, type = nil, &block)
         doc = super
         Rails.logger.debug "RUNNING BUILD CALLBACKS"
@@ -9,12 +10,6 @@ module Mongoid #:nodoc:
         Rails.logger.debug "BUILD CALLBACKS COMPLETE"
         doc
       end
-    end
-  end
-  
-  module Relations #:nodoc:
-    class Many < Proxy
-      include Mongoid::Extensions::BuildCallbacks
     end
   end
   
@@ -26,4 +21,9 @@ module Mongoid #:nodoc:
       end
     end
   end
+end
+
+# patch the build method
+Mongoid::Relations::Many.class_eval do
+  include Mongoid::Extensions::BuildCallbacks
 end
