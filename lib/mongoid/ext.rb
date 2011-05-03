@@ -17,8 +17,11 @@ module Mongoid #:nodoc:
   end
   
   module Callbacks
-    included do
-      define_model_callbacks :build
+    def self.included(base)
+      super
+      base.class_eval do
+        define_model_callbacks :build
+      end
     end
   end
 end
