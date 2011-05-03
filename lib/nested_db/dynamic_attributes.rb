@@ -6,10 +6,12 @@ module NestedDb
       base.class_eval do
         
         after_build do
+          Rails.logger.debug "NestedDb::DynamicAttributes after_build called"
           extend_based_on_taxonomy
         end
         
         after_initialize do
+          Rails.logger.debug "NestedDb::DynamicAttributes after_initialize called"
           extend_based_on_taxonomy if taxonomy
         end
         
