@@ -4,7 +4,9 @@ module Mongoid #:nodoc:
     module BuildCallbacks
       def build(attributes = {}, type = nil, &block)
         doc = super
+        Rails.logger.debug "RUNNING BUILD CALLBACKS"
         doc.run_callbacks(:build) { doc }
+        Rails.logger.debug "BUILD CALLBACKS COMPLETE"
         doc
       end
     end
