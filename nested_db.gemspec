@@ -17,4 +17,8 @@ Gem::Specification.new do |s|
   s.add_dependency("carrierwave", ["= 0.5.3"])
   s.add_dependency("mini_magick", ["= 3.2"])
   s.add_dependency("fog",         ["= 0.7.2"])
+  
+  s.add_development_dependency("mocha", ["= 0.9.8"])
+  s.add_development_dependency("rspec", ["~> 2.4"])
+  s.add_development_dependency("watchr", ["= 0.6"])
 end

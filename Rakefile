@@ -8,17 +8,16 @@ end
 
 require 'rake'
 require 'rake/rdoctask'
+require "rspec"
+require "rspec/core/rake_task"
 
-require 'rake/testtask'
+$LOAD_PATH.unshift File.expand_path("../lib", __FILE__)
 
-Rake::TestTask.new(:test) do |t|
-  t.libs << 'lib'
-  t.libs << 'test'
-  t.pattern = 'test/**/*_test.rb'
-  t.verbose = false
+Rspec::Core::RakeTask.new(:spec) do |spec|
+  spec.pattern = "spec/**/*_spec.rb"
 end
 
-task :default => :test
+task :default => :spec
 
 Rake::RDocTask.new(:rdoc) do |rdoc|
   rdoc.rdoc_dir = 'rdoc'
