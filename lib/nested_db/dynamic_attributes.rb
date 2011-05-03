@@ -14,10 +14,6 @@ module NestedDb
       def extend_based_on_taxonomy
         # load the metaclass
         metaclass = class << self; self; end
-        metaclass.class_eval do
-          Rails.logger.debug "Class evalled this!"
-          field :name, :type => String, :required => true
-        end
         # loop through each property
         taxonomy.properties.each do |name,property|
           case property.data_type
@@ -27,6 +23,7 @@ module NestedDb
               has_many :#{property.name},
                 :class_name  => 'NestedDb::Instance',
                 :foreign_key => :#{property.association_property}
+              Rails.logger.debug "Added has_many for #{property.name}"
             END
           # if it's a belongs_to property
           when 'belongs_to'
@@ -34,23 +31,24 @@ module NestedDb
               belongs_to :#{property.name},
                 :class_name => 'NestedDb::Instance',
                 :required   => #{property.required? ? 'true' : 'false'}
+              Rails.logger.debug "Added belongs_to for #{property.name}"
             END
           # if it's a file property
           when 'file'
             # mount carrierwave
             metaclass.class_eval <<-END
               mount_uploader :#{property.name}, NestedDb::InstanceFileUploader
+              Rails.logger.debug "Added uploader for #{property.name}"
             END
           # if it's a normal property (string etc)
           else
-            #metaclass.class_eval <<-END
-            #  field :#{property.name},
-            #    :type     => #{property.field_type.name},
-            #    :required => #{property.required? ? 'true' : 'false'}
-            #END
-            metaclass.send(:field, property.name, { :type => property.field_type.name, :required => property.required? })
+            metaclass.class_eval <<-END
+              field :#{property.name},
+                :type     => #{property.field_type.name},
+                :required => #{property.required? ? 'true' : 'false'}
+              Rails.logger.debug "Added field: #{property.name}, of type: #{property.field_type.name}"
+            END
           end
-          Rails.logger.debug "Appending field name: #{property.name}"
         end
       end
     end
