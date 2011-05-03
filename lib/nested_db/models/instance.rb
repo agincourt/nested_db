@@ -10,9 +10,6 @@ module NestedDb
         base.class_eval do
           extend ClassMethods
           
-          # we don't want the delegation method
-          remove_method :fields
-          
           # associations
           referenced_in :taxonomy, :inverse_of => :instances, :class_name => "NestedDb::Taxonomy"
           
@@ -36,10 +33,6 @@ module NestedDb
       end
       
       module InstanceMethods
-        def fields
-          self.class.fields
-        end
-        
         private
         # process the rich text fields into HTML
         def process_rich_text
@@ -47,15 +40,6 @@ module NestedDb
             if self.send(pp.name).present?
               write_attribute("#{pp.name}_rich_text_processed", RedCloth.new(self.send(pp.name)).to_html)
             end
-          end
-        end
-        
-        # process the uploaded files
-        def process_file_uploads
-          (@pending_files || {}).each do |name,file|
-            uploader = NestedDb::InstanceFileUploader.new(self, name)
-            uploader.store!(file)
-            write_attribute(name, uploader.url)
           end
         end
         
