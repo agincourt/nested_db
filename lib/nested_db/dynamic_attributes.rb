@@ -39,11 +39,12 @@ module NestedDb
             END
           # if it's a normal property (string etc)
           else
-            metaclass.class_eval <<-END
-              field :#{property.name},
-                :type     => #{property.field_type.name},
-                :required => #{property.required? ? 'true' : 'false'}
-            END
+            #metaclass.class_eval <<-END
+            #  field :#{property.name},
+            #    :type     => #{property.field_type.name},
+            #    :required => #{property.required? ? 'true' : 'false'}
+            #END
+            metaclass.send(:field, property.name, { :type => property.field_type.name, :required => property.required? })
           end
           Rails.logger.debug "Appending field name: #{property.name}"
         end
