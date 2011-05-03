@@ -5,7 +5,7 @@ gem 'rails', '3.0.5'
 # Databases
 gem 'mongo',    '>= 1.2.4'
 gem 'bson_ext', '>= 1.2.4'
-gem 'mongoid',  '>= 2.0.0'
+gem 'mongoid',   :git => 'git@github.com:ryantownsend/mongoid.git' #,  '2.0.1'
 
 # Templating
 gem 'haml',     '>= 3.1.0.alpha.147'
