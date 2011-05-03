@@ -12,6 +12,7 @@ module NestedDb
     module InstanceMethods
       protected
       def extend_based_on_taxonomy
+        
         # load the metaclass
         metaclass = class << self; self; end
         # loop through each property
@@ -23,6 +24,7 @@ module NestedDb
               has_many :#{property.name},
                 :class_name  => 'NestedDb::Instance',
                 :foreign_key => :#{property.association_property}
+              accepts_nested_attributes_for :#{property.name}
               Rails.logger.debug "Added has_many for #{property.name}"
             END
           # if it's a belongs_to property
@@ -49,7 +51,8 @@ module NestedDb
               Rails.logger.debug "Added field: #{property.name}, of type: #{property.field_type.name}"
             END
           end
-        end
+        end # end loop through properties
+        
       end
     end
   end
