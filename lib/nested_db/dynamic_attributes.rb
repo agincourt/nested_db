@@ -5,8 +5,9 @@ module NestedDb
       # setup our callbacks
       base.class_eval do
         
+        attr_accessor :extended_from_taxonomy
+        
         after_build do
-          Rails.logger.debug "NestedDb::DynamicAttributes after_build called"
           extend_based_on_taxonomy
         end
         
@@ -21,7 +22,8 @@ module NestedDb
       protected
       # dynamically adds fields for each of the taxonomy's properties
       def extend_based_on_taxonomy
-        
+        # don't re-extend if this method has already been run
+        return if extended_from_taxonomy
         # load the metaclass
         metaclass = class << self; self; end
         # loop through each property
@@ -62,6 +64,8 @@ module NestedDb
           end
         end # end loop through properties
         
+        # mark as extended
+        self.extended_from_taxonomy = true
       end
     end
   end
