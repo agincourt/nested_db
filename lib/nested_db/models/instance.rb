@@ -39,6 +39,10 @@ module NestedDb
       end
       
       module InstanceMethods
+        def fields
+          self.class.fields
+        end
+        
         private
         # process the rich text fields into HTML
         def process_rich_text

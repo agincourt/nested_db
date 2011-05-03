@@ -6,9 +6,8 @@ module NestedDb
     
     module InstanceMethods
       # allows for typecasting on the dynamic taxonomy fields
-      alias_method :old_fields, :fields
       def fields
-        old_fields.reverse_merge(taxonomy.try(:property_fields) || {})
+        super.reverse_merge(taxonomy.try(:property_fields) || {})
       end
       
       # allows for readers when the attribute hasn't been
