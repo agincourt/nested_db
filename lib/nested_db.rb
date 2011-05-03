@@ -1,3 +1,4 @@
+require 'mongoid/ext'
 require 'nested_db/data_types'
 require 'nested_db/controllers'
 require 'nested_db/dynamic_attributes'

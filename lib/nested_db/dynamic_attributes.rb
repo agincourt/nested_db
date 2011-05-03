@@ -3,7 +3,7 @@ module NestedDb
     def self.included(base)
       base.send(:include, InstanceMethods)
       base.class_eval do
-        after_initialize :extend_based_on_taxonomy
+        after_build :extend_based_on_taxonomy
       end
     end
     
