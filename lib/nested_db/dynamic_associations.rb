@@ -21,12 +21,9 @@ module NestedDb
       end
       
       # overrides relations method to include our dynamic definitions
-      remove_method :relations
-      remove_method :associations
       def relations
         self.class.relations.merge(dynamic_associations)
       end
-      alias_method :associations, :relations
       
       # intercept read_attribute and check for associations
       #def read_attribute(method)
