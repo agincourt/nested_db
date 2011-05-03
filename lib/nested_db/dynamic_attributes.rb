@@ -14,6 +14,10 @@ module NestedDb
       def extend_based_on_taxonomy
         # load the metaclass
         metaclass = class << self; self; end
+        metaclass.class_eval do
+          Rails.logger.debug "Class evalled this!"
+          field :name, :type => String, :required => true
+        end
         # loop through each property
         taxonomy.properties.each do |name,property|
           case property.data_type
