@@ -45,7 +45,7 @@ module NestedDb
         taxonomy.physical_properties.where(:data_type => 'has_many').each do |property|
           self.dynamic_associations.merge!(          
             property.name => Mongoid::Relations::Metadata.new(
-              :relation           => Referenced::Many,
+              :relation           => Mongoid::Relations::Referenced::Many,
               :inverse_class_name => self.class.name,
               :name               => property.name,
               :property           => property
@@ -56,7 +56,7 @@ module NestedDb
         taxonomy.physical_properties.where(:data_type => 'belongs_to').each do |property|
           self.dynamic_associations.merge!(          
             property.name => Mongoid::Relations::Metadata.new(
-              :relation           => Referenced::In,
+              :relation           => Mongoid::Relations::Referenced::In,
               :inverse_class_name => self.class.name,
               :name               => property.name
             )
