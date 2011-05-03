@@ -12,6 +12,8 @@ module NestedDb
       
       # intercept read_attribute and check for associations
       def read_attribute(method)
+        # if we have no taxonomy, return super
+        return super(method) unless taxonomy
         # try to load the property
         property = taxonomy.properties[method.to_s]
         # if we found one, check it's data type (nil defaults to else)
