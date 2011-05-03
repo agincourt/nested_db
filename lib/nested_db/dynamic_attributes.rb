@@ -11,8 +11,12 @@ module NestedDb
         end
         
         after_initialize do
-          Rails.logger.debug "NestedDb::DynamicAttributes after_initialize called"
-          extend_based_on_taxonomy if taxonomy
+          if taxonomy
+            Rails.logger.debug "NestedDb::DynamicAttributes after_initialize called"
+            extend_based_on_taxonomy
+          else
+            Rails.logger.debug "NestedDb::DynamicAttributes after_initialize called BUT NO TAXONOMY"
+          end
         end
         
       end
