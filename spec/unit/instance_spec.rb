@@ -121,6 +121,11 @@ describe NestedDb::Instance do
       it "should return a selection criteria for the relation" do
         instance.articles.class.should == Array
       end
+      
+      it "should be able to build related instances" do
+        inst = instance
+        inst.articles.build.category.should == inst
+      end
     end
   end
   

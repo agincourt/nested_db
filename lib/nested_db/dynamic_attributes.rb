@@ -48,8 +48,22 @@ module NestedDb
       def extend_based_on_taxonomy
         # don't re-extend if this method has already been run
         return if extended_from_taxonomy
+        # load taxonomy into temporary var
+        temporary_taxonomy = taxonomy
+        # if we don't have a taxonomy, but this has been built (e.g. from another instance)
+        if metadata && metadata.taxonomy_class.present?
+          # load the taxonomy class (typically NestedDb::Taxonomy)
+          taxonomy_collection = metadata.taxonomy_class.constantize
+          # if the collection is scoped
+          if taxonomy_collection.scoped?
+            # load the association based on the scope
+            taxonomy_collection = metadata.scoped_type.constantize.find(metadata.scoped_type).taxonomies
+          end
+          # find the taxonomy by reference (e.g. articles)
+          temporary_taxonomy ||= taxonomy_collection.where(:reference => metadata.taxonomy_reference).first
+        end
         # loop through each property
-        taxonomy.properties.each do |name,property|
+        temporary_taxonomy.properties.each do |name,property|
           case property.data_type
           # if it's a has_many property
           when 'has_many'
@@ -57,16 +71,27 @@ module NestedDb
               has_many :#{property.name},
                 :class_name         => 'NestedDb::Instance',
                 :inverse_class_name => 'NestedDb::Instance',
-                :foreign_key        => '#{property.association_property}_id'
+                :inverse_of         => '#{property.association_property}',
+                :foreign_key        => '#{property.association_property}_id',
+                :taxonomy_reference => '#{property.association_taxonomy}',
+                :taxonomy_class     => '#{temporary_taxonomy.class.name}',
+                :scoped_type        => '#{temporary_taxonomy.scoped_type}',
+                :scoped_id          => '#{temporary_taxonomy.scoped_id}',
+                :source_id          => '#{id}'
+              
               accepts_nested_attributes_for :#{property.name}
             END
           # if it's a belongs_to property
           when 'belongs_to'
             metaclass.class_eval <<-END
               belongs_to :#{property.name},
-                :class_name    => 'NestedDb::Instance',
-                :required      => #{property.required? ? 'true' : 'false'},
-                :counter_cache => true
+                :class_name         => 'NestedDb::Instance',
+                :required           => #{property.required? ? 'true' : 'false'},
+                :taxonomy_reference => '#{property.association_taxonomy}',
+                :taxonomy_class     => '#{temporary_taxonomy.class.name}',
+                :scoped_type        => '#{temporary_taxonomy.scoped_type}',
+                :scoped_id          => '#{temporary_taxonomy.scoped_id}',
+                :counter_cache      => true
             END
           # if it's a file property
           when 'file'
@@ -83,6 +108,11 @@ module NestedDb
             END
           end
         end # end loop through properties
+        
+        # if we have a source_id
+        if metadata && metadata.inverse_of.present? && metadata.source_id.present?
+          self.send(metadata.inverse_of, metadata.source_id)
+        end
         
         # mark as extended
         self.extended_from_taxonomy = true
