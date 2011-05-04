@@ -19,13 +19,26 @@ module NestedDb
     end
     
     module InstanceMethods
+      def metaclass
+        # memoize
+        return @metaclass if defined?(@metaclass)
+        # load the meta class
+        @metaclass = class << self; self; end
+        # define a name on it
+        @metaclass.class_eval %Q{
+          def self.name
+            'NestedDb::Instance'
+          end
+        }
+        # return it
+        @metaclass
+      end
+      
       protected
       # dynamically adds fields for each of the taxonomy's properties
       def extend_based_on_taxonomy
         # don't re-extend if this method has already been run
         return if extended_from_taxonomy
-        # load the metaclass
-        metaclass = class << self; self; end
         # loop through each property
         taxonomy.properties.each do |name,property|
           case property.data_type
@@ -34,8 +47,8 @@ module NestedDb
             metaclass.class_eval <<-END
               has_many :#{property.name},
                 :class_name         => 'NestedDb::Instance',
-                :inverse_of         => :#{property.association_property},
-                :inverse_class_name => 'NestedDb::Instance'
+                :inverse_class_name => 'NestedDb::Instance',
+                :foreign_key        => '#{property.association_property}_id'
               accepts_nested_attributes_for :#{property.name}
             END
           # if it's a belongs_to property

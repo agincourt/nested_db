@@ -40,9 +40,7 @@ module NestedDb
       
       module InstanceMethods
         def validate_instance(instance)
-          value = instance.send(name)
-          
-          if required? && value.blank?
+          if required? && instance.try(name).blank?
             instance.errors.add(name, "cannot be blank")
           end
         end
@@ -62,7 +60,7 @@ module NestedDb
         private
         def validate_inclusion_of_association_taxonomy_in_taxonomies
           # load the available taxonomies
-          choices = self.taxonomy.global_scope.map(&:reference)
+          choices = self.taxonomy.global_scope.all.map(&:reference)
           # check the taxonomy is available
           self.errors.add(:association_taxonomy, "must be selected") unless choices.include?(association_taxonomy)
         end
@@ -77,12 +75,14 @@ module NestedDb
         end
         
         def validate_association_property_in_association_taxonomy_belongs_to
+          # load the remote taxonomy
+          foreign_taxonomy = self.taxonomy.global_scope.where(:reference => association_taxonomy).first
           # load the belongs to properties of the taxonomy
-          choices = self.taxonomy.global_scope.where(:reference => association_taxonomy).first.try(:physical_properties)
+          choices = foreign_taxonomy.physical_properties.select { |p| 'belongs_to' == p.data_type }
           # pull in names
-          choices = (choices || []).select { |p| 'belongs_to' == p.data_type }.map(&:name)
+          choices.map!(&:name)
           # check property is in choices
-          self.errors.add(:association_property, "must be chosen from: #{choices.join(', ')}") unless choices.include?(association_property)
+          self.errors.add(:association_property, "must be chosen from belongs_to: #{choices.join(', ')}") unless choices.include?(association_property)
         end
       end
     end

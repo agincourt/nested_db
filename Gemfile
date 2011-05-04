@@ -1,4 +1,5 @@
 source "http://rubygems.org"
+gem 'mongoid', :git => 'git@github.com:ryantownsend/mongoid.git'
 gemspec
 
 gem 'rails', '3.0.5'
@@ -6,7 +7,6 @@ gem 'rails', '3.0.5'
 # Databases
 gem 'mongo',    '>= 1.3.0'
 gem 'bson_ext', '>= 1.3.0'
-gem 'mongoid',   :git => 'git@github.com:ryantownsend/mongoid.git' #,  '2.0.1'
 
 # Templating
 gem 'haml',     '>= 3.1.0.alpha.147'
