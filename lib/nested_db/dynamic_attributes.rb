@@ -57,7 +57,7 @@ module NestedDb
           # if the collection is scoped
           if taxonomy_collection.scoped?
             # load the association based on the scope
-            taxonomy_collection = metadata.scoped_type.constantize.find(metadata.scoped_type).taxonomies
+            taxonomy_collection = metadata.scoped_type.constantize.find(metadata.scoped_id).taxonomies
           end
           # find the taxonomy by reference (e.g. articles)
           temporary_taxonomy ||= taxonomy_collection.where(:reference => metadata.taxonomy_reference).first
