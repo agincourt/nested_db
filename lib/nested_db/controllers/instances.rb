@@ -24,9 +24,16 @@ module NestedDb
       module InstanceMethods
         def new
           @instance = @taxonomy.instances.build
+          @taxonomy.physical_properties.select { |pp| 'has_many' == pp.data_type }.each { |pp|
+            @instance.send(pp.name).build if @instance.send(pp.name).size == 0
+          }
         end
         
-        def edit; end
+        def edit
+          @taxonomy.physical_properties.select { |pp| 'has_many' == pp.data_type }.each { |pp|
+            @instance.send(pp.name).build if @instance.send(pp.name).size == 0
+          }
+        end
         
         def create
           @instance            = @taxonomy.instances.build
