@@ -126,6 +126,14 @@ describe NestedDb::Instance do
         inst = instance
         inst.articles.build.category.should == inst
       end
+      
+      it "should be able to create related instances" do
+        instance.should respond_to 'articles_attributes='
+        instance.class.relations.keys.should include 'articles'
+        instance.update_attributes({
+          'articles_attributes' => { '0' => { 'name' => 'Test' } }
+        }).should == true
+      end
     end
   end
   

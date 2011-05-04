@@ -28,7 +28,7 @@ module NestedDb
         # define a name on it
         @metaclass.class_eval %Q{
           def self.name
-            'NestedDb::Instance'
+            superclass.name
           end
         }
         # return it
@@ -79,7 +79,10 @@ module NestedDb
                 :scoped_id          => '#{temporary_taxonomy.scoped_id}',
                 :source_id          => '#{id}'
               
-              accepts_nested_attributes_for :#{property.name}
+              accepts_nested_attributes_for :#{property.name},
+                :reject_if     => :all_blank,
+                :allow_destroy => true
+              self.superclass.relations.merge('#{property.name}' => relations['#{property.name}'])
             END
           # if it's a belongs_to property
           when 'belongs_to'
