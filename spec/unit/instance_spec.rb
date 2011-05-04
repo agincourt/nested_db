@@ -2,6 +2,48 @@ require "spec_helper"
 
 describe NestedDb::Instance do
   
+  describe "file uploads" do
+    context "when the instance's taxonomy defines a file field" do
+      let(:taxonomy) do
+        return @taxonomy if defined?(@taxonomy)
+        # wipe all taxonomies
+        NestedDb::Taxonomy.delete_all
+        # create the taxonomy
+        @taxonomy = NestedDb::Taxonomy.create!({
+          :name      => 'Category',
+          :reference => 'categories'
+        })
+        # add a file property
+        @taxonomy.physical_properties.create!({
+          :name      => 'image',
+          :data_type => 'file'
+        })
+        # return
+        @taxonomy
+      end
+      
+      let(:instance) do
+        @instance ||= taxonomy.instances.build
+      end
+      
+      it "should relay the uploaders from the metaclass" do
+        instance.should respond_to 'uploaders'
+        instance.uploaders.keys.should include :image
+      end
+      
+      it "should relay the uploader_options from the metaclass" do
+        instance.should respond_to 'uploader_options'
+        instance.uploaders.keys.should include :image
+      end
+      
+      it "should respond to image methods" do
+        instance.should respond_to 'image='
+        instance.should respond_to 'image'
+        instance.image.should respond_to 'url'
+      end
+    end
+  end
+  
   describe "has_many relationships" do
     context "when the instance's taxonomy defines a has_many association" do
       let(:taxonomy) do

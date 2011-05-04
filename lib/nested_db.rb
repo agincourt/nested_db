@@ -1,4 +1,6 @@
 require 'engine' if defined?(Rails) && Rails::VERSION::MAJOR == 3
+require 'carrierwave'
+require 'ext/carrierwave'
 require 'nested_db/data_types'
 require 'nested_db/controllers'
 require 'nested_db/dynamic_attributes'

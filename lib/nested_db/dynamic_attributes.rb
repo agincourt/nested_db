@@ -1,6 +1,7 @@
 module NestedDb
   module DynamicAttributes
     def self.included(base)
+      base.extend ClassMethods
       base.send(:include, InstanceMethods)
       # setup our callbacks
       base.class_eval do
@@ -32,6 +33,14 @@ module NestedDb
         }
         # return it
         @metaclass
+      end
+      
+      def uploaders
+        metaclass.uploaders
+      end
+      
+      def uploader_options
+        metaclass.uploader_options
       end
       
       protected
