@@ -64,8 +64,9 @@ module NestedDb
           when 'belongs_to'
             metaclass.class_eval <<-END
               belongs_to :#{property.name},
-                :class_name => 'NestedDb::Instance',
-                :required   => #{property.required? ? 'true' : 'false'}
+                :class_name    => 'NestedDb::Instance',
+                :required      => #{property.required? ? 'true' : 'false'},
+                :counter_cache => true
             END
           # if it's a file property
           when 'file'
