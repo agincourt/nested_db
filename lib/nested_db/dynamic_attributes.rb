@@ -33,8 +33,9 @@ module NestedDb
           when 'has_many'
             metaclass.class_eval <<-END
               has_many :#{property.name},
-                :class_name => 'NestedDb::Instance',
-                :inverse_of => :#{property.association_property}
+                :class_name         => 'NestedDb::Instance',
+                :inverse_of         => :#{property.association_property},
+                :inverse_class_name => 'NestedDb::Instance'
               accepts_nested_attributes_for :#{property.name}
             END
           # if it's a belongs_to property
