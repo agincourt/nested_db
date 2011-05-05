@@ -43,8 +43,9 @@ describe NestedDb::Instance do
         instance.image.should respond_to 'versions'
       end
       
-      it "should have an image version called 'square' loaded from the instance model" do
+      it "should have an image version called 'square' and one for the mounted_as property loaded from the instance model" do
         instance.image.versions.keys.should include 'square'
+        instance.image.versions.keys.should include 'image'
       end
     end
   end

@@ -18,7 +18,7 @@ class NestedDb::InstanceFileUploader < CarrierWave::Uploader::Base
     # if the model has it's own version
     if model.respond_to?(:versions)
       # merge them into the hash
-      @versions.merge!(model.versions.to_a.inject({}) { |hash,arr|
+      @versions.merge!(model.versions(mounted_as).to_a.inject({}) { |hash,arr|
         klass = Class.new(self.class)
         klass.class_eval arr[1] if arr[1]
         hash.merge(arr[0] => klass)
