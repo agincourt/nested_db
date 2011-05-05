@@ -82,6 +82,7 @@ module NestedDb
               accepts_nested_attributes_for :#{property.name},
                 :reject_if     => :all_blank,
                 :allow_destroy => true
+              
               self.superclass.relations.merge('#{property.name}' => relations['#{property.name}'])
             END
           # if it's a belongs_to property
@@ -109,6 +110,13 @@ module NestedDb
                 :type     => #{property.field_type.name},
                 :required => #{property.required? ? 'true' : 'false'}
             END
+            
+            if 'money' == property.data_type
+              metaclass.class_eval <<-END
+                validates_numericality_of :#{property.name},
+                  :greater_than_or_equal_to => 0
+              END
+            end
           end
         end # end loop through properties
         

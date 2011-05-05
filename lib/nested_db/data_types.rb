@@ -10,6 +10,7 @@ module NestedDb
         {
           :array      => Array,
           :decimal    => Float,
+          :money      => Float,
           :boolean    => Boolean,
           :date       => Date,
           :datetime   => DateTime,
