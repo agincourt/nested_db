@@ -1,6 +1,7 @@
 require 'rubygems'
 require 'bundler/setup'
 require 'nested_db'
+require 'fileutils'
 
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), "..", "lib"))
@@ -22,6 +23,11 @@ Mongoid.configure do |config|
   config.logger = nil
 end
 
+CarrierWave.configure do |config|
+  config.storage = :file
+  config.enable_processing = false
+end
+
 Dir[ File.join(MODELS, "*.rb") ].sort.each { |file| require File.basename(file) }
 Dir[ File.join(SUPPORT, "*.rb") ].each { |file| require File.basename(file) }
 
@@ -29,6 +35,8 @@ Rspec.configure do |config|
   config.mock_with(:mocha)
   config.after(:suite) do
     Mongoid.master.collections.select {|c| c.name !~ /system/ }.each(&:drop)
+    FileUtils.rm_rf File.join(File.dirname(__FILE__), '..', 'test')
+    FileUtils.rm_rf File.join(File.dirname(__FILE__), '..', 'uploads')
   end
   config.before(:suite) do
     # delete all taxonomies

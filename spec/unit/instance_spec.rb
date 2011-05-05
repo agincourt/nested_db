@@ -44,10 +44,17 @@ describe NestedDb::Instance do
       end
       
       it "should have an image version called 'square' and one for the mounted_as property loaded from the instance model" do
-        instance.image.versions.keys.should include :square
-        instance.image.versions.keys.should include :image
-        instance.image.versions[:square].class.should == NestedDb::InstanceFileUploader
-        [String, NilClass].should include instance.image.url(:square).class
+        inst = instance
+        inst.image.versions.keys.should include :square
+        inst.image.versions.keys.should include :image
+        inst.image.versions[:square].class.should == NestedDb::InstanceFileUploader
+        [String, NilClass].should include inst.image.url(:square).class
+      end
+      
+      it "should accept a new image" do
+        file = File.join(File.dirname(__FILE__), 'image.png')
+        File.exist?(file).should == true
+        instance.image = File.new(file)
       end
     end
   end
