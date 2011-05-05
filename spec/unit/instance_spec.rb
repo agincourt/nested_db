@@ -47,6 +47,7 @@ describe NestedDb::Instance do
         inst = instance
         inst.image.versions.keys.should include :square
         inst.image.versions.keys.should include :image
+        inst.image.versions[:square].version_name.should == :square
         inst.image.versions[:square].class.should == NestedDb::InstanceFileUploader
         [String, NilClass].should include inst.image.url(:square).class
       end
