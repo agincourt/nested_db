@@ -18,10 +18,10 @@ class NestedDb::InstanceFileUploader < CarrierWave::Uploader::Base
     # if the model has it's own version
     if model.respond_to?(:versions)
       # merge them into the hash
-      @versions.merge!(model.versions(mounted_as).to_a.inject({}) { |hash,arr|
+      @versions.merge!(model.versions(mounted_as).to_a.inject({}) { |result,arr|
         version_uploader = self.class.new(model, mounted_as)
         version_uploader.class_eval arr[1] if arr[1]
-        hash.merge(arr[0].to_sym => version_uploader)
+        result.merge(arr[0].to_sym => version_uploader)
       })
     end
     # return the versions
@@ -49,13 +49,5 @@ class NestedDb::InstanceFileUploader < CarrierWave::Uploader::Base
     model.taxonomy.class.scoped? &&
     model.taxonomy.scoped_object.respond_to?(:nested_db_bucket) &&
     model.taxonomy.scoped_object.nested_db_bucket
-  end
-  
-  def method_missing(method, *args)
-    if versions.has_key?(method.to_s)
-      versions[method.to_s]
-    else
-      super
-    end
   end
 end
