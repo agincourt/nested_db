@@ -19,7 +19,7 @@ class NestedDb::InstanceFileUploader < CarrierWave::Uploader::Base
     if model.respond_to?(:versions)
       # merge them into the hash
       @versions.merge!(model.versions(mounted_as).to_a.inject({}) { |hash,arr|
-        klass = self.class.new
+        klass = self.class.new(model, mounted_as)
         klass.class_eval arr[1] if arr[1]
         hash.merge(arr[0] => klass)
       })
@@ -49,5 +49,13 @@ class NestedDb::InstanceFileUploader < CarrierWave::Uploader::Base
     model.taxonomy.class.scoped? &&
     model.taxonomy.scoped_object.respond_to?(:nested_db_bucket) &&
     model.taxonomy.scoped_object.nested_db_bucket
+  end
+  
+  def method_missing(method, *args)
+    if versions.has_key?(method.to_s)
+      versions[method.to_s]
+    else
+      super
+    end
   end
 end
