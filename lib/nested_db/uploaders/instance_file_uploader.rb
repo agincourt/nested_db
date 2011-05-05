@@ -11,6 +11,23 @@ class NestedDb::InstanceFileUploader < CarrierWave::Uploader::Base
     process :resize_to_fill => [95,70]
   end
   
+  def versions
+    return @versions if defined?(@versions)
+    # load the versions the original way
+    super
+    # if the model has it's own version
+    if model.respond_to?(:versions)
+      # merge them into the hash
+      @versions.merge!(model.versions.inject({}) { |hash,key,value|
+        klass = Class.new(self.class)
+        klass.class_eval value
+        hash.merge(key => klass)
+      })
+    end
+    # return the versions
+    @versions
+  end
+  
   def store_dir
     dir  = ''
     dir += 'system/' unless Rails.env.production?
