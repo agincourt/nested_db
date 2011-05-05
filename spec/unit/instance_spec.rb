@@ -40,6 +40,11 @@ describe NestedDb::Instance do
         instance.should respond_to 'image='
         instance.should respond_to 'image'
         instance.image.should respond_to 'url'
+        instance.image.should respond_to 'versions'
+      end
+      
+      it "should have an image version called 'square' loaded from the instance model" do
+        instance.image.versions.keys.should include 'square'
       end
     end
   end
