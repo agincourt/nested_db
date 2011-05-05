@@ -21,7 +21,7 @@ class NestedDb::InstanceFileUploader < CarrierWave::Uploader::Base
       @versions.merge!(model.versions(mounted_as).to_a.inject({}) { |hash,arr|
         version_uploader = self.class.new(model, mounted_as)
         version_uploader.class_eval arr[1] if arr[1]
-        hash.merge(arr[0] => version_uploader)
+        #hash.merge(arr[0].to_s => version_uploader)
       })
     end
     # return the versions
