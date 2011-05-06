@@ -10,6 +10,10 @@ module NestedDb
         base.class_eval do
           extend ClassMethods
           
+          # pagination
+          cattr_reader :per_page
+          @@per_page = 20
+          
           # associations
           referenced_in :taxonomy, :inverse_of => :instances, :class_name => "NestedDb::Taxonomy"
           

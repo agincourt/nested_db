@@ -2,7 +2,7 @@ module NestedDb
   module Controllers
     module Instances
       def self.included(base)
-        base.class_eval do
+        base.class_eval do          
           before_filter :load_taxonomy
           before_filter :load_instance, :except => [ :index, :new, :create ]
         end

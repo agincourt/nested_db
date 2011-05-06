@@ -18,6 +18,9 @@ gem 'carrierwave', '>= 0.5.3'
 gem 'mini_magick', '>= 3.2'
 gem 'fog',         '>= 0.7.2'
 
+# Pagination
+gem 'will_paginate', '3.0.pre2'
+
 # Testing
 group :test do
   gem 'capybara', '>= 0.4.0'

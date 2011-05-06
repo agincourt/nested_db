@@ -16,6 +16,15 @@ module NestedDb
           @taxonomies = taxonomy_scope.order_by(:name.asc)
         end
         
+        def show
+          @instances = @taxonomy.instances.
+            order_by(
+              params[:order] && params[:order][:column] && @taxonomy.has_property?(params[:order][:column]) ?
+              params[:order][:column].to_sym.send('asc' == params[:order][:direction] ? :asc : :desc) :
+              :created_at.desc).
+            paginate(:per_page => params[:page])
+        end
+        
         def new
           @taxonomy = taxonomy_scope.new
           @taxonomy.physical_properties.build
