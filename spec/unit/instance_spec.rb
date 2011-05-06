@@ -16,7 +16,11 @@ describe NestedDb::Instance do
         # add a file property
         @taxonomy.physical_properties.create!({
           :name      => 'image',
-          :data_type => 'image'
+          :data_type => 'image',
+          :image_versions_attributes => {
+            "0" => { :name => 'square', :width => 200, :height => 200, :operation => 'resize_to_fit' },
+            "1" => { :name => 'image',  :width => 540, :height => 200, :operation => 'resize_to_fill' }
+          }
         })
         # return
         @taxonomy

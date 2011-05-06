@@ -34,6 +34,17 @@ module NestedDb
       end
       
       module InstanceMethods
+        def versions(mounted_as)
+          # if the taxonomy doesn't have this property, return blank hash
+          return {} unless taxonomy.has_property?(mounted_as)
+          # load the property
+          property = taxonomy.properties[mounted_as.to_s]
+          # map the versions into a hash
+          (property.try(:image_versions) || []).inject({}) { |result,iv|
+            result.merge(iv.name => "process :#{iv.operation} => [#{iv.width},#{iv.height}]")
+          }
+        end
+        
         private
         # process the rich text fields into HTML
         def process_rich_text

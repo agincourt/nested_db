@@ -22,6 +22,12 @@ module NestedDb
           embedded_in :taxonomy,
             :inverse_of => :physical_properties,
             :class_name => "NestedDb::Taxonomy"
+          embeds_many :image_versions,
+            :inverse_of => :property,
+            :class_name => "NestedDb::ImageVersion"
+          accepts_nested_attributes_for :image_versions,
+            :reject_if     => :all_blank,
+            :allow_destroy => true
           
           # scopes
           scope :indexed, where(:table_display => true)
