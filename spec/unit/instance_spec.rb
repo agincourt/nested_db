@@ -148,11 +148,15 @@ describe NestedDb::Instance do
       end
       
       it "should be able to create related instances" do
-        instance.should respond_to 'articles_attributes='
-        instance.class.relations.keys.should include 'articles'
-        instance.update_attributes({
+        inst = instance
+        inst.should respond_to 'articles_attributes='
+        inst.update_attributes({
           'articles_attributes' => { '0' => { 'name' => 'Test' } }
-        }).should == true
+        })
+        inst.articles.each { |a|
+          a.errors.should be_empty
+        }
+        inst.errors.should be_empty
       end
     end
   end

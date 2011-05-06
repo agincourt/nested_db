@@ -79,11 +79,17 @@ module NestedDb
                 :scoped_id          => '#{temporary_taxonomy.scoped_id}',
                 :source_id          => '#{id}'
               
-              accepts_nested_attributes_for :#{property.name},
-                :reject_if     => :all_blank,
-                :allow_destroy => true
+              self.superclass.nested_attributes += [ "#{property.name}_attributes=" ]
               
-              self.superclass.relations.merge('#{property.name}' => relations['#{property.name}'])
+              # load the relation before defining the method
+              relation = relations['#{property.name}']
+              define_method("#{property.name}_attributes=") do |attrs|
+                taxonomy = NestedDb::Taxonomy.where(:reference => '#{property.association_taxonomy}'#{", :scoped_type => '#{temporary_taxonomy.scoped_type}', :scoped_id => '#{temporary_taxonomy.scoped_id}'" if temporary_taxonomy.class.scoped?}).first
+                attrs.each { |k,v|
+                  attrs[k].merge!({ :taxonomy => taxonomy })
+                }
+                relation.nested_builder(attrs, :reject_if => Mongoid::NestedAttributes::ClassMethods::REJECT_ALL_BLANK_PROC, :allow_destroy => true).build(self)
+              end
             END
           # if it's a belongs_to property
           when 'belongs_to'
