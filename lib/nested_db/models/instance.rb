@@ -15,7 +15,9 @@ module NestedDb
           @@per_page = 20
           
           # associations
-          referenced_in :taxonomy, :inverse_of => :instances, :class_name => "NestedDb::Taxonomy"
+          belongs_to :taxonomy,
+            :inverse_of => :instances,
+            :class_name => "NestedDb::Taxonomy"
           
           # validation
           validates_presence_of :taxonomy
@@ -52,11 +54,9 @@ module NestedDb
         private
         # process the rich text fields into HTML
         def process_rich_text
-          if taxonomy
-            taxonomy.physical_properties.where(:data_type => 'rich_text').each do |pp|
-              if self.send(pp.name).present?
-                write_attribute("#{pp.name}_rich_text_processed", RedCloth.new(self.send(pp.name)).to_html)
-              end
+          taxonomy.physical_properties.where(:data_type => 'rich_text').each do |pp|
+            if self.send(pp.name).present?
+              write_attribute("#{pp.name}_rich_text_processed", RedCloth.new(self.send(pp.name)).to_html)
             end
           end
         end

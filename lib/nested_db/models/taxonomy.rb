@@ -25,9 +25,14 @@ module NestedDb
           validates_presence_of :scoped_type, :if => proc { |obj| obj.class.scoped? }
           
           # associations
-          embeds_many     :physical_properties, :class_name => "NestedDb::PhysicalProperty"
-          embeds_many     :virtual_properties, :class_name => "NestedDb::VirtualProperty"
-          references_many :instances, :class_name => "NestedDb::Instance", :inverse_of => :taxonomy, :dependent => :destroy
+          embeds_many :physical_properties,
+            :class_name => "NestedDb::PhysicalProperty"
+          embeds_many :virtual_properties,
+            :class_name => "NestedDb::VirtualProperty"
+          has_many :instances,
+            :class_name => "NestedDb::Instance",
+            :inverse_of => :taxonomy,
+            :dependent  => :destroy
           
           accepts_nested_attributes_for :physical_properties, :allow_destroy => true
           
