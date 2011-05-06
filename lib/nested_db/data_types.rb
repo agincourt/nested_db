@@ -19,7 +19,8 @@ module NestedDb
           :rich_text  => String,
           :plain_text => String,
           :time       => Time,
-          :file       => String,
+          :file       => nil,
+          :image      => nil,
           :belongs_to => BSON::ObjectId,
           :has_many   => Hash
         }

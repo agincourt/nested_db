@@ -16,7 +16,7 @@ describe NestedDb::Instance do
         # add a file property
         @taxonomy.physical_properties.create!({
           :name      => 'image',
-          :data_type => 'file'
+          :data_type => 'image'
         })
         # return
         @taxonomy
@@ -48,7 +48,7 @@ describe NestedDb::Instance do
         inst.image.versions.keys.should include :square
         inst.image.versions.keys.should include :image
         inst.image.versions[:square].version_name.should == :square
-        inst.image.versions[:square].class.should == NestedDb::InstanceFileUploader
+        inst.image.versions[:square].class.should == NestedDb::InstanceImageUploader
         [String, NilClass].should include inst.image.url(:square).class
       end
       

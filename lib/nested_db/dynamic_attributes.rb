@@ -103,6 +103,12 @@ module NestedDb
             metaclass.class_eval <<-END
               mount_uploader :#{property.name}, NestedDb::InstanceFileUploader
             END
+          # if it's an image property
+          when 'image'
+            # mount carrierwave
+            metaclass.class_eval <<-END
+              mount_uploader :#{property.name}, NestedDb::InstanceImageUploader
+            END
           # if it's a normal property (string etc)
           else
             metaclass.class_eval <<-END
