@@ -67,6 +67,8 @@ module NestedDb
           case property.data_type
           # if it's a has_many property
           when 'has_many'
+            target_taxonomy = temporary_taxonomy.global_scope.where(:reference => property.association_taxonomy).first
+            
             metaclass.class_eval <<-END
               has_many :#{property.name},
                 :class_name         => 'NestedDb::Instance',
@@ -84,9 +86,9 @@ module NestedDb
               # load the relation before defining the method
               relation = relations['#{property.name}']
               define_method("#{property.name}_attributes=") do |attrs|
-                taxonomy = NestedDb::Taxonomy.where(:reference => '#{property.association_taxonomy}'#{", :scoped_type => '#{temporary_taxonomy.scoped_type}', :scoped_id => '#{temporary_taxonomy.scoped_id}'" if temporary_taxonomy.class.scoped?}).first
+                t = NestedDb::Taxonomy.find('#{target_taxonomy.id}')
                 attrs.each { |k,v|
-                  attrs[k].merge!({ :taxonomy => taxonomy })
+                  attrs[k].merge!({ :taxonomy => t })
                 }
                 relation.nested_builder(attrs, :reject_if => Mongoid::NestedAttributes::ClassMethods::REJECT_ALL_BLANK_PROC, :allow_destroy => true).build(self)
               end
