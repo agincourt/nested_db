@@ -14,6 +14,7 @@ module NestedDb
           # fields
           field :required,             :type => Boolean
           field :table_display,        :type => Boolean, :default => true
+          field :form_display,         :type => Boolean, :default => true
           field :index,                :type => Integer, :default => 0, :required => true
           field :association_taxonomy, :type => String
           field :association_property, :type => String
@@ -30,7 +31,8 @@ module NestedDb
             :allow_destroy => true
           
           # scopes
-          scope :indexed, where(:table_display => true)
+          scope :indexed,      where(:table_display => true)
+          scope :form_display, where(:form_display => true)
           
           # validation
           validates_inclusion_of :data_type,
