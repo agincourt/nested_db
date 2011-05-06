@@ -157,6 +157,7 @@ describe NestedDb::Instance do
           a.errors.should be_empty
         }
         inst.errors.should be_empty
+        inst.articles.size.should == 1
       end
     end
   end

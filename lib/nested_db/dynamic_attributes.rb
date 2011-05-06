@@ -88,7 +88,7 @@ module NestedDb
               define_method("#{property.name}_attributes=") do |attrs|
                 t = NestedDb::Taxonomy.find('#{target_taxonomy.id}')
                 attrs.each { |k,v|
-                  attrs[k].merge!({ :taxonomy => t, :#{property.association_property} => self })
+                  attrs[k].merge!({ :taxonomy => t, :#{property.association_property} => id })
                 }
                 relation.nested_builder(attrs, :reject_if => Mongoid::NestedAttributes::ClassMethods::REJECT_ALL_BLANK_PROC, :allow_destroy => true).build(self)
               end
