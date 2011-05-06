@@ -19,9 +19,12 @@ module NestedDb
         def new
           @taxonomy = taxonomy_scope.new
           @taxonomy.physical_properties.build
+          @taxonomy.physical_properties.each { |pp| pp.image_versions.build }
         end
         
-        def edit; end
+        def edit
+          @taxonomy.physical_properties.each { |pp| pp.image_versions.build }
+        end
         
         def create
           @taxonomy = taxonomy_scope.new(params[:nested_db_taxonomy])
