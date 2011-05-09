@@ -43,6 +43,11 @@ module NestedDb
         metaclass.uploader_options
       end
       
+      def taxonomy=(value)
+        super(value)
+        extend_based_on_taxonomy
+      end
+      
       protected
       # dynamically adds fields for each of the taxonomy's properties
       def extend_based_on_taxonomy
@@ -84,6 +89,10 @@ module NestedDb
                   :after_build        => proc { |obj|
                     # set the taxonomy
                     obj.taxonomy = #{target_taxonomy.class.name}.find('#{target_taxonomy.id}')
+                    # load the taxonomy properties
+                    obj.send(:extend_based_on_taxonomy)
+                    # set the association if persisted
+                    #{ "obj.#{property.association_property} ||= #{self.class.name}.find('#{id}')" if persisted? }
                   }
               
                 self.superclass.nested_attributes += [ "#{property.name}_attributes=" ]
@@ -93,10 +102,15 @@ module NestedDb
                 
                 # define the method for accepting the nested_attributes
                 define_method("#{property.name}_attributes=") do |attrs|
-                  
-                  # build the nested relationship
-                  relation.nested_builder(attrs, :reject_if => Mongoid::NestedAttributes::ClassMethods::REJECT_ALL_BLANK_PROC, :allow_destroy => true).build(self)
-                  
+                  # create our builder
+                  b = relation.nested_builder(attrs, :reject_if => Mongoid::NestedAttributes::ClassMethods::REJECT_ALL_BLANK_PROC, :allow_destroy => true)
+                  # prepend the attributes for taxonomy / this object
+                  b.attributes.unshift(
+                    [:taxonomy, #{target_taxonomy.class.name}.find('#{target_taxonomy.id}')],
+                    [:#{property.association_property}, self]
+                  )
+                  # build based on self
+                  b.build(self)
                 end
               END
             end
