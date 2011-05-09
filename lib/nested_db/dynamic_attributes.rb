@@ -50,18 +50,20 @@ module NestedDb
         return if extended_from_taxonomy
         # load taxonomy into temporary var
         temporary_taxonomy = taxonomy
+        # check we have a taxonomy
+        return unless temporary_taxonomy
         # if we don't have a taxonomy, but this has been built (e.g. from another instance)
-        if metadata && metadata.taxonomy_class.present?
-          # load the taxonomy class (typically NestedDb::Taxonomy)
-          taxonomy_collection = metadata.taxonomy_class.constantize
-          # if the collection is scoped
-          if taxonomy_collection.scoped?
-            # load the association based on the scope
-            taxonomy_collection = metadata.scoped_type.constantize.find(metadata.scoped_id).taxonomies
-          end
-          # find the taxonomy by reference (e.g. articles)
-          temporary_taxonomy ||= taxonomy_collection.where(:reference => metadata.taxonomy_reference).first
-        end
+        #if metadata && metadata.taxonomy_class.present?
+        #  # load the taxonomy class (typically NestedDb::Taxonomy)
+        #  taxonomy_collection = metadata.taxonomy_class.constantize
+        #  # if the collection is scoped
+        #  if taxonomy_collection.scoped?
+        #    # load the association based on the scope
+        #    taxonomy_collection = metadata.scoped_type.constantize.find(metadata.scoped_id).taxonomies
+        #  end
+        #  # find the taxonomy by reference (e.g. articles)
+        #  temporary_taxonomy ||= taxonomy_collection.where(:reference => metadata.taxonomy_reference).first
+        #end
         # loop through each property
         temporary_taxonomy.properties.each do |name,property|
           case property.data_type
@@ -135,9 +137,9 @@ module NestedDb
         end # end loop through properties
         
         # if we have a source_id
-        if metadata && metadata.inverse_of.present? && metadata.source_id.present?
-          self.send(metadata.inverse_of.gsub(/\=+$/, '='), metadata.source_id)
-        end
+        #if metadata && metadata.inverse_of.present? && metadata.source_id.present?
+        #  self.send(metadata.inverse_of.gsub(/\=+$/, '='), metadata.source_id)
+        #end
         
         # mark as extended
         self.extended_from_taxonomy = true
