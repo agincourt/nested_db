@@ -48,64 +48,71 @@ module NestedDb
       def extend_based_on_taxonomy
         # don't re-extend if this method has already been run
         return if extended_from_taxonomy
+        # if we have metadata and it's got an after_build property
+        if metadata && metadata.after_build
+          metadata.after_build.call(self)
+        end
         # load taxonomy into temporary var
         temporary_taxonomy = taxonomy
-        # check we have a taxonomy
-        return unless temporary_taxonomy
         # if we don't have a taxonomy, but this has been built (e.g. from another instance)
-        #if metadata && metadata.taxonomy_class.present?
-        #  # load the taxonomy class (typically NestedDb::Taxonomy)
-        #  taxonomy_collection = metadata.taxonomy_class.constantize
-        #  # if the collection is scoped
-        #  if taxonomy_collection.scoped?
-        #    # load the association based on the scope
-        #    taxonomy_collection = metadata.scoped_type.constantize.find(metadata.scoped_id).taxonomies
-        #  end
-        #  # find the taxonomy by reference (e.g. articles)
-        #  temporary_taxonomy ||= taxonomy_collection.where(:reference => metadata.taxonomy_reference).first
-        #end
+        if !temporary_taxonomy && metadata && metadata.taxonomy_class.present?
+          # load the taxonomy
+          t = metadata.taxonomy_class.constantize.find(metadata.taxonomy_id)
+          # set it
+          temporary_taxonomy = t
+        end
+        # check we have a taxonomy
+        raise StandardError, "No taxonomy" unless temporary_taxonomy
         # loop through each property
         temporary_taxonomy.properties.each do |name,property|
           case property.data_type
           # if it's a has_many property
           when 'has_many'
+            # load the target taxonomy
+            target_taxonomy = temporary_taxonomy.global_scope.where(:reference => property.association_taxonomy).first
+            # only allow the relation if we found the target
+            if target_taxonomy
+              metaclass.class_eval <<-END
+                has_many :#{property.name},
+                  :class_name         => '#{self.class.name}',
+                  :inverse_class_name => '#{self.class.name}',
+                  :inverse_of         => '#{property.association_property}',
+                  :foreign_key        => '#{property.association_property}_id',
+                  :taxonomy_id        => '#{target_taxonomy.id}',
+                  :taxonomy_class     => '#{target_taxonomy.class.name}',
+                  :source_id          => '#{id}',
+                  :after_build        => proc { |obj|
+                    # set the taxonomy
+                    obj.taxonomy = #{target_taxonomy.class.name}.find('#{target_taxonomy.id}')
+                  }
+              
+                self.superclass.nested_attributes += [ "#{property.name}_attributes=" ]
+              
+                # load the relation before defining the method
+                relation = relations['#{property.name}']
+                
+                # define the method for accepting the nested_attributes
+                define_method("#{property.name}_attributes=") do |attrs|
+                  
+                  # build the nested relationship
+                  relation.nested_builder(attrs, :reject_if => Mongoid::NestedAttributes::ClassMethods::REJECT_ALL_BLANK_PROC, :allow_destroy => true).build(self)
+                  
+                end
+              END
+            end
+          # if it's a belongs_to property
+          when 'belongs_to'
             target_taxonomy = temporary_taxonomy.global_scope.where(:reference => property.association_taxonomy).first
             
             metaclass.class_eval <<-END
-              has_many :#{property.name},
-                :class_name         => 'NestedDb::Instance',
-                :inverse_class_name => 'NestedDb::Instance',
-                :inverse_of         => '#{property.association_property}',
-                :foreign_key        => '#{property.association_property}_id',
-                :taxonomy_reference => '#{property.association_taxonomy}',
-                :taxonomy_class     => '#{temporary_taxonomy.class.name}',
-                :scoped_type        => '#{temporary_taxonomy.scoped_type}',
-                :scoped_id          => '#{temporary_taxonomy.scoped_id}',
-                :source_id          => '#{id}'
-              
-              self.superclass.nested_attributes += [ "#{property.name}_attributes=" ]
-              
-              # load the relation before defining the method
-              relation = relations['#{property.name}']
-              define_method("#{property.name}_attributes=") do |attrs|
-                t = NestedDb::Taxonomy.find('#{target_taxonomy.id}')
-                attrs.each { |k,v|
-                  attrs[k].merge!({ :taxonomy => t, :#{property.association_property} => id })
-                }
-                relation.nested_builder(attrs, :reject_if => Mongoid::NestedAttributes::ClassMethods::REJECT_ALL_BLANK_PROC, :allow_destroy => true).build(self)
-              end
-            END
-          # if it's a belongs_to property
-          when 'belongs_to'
-            metaclass.class_eval <<-END
               belongs_to :#{property.name},
-                :class_name         => 'NestedDb::Instance',
-                :required           => #{property.required? ? 'true' : 'false'},
-                :taxonomy_reference => '#{property.association_taxonomy}',
-                :taxonomy_class     => '#{temporary_taxonomy.class.name}',
-                :scoped_type        => '#{temporary_taxonomy.scoped_type}',
-                :scoped_id          => '#{temporary_taxonomy.scoped_id}',
-                :counter_cache      => true
+                :class_name     => '#{self.class.name}',
+                :required       => #{property.required? ? 'true' : 'false'},
+                :taxonomy_id    => '#{target_taxonomy.id}',
+                :taxonomy_class => '#{target_taxonomy.class.name}',
+                :scoped_type    => '#{temporary_taxonomy.scoped_type}',
+                :scoped_id      => '#{temporary_taxonomy.scoped_id}',
+                :counter_cache  => true
             END
           # if it's a file property
           when 'file'
@@ -137,9 +144,9 @@ module NestedDb
         end # end loop through properties
         
         # if we have a source_id
-        #if metadata && metadata.inverse_of.present? && metadata.source_id.present?
-        #  self.send(metadata.inverse_of.gsub(/\=+$/, '='), metadata.source_id)
-        #end
+        if metadata && metadata.inverse_of.present? && metadata.source_id.present?
+          self.send(metadata.inverse_of.gsub(/\=+$/, '='), metadata.source_id)
+        end
         
         # mark as extended
         self.extended_from_taxonomy = true

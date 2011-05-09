@@ -86,10 +86,17 @@ describe NestedDb::Instance do
           :name      => 'Article',
           :reference => 'articles'
         })
-        # add a normal property
+        # add a normal property to articles
         @taxonomy_two.physical_properties.create!({
           :name      => 'name',
-          :data_type => 'string'
+          :data_type => 'string',
+          :required  => true
+        })
+        # add a image property to articles
+        @taxonomy_two.physical_properties.create!({
+          :name      => 'image',
+          :data_type => 'image',
+          :required  => true
         })
         # add a belongs relation from taxonomy two to taxonomy one
         @taxonomy_two.physical_properties.create!({
@@ -136,29 +143,69 @@ describe NestedDb::Instance do
         association.class_name.should         == 'NestedDb::Instance'
         association.foreign_key.should        == 'category_id'
         association.inverse_class_name.should == 'NestedDb::Instance'
+        association.taxonomy_class.should     == 'NestedDb::Taxonomy'
+        association.taxonomy_id.should_not    be_blank
         instance.metaclass.name.should        == 'NestedDb::Instance'
       end
       
       it "should return a selection criteria for the relation" do
+        instance.should respond_to 'articles'
         instance.articles.class.should == Array
       end
       
-      it "should be able to build related instances" do
+      it "should pass on itself to new related instances" do
         inst = instance
-        inst.articles.build.category.should == inst
+        article = inst.articles.build
+        article.category.should == inst
+      end
+      
+      it "should pass the correct taxonomy to new related instances" do
+        inst = instance
+        article = inst.articles.build
+        article.taxonomy.should_not be_nil
+        article.taxonomy.reference.should == 'articles'
+      end
+      
+      it "should respond to the correct methods when built from a parent object" do
+        article = instance.articles.build
+        article.should respond_to 'name'
+        article.should respond_to 'name='
+        article.should respond_to 'image'
+        article.should respond_to 'image='
+        article.image.class.should == NestedDb::InstanceImageUploader
+        article.image = File.new(File.join(File.dirname(__FILE__), 'image.png'))
+        article.save.should == true
+        article.image.url.should_not be_blank
       end
       
       it "should be able to create related instances" do
+        file = File.join(File.dirname(__FILE__), 'image.png')
+        # ensure the file is okay
+        CarrierWave::SanitizedFile.new(file).should_not be_empty
+        # create our instance
         inst = instance
+        # ensure it responds to the nested attributes creator
         inst.should respond_to 'articles_attributes='
+        # update the instance with an article
         inst.update_attributes({
-          'articles_attributes' => { '0' => { 'name' => 'Test' } }
+          'articles_attributes' => { '0' => {
+            'name'  => 'Test',
+            'image' => File.new(file)
+          } }
         })
-        inst.articles.each { |a|
-          a.errors.should be_empty
-        }
-        inst.errors.should be_empty
+        # ensure we have one article
         inst.articles.size.should == 1
+        # ensure the article is valid
+        inst.articles.each { |a|
+          a.name.should == 'Test'
+          a.image.should_not be_nil
+          a.image.class.should == NestedDb::InstanceImageUploader
+          a.image.file.should_not be_nil
+          a.image?.should == true
+          a.image.should respond_to 'url'
+          a.errors.should == {}
+        }
+        inst.errors.should == {}
       end
     end
   end
