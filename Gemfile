@@ -9,7 +9,7 @@ gem 'mongo',    '>= 1.3.0'
 gem 'bson_ext', '>= 1.3.0'
 
 # Templating
-gem 'haml',     '>= 3.1.0.alpha.147'
+gem 'haml',     '>= 3.1.0'
 gem 'liquid',   '>= 2.2.2'
 gem 'RedCloth', '>= 4.2.7', :require => 'redcloth'
 
