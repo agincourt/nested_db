@@ -136,7 +136,7 @@ module NestedDb
         
         # if we have a source_id
         if metadata && metadata.inverse_of.present? && metadata.source_id.present?
-          self.send(metadata.inverse_of, metadata.source_id)
+          self.send(metadata.inverse_of.gsub(/\=+$/, '='), metadata.source_id)
         end
         
         # mark as extended
