@@ -10,6 +10,8 @@ module NestedDb
         base.class_eval do
           extend ClassMethods
           
+          attr_accessor :ignore_errors
+          
           # pagination
           cattr_reader :per_page
           @@per_page = 20
@@ -40,6 +42,18 @@ module NestedDb
       end
       
       module InstanceMethods
+        def ignore_errors_on(properties)
+          self.ignore_errors ||= []
+          self.ignore_errors +=  Array(properties)
+        end
+        
+        def valid?(force = nil)
+          self.ignore_errors ||= []
+          self.ignore_errors.map!(&:to_sym)
+          
+          super || self.errors.delete_if { |k,v| ignore_errors.include?(k.to_sym) }.size == 0
+        end
+        
         def versions(mounted_as)
           # if the taxonomy doesn't have this property, return blank hash
           return {} unless taxonomy.has_property?(mounted_as)
