@@ -48,8 +48,8 @@ module NestedDb
           obj = parent.send(association).build
           # call extend
           obj.extend_based_on_taxonomy
-          # set parent
-          #obj.send("#{reverse_association}=", parent)
+          # update the parent
+          obj.send("#{reverse_association}=", parent.id)
         end
         
         # if we have an object
