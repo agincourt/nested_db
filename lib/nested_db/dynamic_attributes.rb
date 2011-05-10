@@ -61,7 +61,7 @@ module NestedDb
       def validate_nested_attributes
         self.nested_attributes.each { |k,v|
           self.errors.add(k, "are invalid") unless v.valid_as_nested?
-        }
+        } if self.nested_attributes
       end
       
       # saves each nested_attribute after
@@ -72,7 +72,7 @@ module NestedDb
           v.parent = self
           # save the object
           v.save
-        }
+        } if self.nested_attributes
       end
       
       # dynamically adds fields for each of the taxonomy's properties
