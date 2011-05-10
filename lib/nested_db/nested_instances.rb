@@ -49,7 +49,7 @@ module NestedDb
           # call extend
           obj.extend_based_on_taxonomy
           # set parent
-          obj.send(reverse_association, parent)
+          #obj.send("#{reverse_association}=", parent)
         end
         
         # if we have an object
@@ -93,7 +93,7 @@ module NestedDb
           object.destroy
         else
           # update the parent
-          object.send(reverse_association, parent) unless object.send(reverse_association).try(:persisted?)
+          object.send("#{reverse_association}=", parent)
           # save the object
           object.save
         end

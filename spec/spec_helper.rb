@@ -11,6 +11,7 @@ SUPPORT = File.join(File.dirname(__FILE__), "support")
 $LOAD_PATH.unshift(MODELS)
 $LOAD_PATH.unshift(SUPPORT)
 
+require "rails"
 require "mongoid"
 require "mocha"
 require "rspec"
@@ -37,6 +38,7 @@ Rspec.configure do |config|
     Mongoid.master.collections.select {|c| c.name !~ /system/ }.each(&:drop)
     FileUtils.rm_rf File.join(File.dirname(__FILE__), '..', 'test')
     FileUtils.rm_rf File.join(File.dirname(__FILE__), '..', 'uploads')
+    FileUtils.rm_rf File.join(File.dirname(__FILE__), '..', 'system')
   end
   config.before(:suite) do
     # delete all taxonomies

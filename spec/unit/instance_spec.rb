@@ -119,8 +119,20 @@ describe NestedDb::Instance do
         @instance ||= taxonomy.instances.create!({ :title => 'Test' })
       end
       
-      let(:file) do
-        @file ||= File.join(File.dirname(__FILE__), 'image.png')
+      def file(name)
+        ActionDispatch::Http::UploadedFile.new(
+          :filename => "rails.png", 
+          :type => "image/png", 
+          :head => "Content-Disposition: form-data;
+                    name=\"#{name}\"; 
+                    filename=\"rails.png\" 
+                    Content-Type: image/png\r\n",
+          :tempfile => File.new(file_path)
+        )
+      end
+      
+      let(:file_path) do
+        File.join(File.dirname(__FILE__), 'image.png')
       end
       
       it "should have a taxonomy with an articles property" do
@@ -178,7 +190,7 @@ describe NestedDb::Instance do
         article.should respond_to 'image'
         article.should respond_to 'image='
         article.image.class.should == NestedDb::InstanceImageUploader
-        article.image = File.new(file)
+        article.image = file('image')
         article.name  = "testing123"
         article.save
         article.errors.should be_empty
@@ -186,7 +198,7 @@ describe NestedDb::Instance do
       
       it "should be able to create related instances" do
         # ensure the file is okay
-        CarrierWave::SanitizedFile.new(file).should_not be_empty
+        CarrierWave::SanitizedFile.new(file_path).should_not be_empty
         # create our instance
         inst = instance
         # ensure it responds to the nested attributes creator
@@ -195,11 +207,11 @@ describe NestedDb::Instance do
         inst.articles_attributes = {
           '0' => {
             'name'  => 'Test',
-            'image' => File.new(file)
+            'image' => file('image')
           },
           '1' => {
             'name'  => 'Test',
-            'image' => File.new(file)
+            'image' => file('image')
           }
         }
         # ensure we have one article
@@ -228,11 +240,11 @@ describe NestedDb::Instance do
         inst.update_attributes(:articles_attributes => {
           '0' => {
             'name'  => 'Test',
-            'image' => File.new(file)
+            'image' => file('image')
           },
           '1' => {
             'name'  => 'Test',
-            'image' => File.new(file)
+            'image' => file('image')
           }
         })
         # ensure we have 2 articles
@@ -243,7 +255,7 @@ describe NestedDb::Instance do
           '0' => {
             'id'    => inst.articles.first.id,
             'name'  => 'Test 2',
-            'image' => File.new(file)
+            'image' => file('image')
           },
           '1' => {
             'id'       => inst.articles.last.id,
@@ -253,7 +265,25 @@ describe NestedDb::Instance do
         # ensure the article's name has changed
         inst.articles.first.name.should == 'Test 2'
         # TODO: ensure the second article was deleted
+        # inst.articles.size.should == 1
+      end
+      
+      it "should be able to create nested instances during it's own creation" do
+        inst = taxonomy.instances.build
+        inst.write_attributes({
+          :title => 'Test',
+          :articles_attributes => {
+            '0' => {
+              'name'  => 'Test 2',
+              'image' => file('image')
+            }
+          }
+        })
+        inst.save
+        # ensure we have 1 article
         inst.articles.size.should == 1
+        # ensure the article has the category set
+        inst.articles.first.category.should == inst
       end
     end
   end
