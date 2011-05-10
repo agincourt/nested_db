@@ -96,7 +96,10 @@ describe NestedDb::Instance do
         @taxonomy_two.physical_properties.create!({
           :name      => 'image',
           :data_type => 'image',
-          :required  => true
+          :required  => true,
+          :image_versions_attributes => {
+            "0" => { :name => 'square', :width => 200, :height => 200, :operation => 'resize_to_fit' }
+          }
         })
         # add a belongs relation from taxonomy two to taxonomy one
         @taxonomy_two.physical_properties.create!({
