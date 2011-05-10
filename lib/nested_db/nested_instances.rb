@@ -32,6 +32,8 @@ module NestedDb
         if existing_id
           # find the existing object
           obj = parent.send(association).select { |o| o.id == existing_id }.first
+          # ensure we have the object
+          raise StandardError, "Existing ID: #{existing_id}, not found in association `#{association}`. Options are: #{parent.send(association).map(&:id).join(', ')}" unless obj
           # set the taxonomy
           obj.taxonomy = taxonomy
           # call extend
