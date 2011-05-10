@@ -37,9 +37,9 @@ module NestedDb
           # update it with new attributes
           obj.write_attributes(attrs)
           # if this is set to destroy
-          self.destroy_ids << existing_id if attrs.has_key(:destroy)
+          self.destroy_ids << existing_id if attrs.has_key?(:destroy)
         # don't setup a new field if it's set to be destroyed
-        elsif !attrs.has_key(:destroy)
+        elsif !attrs.has_key?(:destroy)
           # create the new object
           obj = taxonomy.instances.build
           # call extend

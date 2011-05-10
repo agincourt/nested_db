@@ -7,7 +7,7 @@ module NestedDb
       base.class_eval do
         
         attr_accessor :extended_from_taxonomy,
-                      :nested_attributes
+                      :nested_instance_attributes
         
         # validation
         validate :validate_nested_attributes
@@ -42,6 +42,10 @@ module NestedDb
         @metaclass
       end
       
+      def nested_attributes
+        super + (nested_instance_attributes || {}).map { |k,v| "#{k.to_s}_attributes=" }
+      end
+      
       def uploaders
         metaclass.uploaders
       end
@@ -53,26 +57,6 @@ module NestedDb
       def taxonomy=(value)
         super(value)
         extend_based_on_taxonomy
-      end
-      
-      protected
-      # validates the nested_attributes and
-      # adds an error to the root object if they are invalid
-      def validate_nested_attributes
-        self.nested_attributes.each { |k,v|
-          self.errors.add(k, "are invalid") unless v.valid_as_nested?
-        } if self.nested_attributes
-      end
-      
-      # saves each nested_attribute after
-      # passing this object's id to it
-      def save_nested_attributes
-        self.nested_attributes.each { |k,v|
-          # pass our saved id to the object
-          v.parent = self
-          # save the object
-          v.save
-        } if self.nested_attributes
       end
       
       # dynamically adds fields for each of the taxonomy's properties
@@ -124,7 +108,7 @@ module NestedDb
                 # define the method for accepting the nested_attributes
                 define_method("#{property.name}_attributes=") do |attrs|
                   # setup a blank hash
-                  self.nested_attributes ||= {}
+                  self.nested_instance_attributes ||= {}
                   # setup our nested object
                   ni = NestedDb::NestedInstances.new(
                     self,
@@ -135,7 +119,7 @@ module NestedDb
                     }
                   )
                   # merge in to the hash
-                  self.nested_attributes.merge!(:#{property.name} => ni)
+                  self.nested_instance_attributes.merge!(:#{property.name} => ni)
                   # update our instance of the objects
                   @#{property.name} = ni.objects
                 end
@@ -191,6 +175,26 @@ module NestedDb
         
         # mark as extended
         self.extended_from_taxonomy = true
+      end
+      
+      protected
+      # validates the nested_attributes and
+      # adds an error to the root object if they are invalid
+      def validate_nested_attributes
+        self.nested_instance_attributes.each { |k,v|
+          self.errors.add(k, "are invalid") unless v.valid_as_nested?
+        } if self.nested_instance_attributes
+      end
+      
+      # saves each nested_attribute after
+      # passing this object's id to it
+      def save_nested_attributes
+        self.nested_instance_attributes.each { |k,v|
+          # pass our saved id to the object
+          v.parent = self
+          # save the object
+          v.save
+        } if self.nested_instance_attributes
       end
     end
   end
