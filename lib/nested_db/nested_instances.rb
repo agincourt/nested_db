@@ -5,52 +5,58 @@ module NestedDb
                   :objects,
                   :destroy_ids,
                   :errors,
-                  :reverse_association
+                  :reverse_association,
+                  :association
     
     def initialize(parent, options = {})
       # setup an array to hold the objects
       self.objects ||= []
       # setup an array to hold ids of those which should be deleted
       self.destroy_ids ||= []
-      # set the taxonomy
-      self.taxonomy = options[:taxonomy]
       # set the parent
       self.parent = parent
-      # set the reverse association
+      # set the taxonomy
+      self.taxonomy = options[:taxonomy]
+      # set the associations
       self.reverse_association = options[:inverse_of]
+      self.association         = options[:association_name]
       
       # loop through each attribute set to setup each object
       (options[:attributes] || {}).each do |i,attrs|
         attrs.symbolize_keys! unless attrs.kind_of?(ActiveSupport::HashWithIndifferentAccess)
         # pull out the ID (if present)
         existing_id = attrs.delete(:id)
+        # if all attributes are blank, skip
+        next if attrs.all? { |_, value| value.blank? }
         # if we have an ID
         if existing_id
           # find the existing object
-          obj = taxonomy.instances.find(existing_id)
+          obj = parent.send(association).select { |o| o.id == existing_id }.first
           # set the taxonomy
           obj.taxonomy = taxonomy
           # call extend
           obj.extend_based_on_taxonomy
           # set parent
           obj.send(reverse_association, parent)
-          # update it with new attributes
-          obj.write_attributes(attrs)
           # if this is set to destroy
-          self.destroy_ids << existing_id if attrs.has_key?(:destroy)
+          self.destroy_ids << obj.id if attrs.delete(:_destroy)
         # don't setup a new field if it's set to be destroyed
-        elsif !attrs.has_key?(:destroy)
+        elsif !attrs.delete(:_destroy)
           # create the new object
-          obj = taxonomy.instances.build
+          obj = parent.send(association).build
           # call extend
           obj.extend_based_on_taxonomy
           # set parent
           obj.send(reverse_association, parent)
-          # update it with new attributes
-          obj.write_attributes(attrs)
         end
-        # add this object to the set
-        self.objects << obj if obj
+        
+        # if we have an object
+        if obj
+          # update the attributes
+          attrs.each { |k,v| obj.send("#{k.to_s}=", v) }
+          # add this object to the set
+          self.objects << obj
+        end
       end
     end
     
@@ -80,7 +86,7 @@ module NestedDb
     def save
       objects.each do |object|
         # if this object has been saved, and it's marked for deletion
-        if object.persisted? && destroy_ids.include?(object.id)
+        if destroy_ids.include?(object.id)
           # delete it
           object.destroy
         else

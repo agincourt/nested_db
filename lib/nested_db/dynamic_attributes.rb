@@ -113,16 +113,17 @@ module NestedDb
                   ni = NestedDb::NestedInstances.new(
                     self,
                     {
-                      :taxonomy   => #{target_taxonomy.class.name}.find('#{target_taxonomy.id}'),
-                      :attributes => attrs,
-                      :inverse_of => '#{property.association_property}'
+                      :taxonomy         => #{target_taxonomy.class.name}.find('#{target_taxonomy.id}'),
+                      :attributes       => attrs,
+                      :inverse_of       => '#{property.association_property}',
+                      :association_name => '#{property.name}'
                     }
                   )
                   # merge in to the hash
                   self.nested_instance_attributes.merge!(:#{property.name} => ni)
                   # update our instance of the objects
-                  self.#{property.name}.clear
-                  self.#{property.name} += ni.objects
+                  # self.#{property.name}.clear
+                  # self.#{property.name} += ni.objects
                 end
               END
             end

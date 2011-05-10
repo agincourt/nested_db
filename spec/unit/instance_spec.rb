@@ -119,6 +119,10 @@ describe NestedDb::Instance do
         @instance ||= taxonomy.instances.create!({ :title => 'Test' })
       end
       
+      let(:file) do
+        @file ||= File.join(File.dirname(__FILE__), 'image.png')
+      end
+      
       it "should have a taxonomy with an articles property" do
         instance.taxonomy.has_property?(:articles).should == true
       end
@@ -174,14 +178,13 @@ describe NestedDb::Instance do
         article.should respond_to 'image'
         article.should respond_to 'image='
         article.image.class.should == NestedDb::InstanceImageUploader
-        article.image = File.new(File.join(File.dirname(__FILE__), 'image.png'))
+        article.image = File.new(file)
         article.name  = "testing123"
         article.save
         article.errors.should be_empty
       end
       
       it "should be able to create related instances" do
-        file = File.join(File.dirname(__FILE__), 'image.png')
         # ensure the file is okay
         CarrierWave::SanitizedFile.new(file).should_not be_empty
         # create our instance
@@ -189,16 +192,22 @@ describe NestedDb::Instance do
         # ensure it responds to the nested attributes creator
         inst.should respond_to 'articles_attributes='
         # update the instance with an article
-        inst.articles_attributes = { '0' => {
-          'name'  => 'Test',
-          'image' => File.new(file)
-        } }
+        inst.articles_attributes = {
+          '0' => {
+            'name'  => 'Test',
+            'image' => File.new(file)
+          },
+          '1' => {
+            'name'  => 'Test',
+            'image' => File.new(file)
+          }
+        }
         # ensure we have one article
-        inst.articles.size.should == 1
+        inst.articles.size.should == 2
         # ensure the article's taxonomy was set
         inst.articles.first.taxonomy.should_not be_nil
         # save
-        inst.save
+        inst.save.should == true
         # ensure the article is valid
         inst.articles.each { |a|
           a.name.should == 'Test'
@@ -210,6 +219,41 @@ describe NestedDb::Instance do
           a.errors.should == {}
         }
         inst.errors.should == {}
+      end
+      
+      it "should be able to update related instances" do
+        # create our instance
+        inst = instance
+        # update the instance with an article
+        inst.update_attributes(:articles_attributes => {
+          '0' => {
+            'name'  => 'Test',
+            'image' => File.new(file)
+          },
+          '1' => {
+            'name'  => 'Test',
+            'image' => File.new(file)
+          }
+        })
+        # ensure we have 2 articles
+        inst.articles.size.should == 2
+        inst.articles.first.persisted?.should == true
+        # update the article
+        inst.update_attributes(:articles_attributes => {
+          '0' => {
+            'id'    => inst.articles.first.id,
+            'name'  => 'Test 2',
+            'image' => File.new(file)
+          },
+          '1' => {
+            'id'       => inst.articles.last.id,
+            '_destroy' => '1'
+          }
+        })
+        # ensure the article's name has changed
+        inst.articles.first.name.should == 'Test 2'
+        # TODO: ensure the second article was deleted
+        # inst.articles.size.should == 1
       end
     end
   end
