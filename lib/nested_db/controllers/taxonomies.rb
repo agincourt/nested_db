@@ -69,7 +69,7 @@ module NestedDb
         end
         
         def delete
-          destroy && return if 'DELETE' == request.method
+          destroy && return unless 'DELETE' == request.method
         end
         
         def destroy

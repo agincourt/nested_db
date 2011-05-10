@@ -60,12 +60,12 @@ module NestedDb
         end
         
         def delete
-          destroy && return if 'DELETE' == request.method
+          destroy && return unless 'GET' == request.method
         end
         
         def destroy
           @instance.try(:destroy)
-          redirect_to(taxonomy_relative_to_instance_url)
+          redirect_to(taxonomy_relative_to_instance_url, :notice => "#{@taxonomy.name.titleize} deleted!")
         end
         
         protected
