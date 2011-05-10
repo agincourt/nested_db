@@ -121,6 +121,7 @@ module NestedDb
                   # merge in to the hash
                   self.nested_instance_attributes.merge!(:#{property.name} => ni)
                   # update our instance of the objects
+                  self.#{property.name}.clear
                   self.#{property.name} += ni.objects
                 end
               END
