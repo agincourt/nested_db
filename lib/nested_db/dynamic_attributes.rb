@@ -6,8 +6,13 @@ module NestedDb
       # setup our callbacks
       base.class_eval do
         
-        attr_accessor :extended_from_taxonomy
+        attr_accessor :extended_from_taxonomy,
+                      :nested_attributes
         
+        # validation
+        validate :validate_nested_attributes
+        
+        # callbacks
         after_build do
           extend_based_on_taxonomy
         end
@@ -15,6 +20,8 @@ module NestedDb
         after_initialize do
           extend_based_on_taxonomy if taxonomy
         end
+        
+        after_save :save_nested_attributes
         
       end
     end
@@ -49,6 +56,25 @@ module NestedDb
       end
       
       protected
+      # validates the nested_attributes and
+      # adds an error to the root object if they are invalid
+      def validate_nested_attributes
+        self.nested_attributes.each { |k,v|
+          self.errors.add(k, "are invalid") unless v.valid_as_nested?
+        }
+      end
+      
+      # saves each nested_attribute after
+      # passing this object's id to it
+      def save_nested_attributes
+        self.nested_attributes.each { |k,v|
+          # pass our saved id to the object
+          v.parent = self
+          # save the object
+          v.save
+        }
+      end
+      
       # dynamically adds fields for each of the taxonomy's properties
       def extend_based_on_taxonomy
         # don't re-extend if this method has already been run
@@ -94,23 +120,24 @@ module NestedDb
                     # set the association if persisted
                     #{ "obj.#{property.association_property} ||= #{self.class.name}.find('#{id}')" if persisted? }
                   }
-              
-                self.superclass.nested_attributes += [ "#{property.name}_attributes=" ]
-              
-                # load the relation before defining the method
-                relation = relations['#{property.name}']
                 
                 # define the method for accepting the nested_attributes
                 define_method("#{property.name}_attributes=") do |attrs|
-                  # create our builder
-                  b = relation.nested_builder(attrs, :reject_if => Mongoid::NestedAttributes::ClassMethods::REJECT_ALL_BLANK_PROC, :allow_destroy => true)
-                  # prepend the attributes for taxonomy / this object
-                  b.attributes.unshift(
-                    [:taxonomy, #{target_taxonomy.class.name}.find('#{target_taxonomy.id}')],
-                    [:#{property.association_property}, self]
+                  # setup a blank hash
+                  self.nested_attributes ||= {}
+                  # setup our nested object
+                  ni = NestedDb::NestedInstances.new(
+                    self,
+                    {
+                      :taxonomy   => #{target_taxonomy.class.name}.find('#{target_taxonomy.id}'),
+                      :attributes => attrs,
+                      :inverse_of => '#{property.association_property}'
+                    }
                   )
-                  # build based on self
-                  b.build(self)
+                  # merge in to the hash
+                  self.nested_attributes.merge!(:#{property.name} => ni)
+                  # update our instance of the objects
+                  @#{property.name} = ni.objects
                 end
               END
             end
