@@ -26,7 +26,7 @@ end
 
 CarrierWave.configure do |config|
   config.storage = :file
-  config.enable_processing = false
+  config.enable_processing = true
 end
 
 Dir[ File.join(MODELS, "*.rb") ].sort.each { |file| require File.basename(file) }

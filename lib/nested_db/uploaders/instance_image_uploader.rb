@@ -5,6 +5,10 @@ class NestedDb::InstanceImageUploader < NestedDb::InstanceFileUploader
     process :resize_to_fill => [95,70]
   end
   
+  def delete_tmp_file_after_storage
+    false
+  end
+  
   def versions
     return @versions if defined?(@versions)
     # load the versions the original way
