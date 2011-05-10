@@ -85,9 +85,9 @@ module NestedDb
           object.destroy
         else
           # update the parent
-          obj.send(reverse_association, parent)
+          object.send(reverse_association, parent)
           # save the object
-          obj.save
+          object.save
         end
       end
     end

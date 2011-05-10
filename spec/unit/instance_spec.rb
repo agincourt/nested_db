@@ -193,10 +193,10 @@ describe NestedDb::Instance do
           'name'  => 'Test',
           'image' => File.new(file)
         } }
-        # ensure the article's taxonomy was set
-        inst.articles.first.taxonomy.should_not be_nil
         # ensure we have one article
         inst.articles.size.should == 1
+        # ensure the article's taxonomy was set
+        inst.articles.first.taxonomy.should_not be_nil
         # save
         inst.save
         # ensure the article is valid
