@@ -61,7 +61,7 @@ module NestedDb
           property = taxonomy.properties[mounted_as.to_s]
           # map the versions into a hash
           (property.try(:image_versions) || []).inject({}) { |result,iv|
-            result.merge(iv.name => "process :#{iv.operation} => [#{iv.width},#{iv.height}]")
+            result.merge(iv.name => iv.processes)
           }
         end
         

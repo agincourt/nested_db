@@ -37,6 +37,11 @@ module NestedDb
       end
       
       module InstanceMethods
+        def processes
+          [
+            [ 'resize_to_fit' == operation ? :resize_to_limit : operation.to_sym, [width,height] ]
+          ]
+        end
       end
     end
   end

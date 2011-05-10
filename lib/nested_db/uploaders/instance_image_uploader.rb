@@ -15,8 +15,8 @@ class NestedDb::InstanceImageUploader < NestedDb::InstanceFileUploader
       if model.respond_to?(:versions)
         # merge them into the hash
         @versions.merge!(model.versions(mounted_as).to_a.inject({}) { |result,arr|
-          version_uploader = self.class.new(model, mounted_as)
-          version_uploader.class_eval arr[1] if arr[1]
+          version_uploader = NestedDb::InstanceVersionUploader.new(model, mounted_as)
+          version_uploader.processors = arr[1] if arr[1]
           version_uploader.version_names.push(version_names) unless version_names.empty?
           version_uploader.version_names.push(arr[0].to_sym)
           result.merge(arr[0].to_sym => version_uploader)
