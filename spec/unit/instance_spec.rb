@@ -253,7 +253,7 @@ describe NestedDb::Instance do
         # ensure the article's name has changed
         inst.articles.first.name.should == 'Test 2'
         # TODO: ensure the second article was deleted
-        # inst.articles.size.should == 1
+        inst.articles.size.should == 1
       end
     end
   end
