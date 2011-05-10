@@ -89,6 +89,7 @@ module NestedDb
             if target_taxonomy
               metaclass.class_eval <<-END
                 has_many :#{property.name},
+                  :dependent          => :destroy,
                   :class_name         => '#{self.class.name}',
                   :inverse_class_name => '#{self.class.name}',
                   :inverse_of         => '#{property.association_property}',
