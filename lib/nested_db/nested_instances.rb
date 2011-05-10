@@ -21,7 +21,7 @@ module NestedDb
       
       # loop through each attribute set to setup each object
       (options[:attributes] || {}).each do |i,attrs|
-        attrs.symbolize_keys!
+        attrs.symbolize_keys! unless attrs.kind_of?(ActiveSupport::HashWithIndifferentAccess)
         # pull out the ID (if present)
         existing_id = attrs.delete(:id)
         # if we have an ID
