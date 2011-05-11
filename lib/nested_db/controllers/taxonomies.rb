@@ -22,7 +22,7 @@ module NestedDb
               params[:order] && params[:order][:column] && @taxonomy.has_property?(params[:order][:column]) ?
               params[:order][:column].to_sym.send('asc' == params[:order][:direction] ? :asc : :desc) :
               :created_at.desc).
-            paginate(:page => params[:page])
+            paginate(:per_page => params[:per_page] || NestedDb::Instance.per_page, :page => params[:page])
         end
         
         def new
