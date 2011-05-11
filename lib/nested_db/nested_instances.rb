@@ -51,7 +51,7 @@ module NestedDb
           # ignore errors on association
           obj.ignore_errors_on(reverse_association)
           # update the parent
-          obj.send("#{reverse_association}=", parent.respond_to?(:id) ? parent.id : parent)
+          obj.send("#{reverse_association}=", parent)
         end
         
         # if we have an object
