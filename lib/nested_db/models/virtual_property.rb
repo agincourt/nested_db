@@ -35,7 +35,7 @@ module NestedDb
           {
             :string  => String,
             :integer => Integer,
-            :decimal => Decimal
+            :decimal => Float
           }
         end
       end
