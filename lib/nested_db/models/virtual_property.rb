@@ -45,6 +45,10 @@ module NestedDb
           self.class.data_types[data_type.to_sym] || String
         end
         
+        def required?
+          false
+        end
+        
         def field
           ::Mongoid::Field.new(name, :type => self.data_type.classify.constantize)
         end
