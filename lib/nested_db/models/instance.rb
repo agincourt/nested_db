@@ -72,7 +72,7 @@ module NestedDb
         
         private
         def generate_auto_incremented_id
-          self.auto_incremented_id = taxonomy.instances.size + 1
+          self.auto_incremented_id = taxonomy.instances.count + 1
         end
         
         # process the rich text fields into HTML
