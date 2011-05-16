@@ -23,7 +23,8 @@ module NestedDb
           validates_inclusion_of :data_type,
             :in => %w(string decimal integer)
           validates_inclusion_of :casing,
-            :in => %w(downcase upcase titleize permalink)
+            :in => %w(downcase upcase titleize permalink),
+            :allow_blank => true
         end
       end
       
