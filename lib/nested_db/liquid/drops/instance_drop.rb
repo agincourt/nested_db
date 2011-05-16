@@ -31,7 +31,7 @@ module NestedDb
           assoc = instance.send(property.name)
           assoc ? InstanceDrop.new(assoc) : nil
         when 'has_many'
-          (instance.send(property.name) || []).map { |i| InstanceDrop.new(i) }
+          instance.send(property.name).map { |i| InstanceDrop.new(i) }
         else
           read_attribute(property.name)
         end
