@@ -12,7 +12,7 @@ module NestedDb
       self.taxonomy_drop = taxonomy_drop if taxonomy_drop
     
       # loop through fields
-      attributes.each do |k|
+      fields.each do |k|
         self.class.send(:define_method, k.to_sym) do
           attribute_present?("#{k.to_s}_rich_text_processed") ? read_attribute("#{k.to_s}_rich_text_processed") : read_attribute(k)
         end                                                                                                                                                                        
