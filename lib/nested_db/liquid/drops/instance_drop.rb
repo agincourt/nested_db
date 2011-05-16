@@ -32,8 +32,10 @@ module NestedDb
           assoc ? InstanceDrop.new(assoc) : nil
         when 'has_many'
           instance.send(property.name).map { |i| InstanceDrop.new(i) }
+        when 'image', 'file'
+          instance.send(property.name).try(:to_s)
         else
-          read_attribute(property.name)
+          instance.send(property.name)
         end
         
         result.merge(property.name => value)
