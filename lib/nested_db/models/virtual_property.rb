@@ -60,7 +60,7 @@ module NestedDb
           # render it using the instance
           output = liquid_template.render(taxonomy.physical_properties.inject({}) { |result,pp|
             result.merge({ pp.name => instance.send(pp.name) })
-          })
+          }.merge({ 'id' => pp.auto_incremented_id }))
           # if we have a casing
           output = case casing
           when 'downcase'
@@ -70,7 +70,7 @@ module NestedDb
           when 'titleize'
             output.titleize
           when 'permalink'
-            output.downcase.gsub(/[^\w\-]/, '-').gsub(/\-+/, '-')
+            output.downcase.gsub(/[^\w\-]/, '-').gsub(/\-+/, '-')[0..31]
           else
             output
           end

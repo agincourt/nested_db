@@ -16,6 +16,9 @@ module NestedDb
           cattr_reader :per_page
           @@per_page = 20
           
+          # fields
+          field :auto_incremented_id, :type => Integer
+          
           # associations
           belongs_to :taxonomy,
             :inverse_of => :instances,
@@ -26,6 +29,7 @@ module NestedDb
           validate :validate_against_taxonomy, :if => proc { |obj| obj.taxonomy.present? }
           
           # callbacks
+          after_validation :generate_auto_incremented_id
           after_validation :process_rich_text
           after_validation :process_virtual_properties
         end
@@ -67,6 +71,10 @@ module NestedDb
         end
         
         private
+        def generate_auto_incremented_id
+          self.auto_incremented_id = taxonomy.instances.size + 1
+        end
+        
         # process the rich text fields into HTML
         def process_rich_text
           taxonomy.physical_properties.where(:data_type => 'rich_text').each do |pp|
