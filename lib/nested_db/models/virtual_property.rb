@@ -9,6 +9,8 @@ module NestedDb
         base.send(:include, InstanceMethods)
         
         base.class_eval do
+          extend ClassMethods
+          
           # fields
           field :format
           field :casing
@@ -28,7 +30,21 @@ module NestedDb
         end
       end
       
+      module ClassMethods
+        def data_types
+          {
+            :string  => String,
+            :integer => Integer,
+            :decimal => Decimal
+          }
+        end
+      end
+      
       module InstanceMethods
+        def field_type
+          self.class.data_types[data_type.to_sym] || String
+        end
+        
         def field
           ::Mongoid::Field.new(name, :type => self.data_type.classify.constantize)
         end
