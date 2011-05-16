@@ -15,7 +15,7 @@ module NestedDb
           
           # associations
           embedded_in :taxonomy,
-            :inverse_of => :physical_properties,
+            :inverse_of => :virtual_properties,
             :class_name => "NestedDb::Taxonomy"
   
           # validation

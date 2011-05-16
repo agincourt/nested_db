@@ -26,9 +26,11 @@ module NestedDb
           
           # associations
           embeds_many :physical_properties,
-            :class_name => "NestedDb::PhysicalProperty"
+            :class_name => "NestedDb::PhysicalProperty",
+            :inverse_of => :taxonomy
           embeds_many :virtual_properties,
-            :class_name => "NestedDb::VirtualProperty"
+            :class_name => "NestedDb::VirtualProperty",
+            :inverse_of => :taxonomy
           has_many :instances,
             :class_name => "NestedDb::Instance",
             :inverse_of => :taxonomy,
