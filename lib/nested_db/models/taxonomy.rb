@@ -35,6 +35,7 @@ module NestedDb
             :dependent  => :destroy
           
           accepts_nested_attributes_for :physical_properties, :allow_destroy => true
+          accepts_nested_attributes_for :virtual_properties,  :allow_destroy => true
           
           # callbacks
           before_validation :downcase_reference
