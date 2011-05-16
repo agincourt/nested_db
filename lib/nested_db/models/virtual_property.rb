@@ -58,8 +58,8 @@ module NestedDb
           # parse the format
           liquid_template = Liquid::Template.parse(format)
           # render it using the instance
-          output = liquid_template.render({
-            'object' => InstanceDrop.new(instance)
+          output = liquid_template.render(taxonomy.physical_properties.inject({}) { |result,pp|
+            result.merge({ pp.name => instance.send(pp.name) })
           })
           # if we have a casing
           output = case casing
