@@ -42,7 +42,7 @@ module NestedDb
         def image_variation(input, variation = nil)
           input ||= ''
           input = input.url if input.kind_of?(CarrierWave::Uploader::Base)
-          input.gsub!(/^(.*)\/(.*?)(\?\d+)?$/, "\\1/#{variation.to_s}_\\2") if variation
+          input = input.gsub(/^(.*)\/(.*?)$/, "\\1/#{variation.to_s}_\\2") if variation
           input
         end
       end
