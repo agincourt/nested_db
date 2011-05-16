@@ -36,7 +36,7 @@ module NestedDb
       
       # merge some other properties
       @properties.merge!({
-        :taxonomy   => taxonomy_drop || TaxonomyDrop.new(instance.taxonomy),
+        :taxonomy   => taxonomy,
         :id         => auto_increment_id,
         :created_at => created_at,
         :updated_at => updated_at
@@ -44,6 +44,10 @@ module NestedDb
       
       # return the properties
       @properties
+    end
+    
+    def taxonomy
+      self.taxonomy_drop ||= TaxonomyDrop.new(instance.taxonomy)
     end
   end
 end
