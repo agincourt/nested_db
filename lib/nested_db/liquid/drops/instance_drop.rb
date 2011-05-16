@@ -19,7 +19,7 @@ module NestedDb
       # memoize
       return @properties if defined?(@properties)
       # load fields from taxonomy properties
-      @properties = taxonomy.properties.inject({}) do |result,property|
+      @properties = instance.taxonomy.properties.inject({}) do |result,property|
         value = case property.data_type
         when 'rich_text'
           read_attribute("#{property.name}_rich_text_processed")
