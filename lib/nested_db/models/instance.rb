@@ -78,8 +78,14 @@ module NestedDb
         
         # process each virtual attribute
         def process_virtual_properties
+          # loop through each attribute
           taxonomy.virtual_properties.each do |vp|
-            write_attribute(vp.name, vp.value(self)) if new_record? || !vp.only_create?
+            # if this is a new instance
+            # or the attribute can be set on update
+            unless persisted? && vp.only_create?
+              # get the value and set it
+              write_attribute(vp.name, vp.value(self))
+            end
           end
         end
         
