@@ -32,6 +32,7 @@ module Liquid
       instances = instances.where(conditions(context)) if conditions?
       # if we only want one
       if @quantity == 'one'
+        Rails.logger.debug "Finding first #{@reference} instance, using conditions: #{conditions(context).inspect}"
         # load the first
         instance = instances.first
         # if we found it, return it
