@@ -28,9 +28,10 @@ module NestedDb
         when 'rich_text'
           read_attribute("#{property.name}_rich_text_processed")
         when 'belongs_to'
-          InstanceDrop.new(read_attribute(property.name))
+          assoc = read_attribute(property.name)
+          assoc ? InstanceDrop.new(assoc) : nil
         when 'has_many'
-          read_attribute(property.name).map { |i| InstanceDrop.new(i) }
+          (read_attribute(property.name) || []).map { |i| InstanceDrop.new(i) }
         else
           read_attribute(property.name)
         end
