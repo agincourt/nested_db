@@ -27,11 +27,14 @@ module NestedDb
         
         def new
           @taxonomy = taxonomy_scope.new
+          @taxonomy.virtual_properties.build
           @taxonomy.physical_properties.build
           @taxonomy.physical_properties.each { |pp| pp.image_versions.build }
         end
         
         def edit
+          @taxonomy.virtual_properties.build  unless @taxonomy.virtual_properties.size > 0
+          @taxonomy.physical_properties.build unless @taxonomy.physical_properties.size > 0
           @taxonomy.physical_properties.each { |pp| pp.image_versions.build }
         end
         
