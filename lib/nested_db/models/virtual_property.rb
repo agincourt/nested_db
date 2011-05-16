@@ -14,6 +14,7 @@ module NestedDb
           # fields
           field :format
           field :casing
+          field :only_create, :type => Boolean
           
           # associations
           embedded_in :taxonomy,
@@ -51,6 +52,33 @@ module NestedDb
         
         def field
           ::Mongoid::Field.new(name, :type => self.data_type.classify.constantize)
+        end
+        
+        def value(instance)
+          # parse the format
+          liquid_template = Liquid::Template.parse(format)
+          # render it using the instance
+          output = liquid_template.render({
+            'object' => InstanceDrop.new(instance)
+          })
+          # if we have a casing
+          output = case casing
+          when 'downcase'
+            output.downcase
+          when 'upcase'
+            output.upcase
+          when 'titleize'
+            output.titleize
+          when 'permalink'
+            output.downcase.gsub(/[^\w\-]/, '-').gsub(/\-+/, '-')
+          else
+            output
+          end
+          # if we have a data type other than string
+          output = output.to_f if 'decimal' == data_type
+          output = output.to_i if 'integer' == data_type
+          # return the output
+          output
         end
       end
     end

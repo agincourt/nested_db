@@ -26,7 +26,8 @@ module NestedDb
           validate :validate_against_taxonomy, :if => proc { |obj| obj.taxonomy.present? }
           
           # callbacks
-          after_validation  :process_rich_text
+          after_validation :process_rich_text
+          after_validation :process_virtual_properties
         end
         
         base.send(:include, InstanceMethods)
@@ -72,6 +73,13 @@ module NestedDb
             if self.send(pp.name).present?
               write_attribute("#{pp.name}_rich_text_processed", RedCloth.new(self.send(pp.name)).to_html)
             end
+          end
+        end
+        
+        # process each virtual attribute
+        def process_virtual_properties
+          taxonomy.virtual_properties.each do |vp|
+            write_attribute(vp.name, vp.value(self)) if new_record? || !vp.only_create?
           end
         end
         
