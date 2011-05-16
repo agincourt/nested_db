@@ -33,7 +33,7 @@ module Liquid
       # if we only want one
       if @quantity == 'one'
         # load the first
-        instance = instances.find(:first)
+        instance = instances.first
         # if we found it, return it
         return NestedDb::InstanceDrop.new(instance, taxonomy_drop(context)) if instance
         # otherwise return nil

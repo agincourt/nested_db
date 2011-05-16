@@ -72,7 +72,7 @@ module NestedDb
         
         private
         def generate_auto_incremented_id
-          self.auto_incremented_id = (taxonomy.instances.order_by([[:auto_incremented_id, :desc]]).first.try(:auto_incremented_id) || 0) + 1
+          self.auto_incremented_id = (taxonomy.instances.order_by([[:auto_incremented_id, :desc]]).first.try(:auto_incremented_id) || 0) + 1 if new_record?
         end
         
         # process the rich text fields into HTML
