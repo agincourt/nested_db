@@ -70,7 +70,7 @@ module NestedDb
           when 'titleize'
             output.titleize
           when 'permalink'
-            output.downcase.gsub(/[^\w\-]/, '-').gsub(/\-+/, '-')[0..31]
+            output.downcase.gsub(/[^\w\-]/, '-').gsub(/\-+/, '-')[0..63]
           else
             output
           end
