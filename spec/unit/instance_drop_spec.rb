@@ -115,7 +115,7 @@ describe NestedDb::InstanceDrop do
     it "should return a string for populated file fields" do
       inst = instance
       inst.update_attributes(:image => file('image')).should == true
-      inst.image_filename.should_not be_nil
+      inst.image.url.should_not be_nil
       NestedDb::InstanceDrop.new(inst).to_liquid['image'].should_not be_nil
     end
   end

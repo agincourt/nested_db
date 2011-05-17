@@ -25,6 +25,7 @@ Mongoid.configure do |config|
 end
 
 CarrierWave.configure do |config|
+  config.root    = 'test'
   config.storage = :file
   config.enable_processing = true
 end
