@@ -40,7 +40,7 @@ module NestedDb
           validate :validate_inclusion_of_association_taxonomy_in_taxonomies,
             :if => proc { |obj| ['belongs_to', 'has_many', 'has_and_belongs_to_many'].include?(obj.data_type) }
           validate :validate_association_property_in_association_taxonomy,
-            :if => proc { |obj| obj.association_taxonomy.present? && 'belongs_to' == obj.data_type }
+            :if => proc { |obj| obj.association_taxonomy.present? && 'belongs_to' == obj.data_type && 'has_and_belongs_to_many' == obj.data_type }
           validate :validate_association_property_in_association_taxonomy_belongs_to,
             :if => proc { |obj| obj.association_taxonomy.present? && 'has_many' == obj.data_type }
         end
