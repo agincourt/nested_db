@@ -125,20 +125,69 @@ module NestedDb
                 end
               END
             end
+          # if it's a has_and_belongs_to_many property
+          when 'has_and_belongs_to_many'
+            target_taxonomy = temporary_taxonomy.global_scope.where(:reference => property.association_taxonomy).first
+            # only allow the relation if we found the target
+            if target_taxonomy
+              metaclass.class_eval <<-END
+                after_save :ensure_correct_remote_#{property.name}_ids
+              
+                def #{property.name}_ids=(ids = [])
+                  @#{property.name}_ids = Array(ids)
+                  write_attribute(:#{property.name}_ids, #{property.name}_ids)
+                end
+                
+                def #{property.name}_ids
+                  @#{property.name}_ids ||= read_attribute(:#{property.name}_ids) || []
+                  @#{property.name}_ids.map { |id|
+                    id.kind_of?(BSON::ObjectId) ? id : BSON::ObjectId(id)
+                  }.uniq
+                end
+                
+                def #{property.name}
+                  remote_#{property.name}_taxonomy.instances.where(:_id => { "$nin" => #{property.name}_ids })
+                end
+                
+                def remote_#{property.name}_taxonomy
+                  @remote_#{property.name}_taxonomy ||= taxonomy.global_scope.first(:conditions => { :reference => '#{property.association_taxonomy}' })
+                end
+                
+                private
+                def ensure_correct_remote_#{property.name}_ids
+                  
+                  # find all the instances which contain this id but shouldn't
+                  remote_#{property.name}_taxonomy.instances.
+                    where(:#{temporary_taxonomy.reference}_ids => id).
+                    not_in(:_id => #{property.name}_ids).each do |i|
+                      i.pull_all(:#{temporary_taxonomy.reference}_ids, id)
+                    end
+                  
+                  # find all the instances which should contain this ID
+                  remote_#{property.name}_taxonomy.instances.
+                    any_in(:_id => #{property.name}_ids).each do |i|
+                      i.add_to_set(:#{temporary_taxonomy.reference}_ids, id)
+                    end
+                  
+                end
+              END
+            end
           # if it's a belongs_to property
           when 'belongs_to'
             target_taxonomy = temporary_taxonomy.global_scope.where(:reference => property.association_taxonomy).first
-            
-            metaclass.class_eval <<-END
-              belongs_to :#{property.name},
-                :class_name     => '#{self.class.name}',
-                :required       => #{property.required? ? 'true' : 'false'},
-                :taxonomy_id    => '#{target_taxonomy.id}',
-                :taxonomy_class => '#{target_taxonomy.class.name}',
-                :scoped_type    => '#{temporary_taxonomy.scoped_type}',
-                :scoped_id      => '#{temporary_taxonomy.scoped_id}',
-                :counter_cache  => true
-            END
+            # only allow the relation if we found the target
+            if target_taxonomy
+              metaclass.class_eval <<-END
+                belongs_to :#{property.name},
+                  :class_name     => '#{self.class.name}',
+                  :required       => #{property.required? ? 'true' : 'false'},
+                  :taxonomy_id    => '#{target_taxonomy.id}',
+                  :taxonomy_class => '#{target_taxonomy.class.name}',
+                  :scoped_type    => '#{temporary_taxonomy.scoped_type}',
+                  :scoped_id      => '#{temporary_taxonomy.scoped_id}',
+                  :counter_cache  => true
+              END
+            end
           # if it's a file property
           when 'file'
             # mount carrierwave

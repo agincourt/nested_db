@@ -24,6 +24,18 @@ module NestedDb
             :inverse_of => :instances,
             :class_name => "NestedDb::Taxonomy"
           
+          # scopes
+          class << self
+            def search_on(property, options = {})
+              case options[:using]
+              when :match
+                where(property.to_sym.matches => options[:for])
+              else
+                where(property.to_sym => options[:for])
+              end
+            end
+          end
+          
           # validation
           validates_presence_of :taxonomy
           validate :validate_against_taxonomy, :if => proc { |obj| obj.taxonomy.present? }

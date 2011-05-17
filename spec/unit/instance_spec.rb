@@ -291,4 +291,61 @@ describe NestedDb::Instance do
     end
   end
   
+  describe "has_and_belongs_to_many relationships" do
+    context "when the instance's taxonomy defines a has_and_belongs_to_many association" do
+            let(:taxonomy) do
+        return @taxonomy if defined?(@taxonomy)
+        # wipe all taxonomies
+        NestedDb::Taxonomy.delete_all
+        # create the taxonomy
+        @taxonomy = NestedDb::Taxonomy.create!({
+          :name      => 'Category',
+          :reference => 'categories'
+        })
+        # add a normal property
+        @taxonomy.physical_properties.create!({
+          :name      => 'name',
+          :data_type => 'string'
+        })
+        # create the second taxonomy to relate to
+        @taxonomy_two = NestedDb::Taxonomy.create!({
+          :name      => 'Article',
+          :reference => 'articles'
+        })
+        # add a normal property to articles
+        @taxonomy_two.physical_properties.create!({
+          :name      => 'name',
+          :data_type => 'string',
+          :required  => true
+        })
+        # add a has_and_belongs_to_many relation from taxonomy two to taxonomy one
+        @taxonomy_two.physical_properties.create!({
+          :name                 => 'categories',
+          :data_type            => 'has_and_belongs_to_many',
+          :association_taxonomy => 'categories' # based on reference
+        })
+        # add a has_and_belongs_to_many relation from taxonomy one to taxonomy two
+        @taxonomy.physical_properties.create!({
+          :name                 => 'articles',
+          :data_type            => 'has_and_belongs_to_many',
+          :association_taxonomy => 'articles' # based on reference
+        })
+        @taxonomy
+      end
+      
+      let(:instance) do
+        @instance ||= taxonomy.instances.create!({ :name => 'Test' })
+      end
+      
+      it "should load the relation from the taxonomy" do
+        inst = instance
+        inst.should respond_to 'articles'
+        inst.articles.create({ :name => 'Test' })
+        inst.articles.size.should == 1
+        inst.articles.first.should respond_to 'categories'
+        inst.articles.first.categories.first.should == inst
+      end
+    end
+  end
+  
 end

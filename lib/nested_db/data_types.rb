@@ -22,7 +22,8 @@ module NestedDb
           :file       => nil,
           :image      => nil,
           :belongs_to => BSON::ObjectId,
-          :has_many   => Hash
+          :has_many   => Hash,
+          :has_and_belongs_to_many => nil
         }
       end
       

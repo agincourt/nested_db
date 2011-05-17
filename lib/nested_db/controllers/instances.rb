@@ -22,6 +22,15 @@ module NestedDb
       end
       
       module InstanceMethods
+        def index
+          @instances = @taxonomy.instances
+          @instances = @instances.search_on(params[:column], :for => params[:query], :using => :match) if params[:query]
+          
+          respond_with(@instances) do |wants|
+            wants.html { redirect_to(taxonomy_relative_to_instance_url) }
+          end
+        end
+        
         def new
           @instance = @taxonomy.instances.build
           @taxonomy.physical_properties.select { |pp| 'has_many' == pp.data_type }.each { |pp|
