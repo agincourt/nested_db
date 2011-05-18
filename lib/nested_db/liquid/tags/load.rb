@@ -103,15 +103,15 @@ module Liquid
         # look up the operand and process
         case operand
         when '=='
-          return [:where, { field.to_sym => value }]
+          return [[:where, { field.to_sym => value }]]
         when '>'
-          return [:where, { field.to_sym.gt => value }]
+          return [[:where, { field.to_sym.gt => value }]]
         when '<'
-          return [:where, { field.to_sym.lt => value }]
+          return [[:where, { field.to_sym.lt => value }]]
         when 'exists'
-          return [:where, { field.to_sym.exists => true }]
+          return [[:where, { field.to_sym.exists => true }]]
         when 'not_exists'
-          return [:any_of, [{ field.to_sym.exists => false }, { field.to_sym => '' }, { field.to_sym => 0 }]]
+          return [[:any_of, [{ field.to_sym.exists => false }, { field.to_sym => '' }, { field.to_sym => 0 }]]]
         end
       end
       # default to empty array
