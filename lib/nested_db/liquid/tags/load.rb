@@ -29,7 +29,7 @@ module Liquid
       # load the taxonomy instances relation
       instances = taxonomy(context).instances
       # if we have conditions, enforce them
-      instances = instances.where(conditions(context)) if conditions?
+      instances = apply_conditions(instances, context) if conditions?
       # if we only want one
       if @quantity == 'one'
         Rails.logger.debug "Finding first #{@reference} instance, using conditions: #{conditions(context).inspect}"
@@ -71,6 +71,13 @@ module Liquid
       @attributes.has_key?('where')
     end
     
+    def apply_conditions(object, context)
+      conditions(context).each { |set|
+        object = object.send(set[0], set[1])
+      }
+      object
+    end
+    
     def conditions(context)
       if @attributes['where'] =~ /^['|"](.*)\s(==|!=|>|<)\s(.*)['|"]$/i
         field, operand, value = $1, $2, $2
@@ -87,7 +94,8 @@ module Liquid
           operand = '!=' == operand ? 'not_exists' : 'exists'
         # if it's surrounded with quotes - we want the raw value
         when /^['|"](.*)['|"]$/
-          # do nothing
+          value = $1
+        # otherwise pull it as a variable from the context
         else
           value = context[value]
         end
@@ -95,19 +103,19 @@ module Liquid
         # look up the operand and process
         case operand
         when '=='
-          { field.to_sym => value }
+          return [:where, { field.to_sym => value }]
         when '>'
-          { field.to_sym.gt => value }
+          return [:where, { field.to_sym.gt => value }]
         when '<'
-          { field.to_sym.lt => value }
+          return [:where, { field.to_sym.lt => value }]
         when 'exists'
-          { field.to_sym.exists => true }
+          return [:where, { field.to_sym.exists => true }]
         when 'not_exists'
-          { field.to_sym.exists => false }
+          return [:any_of, [{ field.to_sym.exists => false }, { field.to_sym => '' }, { field.to_sym => 0 }]]
         end
-      else
-        {}
       end
+      # default to empty array
+      []
     end
   end
   
