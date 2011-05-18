@@ -134,15 +134,17 @@ module NestedDb
                 after_save :ensure_correct_remote_#{property.name}_ids
               
                 def #{property.name}_ids=(ids = [])
-                  @#{property.name}_ids = Array(ids)
+                  instance_variable_set(:@#{property.name}_ids, Array(ids))
                   write_attribute(:#{property.name}_ids, #{property.name}_ids)
                 end
                 
                 def #{property.name}_ids
-                  @#{property.name}_ids ||= read_attribute(:#{property.name}_ids) || []
+                  # pull from DB or setup default array
+                  @#{property.name}_ids ||= Array(read_attribute(:#{property.name}_ids) || [])
+                  # parse into BSON::ObjectIds
                   @#{property.name}_ids.delete_if { |id|
                     # ensure we only use legal objectids
-                    !BSON::ObjectId.legal?(id)
+                    !id.kind_of?(BSON::ObjectId) && !BSON::ObjectId.legal?(id)
                   }.map { |id|
                     # change from strings into objectids
                     id.kind_of?(BSON::ObjectId) ? id : BSON::ObjectId(id)
@@ -150,7 +152,7 @@ module NestedDb
                 end
                 
                 def #{property.name}
-                  remote_#{property.name}_taxonomy.instances.where(:_id => { "$nin" => #{property.name}_ids })
+                  remote_#{property.name}_taxonomy.instances.any_in(:_id => #{property.name}_ids)
                 end
                 
                 def remote_#{property.name}_taxonomy
@@ -159,20 +161,38 @@ module NestedDb
                 
                 private
                 def ensure_correct_remote_#{property.name}_ids
-                  
+                  remove_from_remote_#{property.name}
+                  add_to_remote_#{property.name}
+                end
+                
+                def remove_from_remote_#{property.name}
                   # find all the instances which contain this id but shouldn't
-                  remote_#{property.name}_taxonomy.instances.
+                  criteria = remote_#{property.name}_taxonomy.instances.
                     where(:#{temporary_taxonomy.reference}_ids => id).
-                    not_in(:_id => #{property.name}_ids).each do |i|
-                      i.pull_all(:#{temporary_taxonomy.reference}_ids, id)
-                    end
+                    not_in(:_id => #{property.name}_ids).
+                    where(:"#{temporary_taxonomy.reference}_ids".exists => true)
                   
+                  # update them to remove it
+                  criteria.klass.collection.update(
+                    criteria.selector,
+                    { '$pull' => { :"#{temporary_taxonomy.reference}_ids" => id } },
+                    :multi => true,
+                    :safe => Mongoid.persist_in_safe_mode
+                  )
+                end
+                
+                def add_to_remote_#{property.name}
                   # find all the instances which should contain this ID
-                  remote_#{property.name}_taxonomy.instances.
-                    any_in(:_id => #{property.name}_ids).each do |i|
-                      i.add_to_set(:#{temporary_taxonomy.reference}_ids, id)
-                    end
+                  criteria = remote_#{property.name}_taxonomy.instances.
+                    any_in(:_id => #{property.name}_ids)
                   
+                  # update them to add it
+                  criteria.klass.collection.update(
+                    criteria.selector,
+                    { '$addToSet' => { "#{temporary_taxonomy.reference}_ids" => id } },
+                    :multi => true,
+                    :safe => Mongoid.persist_in_safe_mode
+                  )
                 end
               END
             end

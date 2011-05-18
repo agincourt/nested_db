@@ -293,7 +293,7 @@ describe NestedDb::Instance do
   
   describe "has_and_belongs_to_many relationships" do
     context "when the instance's taxonomy defines a has_and_belongs_to_many association" do
-            let(:taxonomy) do
+      let(:taxonomy) do
         return @taxonomy if defined?(@taxonomy)
         # wipe all taxonomies
         NestedDb::Taxonomy.delete_all
@@ -339,11 +339,46 @@ describe NestedDb::Instance do
       
       it "should load the relation from the taxonomy" do
         inst = instance
+        # create another instance in the same taxonomy
+        inst.taxonomy.instances.create!({ :name => 'Test 2' })
+        # instances should respond to their relationship getter method
         inst.should respond_to 'articles'
-        inst.articles.create({ :name => 'Test' })
+        # instances should respond to their relationship ids setter method
+        inst.should respond_to 'articles_ids'
+        # instances should respond to their relationship ids setter method
+        inst.should respond_to 'articles_ids='
+        # build a sub-object
+        article_one = inst.articles.create({ :name => 'Test' })
+        # update the instance to contain this sub-object
+        inst.update_attributes(:articles_ids => [article_one.id])
+        # check it's in the list of ids
+        inst.articles_ids.should == [article_one.id]
+        # check we have one correct sub-object
+        inst.articles.to_a.should == [article_one]
+        # create another sub-object that's unrelated
+        article_two = inst.articles.first.taxonomy.instances.create({ :name => 'Test 2' })
+        # check we still only have one sub-object
         inst.articles.size.should == 1
-        inst.articles.first.should respond_to 'categories'
-        inst.articles.first.categories.first.should == inst
+        # load the sub object
+        sub_object = inst.articles.first
+        # check the sub-object responds to the parent relationship method
+        sub_object.should respond_to 'categories'
+        # check the sub-object has the instance in it's ids
+        sub_object.categories_ids.should == [inst.id]
+        # check the sub-object has the instance
+        sub_object.categories.to_a.should == [inst]
+        # update the instance to remove contain the sub-object
+        inst.update_attributes(:articles_ids => [])
+         # check we not longer have any ids
+        inst.articles_ids.size.should == 0
+        # check we have no sub-objects
+        inst.articles.to_a.size == 0
+        # reload the sub-object
+        sub_object = sub_object.class.find(sub_object.id)
+        # check the sub-object no longer has the instance in it's ids
+        sub_object.categories_ids.size.should == 0
+        # check the sub-object no longer has the instance
+        sub_object.categories.to_a.size.should == 0
       end
     end
   end
