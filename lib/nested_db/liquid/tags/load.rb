@@ -73,10 +73,10 @@ module Liquid
     
     def apply_conditions(scope, context)
       if @attributes['where'] =~ /^['|"](.*)\s(==|!=|>|<)\s(.*)['|"]$/i
-        field, operand, value = $1, $2, $2
+        field, operand, value = $1, $2, $3
         
         # process the value
-        case value
+        case value.strip
         # when it's the keywords blank or nil
         when 'blank', 'nil'
           # ensure the operand is == or !=
@@ -102,10 +102,8 @@ module Liquid
         when '<'
           return scope.where({ field.to_sym.lt => value })
         when 'exists'
-          puts "Processing exists"
           return scope.where({ field.to_sym.exists => true })
         when 'not_exists'
-          puts "Processing not_exists"
           return scope.any_of({ field.to_sym.exists => false }, { field.to_sym => '' }, { field.to_sym => 0 })
         end
       end
