@@ -30,7 +30,7 @@ module NestedDb
         when 'belongs_to'
           assoc = instance.send(property.name)
           assoc ? InstanceDrop.new(assoc) : nil
-        when 'has_many'
+        when 'has_many', 'has_and_belongs_to_many'
           instance.send(property.name).map { |i| InstanceDrop.new(i) }
         when 'image', 'file'
           instance.send(property.name).try(:to_s)
