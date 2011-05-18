@@ -150,7 +150,7 @@ module NestedDb
                 end
                 
                 def remote_#{property.name}_taxonomy
-                  @remote_#{property.name}_taxonomy ||= taxonomy.global_scope.first(:conditions => { :reference => '#{property.association_taxonomy}' })
+                  @remote_#{property.name}_taxonomy ||= taxonomy.global_scope.where(:reference => '#{property.association_taxonomy}').first
                 end
                 
                 private
