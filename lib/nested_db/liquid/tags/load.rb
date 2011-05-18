@@ -84,7 +84,7 @@ module Liquid
             raise SyntaxError.new("Syntax Error in 'load' where condition - Valid syntax: you can't use blank with any operand other than == or !=")
           end
           # update it to an exists/not_exists
-          operand = '!=' == operand ? 'not_exists' : 'exists'
+          operand = '!=' == operand ? 'exists' : 'not_exists'
         # if it's surrounded with quotes - we want the raw value
         when /^['|"](.*)['|"]$/
           value = $1
@@ -102,7 +102,7 @@ module Liquid
         when '<'
           return scope.where({ field.to_sym.lt => value })
         when 'exists'
-          return scope.where({ field.to_sym.exists => true })
+          return scope.where({ field.to_sym.exists => true }.where({ field.to_sym.ne => '' }).where({ field.to_sym.ne => 0 })
         when 'not_exists'
           return scope.any_of({ field.to_sym.exists => false }, { field.to_sym => '' }, { field.to_sym => 0 })
         end
