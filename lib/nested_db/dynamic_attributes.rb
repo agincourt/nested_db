@@ -140,9 +140,13 @@ module NestedDb
                 
                 def #{property.name}_ids
                   @#{property.name}_ids ||= read_attribute(:#{property.name}_ids) || []
-                  @#{property.name}_ids.map { |id|
+                  @#{property.name}_ids.delete_if { |id|
+                    # ensure we only use legal objectids
+                    !BSON::ObjectId.legal?(id)
+                  }.map { |id|
+                    # change from strings into objectids
                     id.kind_of?(BSON::ObjectId) ? id : BSON::ObjectId(id)
-                  }.uniq
+                  }.uniq # ensure unique
                 end
                 
                 def #{property.name}
