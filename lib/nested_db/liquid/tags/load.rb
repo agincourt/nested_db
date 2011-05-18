@@ -71,14 +71,7 @@ module Liquid
       @attributes.has_key?('where')
     end
     
-    def apply_conditions(object, context)
-      conditions(context).each { |set|
-        object = object.send(set[0], set[1])
-      }
-      object
-    end
-    
-    def conditions(context)
+    def apply_conditions(scope, context)
       if @attributes['where'] =~ /^['|"](.*)\s(==|!=|>|<)\s(.*)['|"]$/i
         field, operand, value = $1, $2, $2
         
@@ -103,19 +96,19 @@ module Liquid
         # look up the operand and process
         case operand
         when '=='
-          return [[:where, { field.to_sym => value }]]
+          return scope.where({ field.to_sym => value })
         when '>'
-          return [[:where, { field.to_sym.gt => value }]]
+          return scope.where({ field.to_sym.gt => value })
         when '<'
-          return [[:where, { field.to_sym.lt => value }]]
+          return scope.where({ field.to_sym.lt => value })
         when 'exists'
-          return [[:where, { field.to_sym.exists => true }]]
+          return scope.where({ field.to_sym.exists => true })
         when 'not_exists'
-          return [[:any_of, [{ field.to_sym.exists => false }, { field.to_sym => '' }, { field.to_sym => 0 }]]]
+          return scope.any_of({ field.to_sym.exists => false }, { field.to_sym => '' }, { field.to_sym => 0 })
         end
       end
       # default to empty array
-      []
+      scope
     end
   end
   
