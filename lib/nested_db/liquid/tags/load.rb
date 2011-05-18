@@ -102,7 +102,7 @@ module Liquid
         when '<'
           return scope.where({ field.to_sym.lt => value })
         when 'exists'
-          return scope.where({ field.to_sym.exists => true }.where({ field.to_sym.ne => '' }).where({ field.to_sym.ne => 0 })
+          return scope.where({ field.to_sym.exists => true }).where({ field.to_sym.ne => '' }).where({ field.to_sym.ne => 0 })
         when 'not_exists'
           return scope.any_of({ field.to_sym.exists => false }, { field.to_sym => '' }, { field.to_sym => 0 })
         end
