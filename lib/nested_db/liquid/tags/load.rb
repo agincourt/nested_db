@@ -80,7 +80,7 @@ module Liquid
         # when it's the keywords blank or nil
         when 'blank', 'nil'
           # ensure the operand is == or !=
-          unless ['!=', '=='].includes?(operand)
+          unless ['!=', '=='].include?(operand)
             raise SyntaxError.new("Syntax Error in 'load' where condition - Valid syntax: you can't use blank with any operand other than == or !=")
           end
           # update it to an exists/not_exists
