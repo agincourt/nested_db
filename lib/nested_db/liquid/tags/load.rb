@@ -13,7 +13,7 @@ module Liquid
         end
         @limit = [[(@attributes['limit'] || 100).to_i, 100].min, 0].max
       else
-        raise SyntaxError.new("Syntax Error in 'load' - Valid syntax: load <one|all> <reference> as <variable_name> [where: '<field> < ==|>|< > <value>'] [limit: <quantity>]")
+        raise SyntaxError.new("Syntax Error in 'load' - Valid syntax: load <one|all> <reference> as <variable_name> [where: '<field> < ==|!=|>|< > <value>'] [limit: <quantity>]")
       end
       
       super
@@ -72,14 +72,38 @@ module Liquid
     end
     
     def conditions(context)
-      if @attributes['where'] =~ /^['|"](.*)\s(==|>|<)\s(.*)['|"]$/i
-        case $2
+      if @attributes['where'] =~ /^['|"](.*)\s(==|!=|>|<)\s(.*)['|"]$/i
+        field, operand, value = $1, $2, $2
+        
+        # process the value
+        case value
+        # when it's the keywords blank or nil
+        when 'blank', 'nil'
+          # ensure the operand is == or !=
+          unless ['!=', '=='].includes?(operand)
+            raise SyntaxError.new("Syntax Error in 'load' where condition - Valid syntax: you can't use blank with any operand other than == or !=")
+          end
+          # update it to an exists/not_exists
+          operand = '!=' == operand ? 'not_exists' : 'exists'
+        # if it's surrounded with quotes - we want the raw value
+        when /^['|"](.*)['|"]$/
+          # do nothing
+        else
+          value = context[value]
+        end
+        
+        # look up the operand and process
+        case operand
         when '=='
-          { $1.to_sym => context[$3] }
+          { field.to_sym => value }
         when '>'
-          { $1.to_sym.gt => context[$3] }
+          { field.to_sym.gt => value }
         when '<'
-          { $1.to_sym.lt => context[$3] }
+          { field.to_sym.lt => value }
+        when 'exists'
+          { field.to_sym.exists => true }
+        when 'not_exists'
+          { field.to_sym.exists => false }
         end
       else
         {}
