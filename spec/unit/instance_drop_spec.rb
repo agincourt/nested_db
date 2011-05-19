@@ -80,7 +80,7 @@ describe NestedDb::InstanceDrop do
       drop = NestedDb::InstanceDrop.new(inst)
       drop.should respond_to 'to_liquid'
       (inst.taxonomy.properties.keys + ['id', 'taxonomy', 'created_at', 'updated_at']).each do |key|
-        drop.to_liquid.keys.should include(key)
+        drop.should respond_to key
       end
     end
     
@@ -95,10 +95,10 @@ describe NestedDb::InstanceDrop do
       inst.articles.first.persisted?.should == true
       inst.articles.first.category.should == inst
       drop = NestedDb::InstanceDrop.new(inst)
-      drop.to_liquid.keys.should include('articles')
-      drop.to_liquid['articles'].size.should     == 1
-      drop.to_liquid['articles'][0].class.should == NestedDb::Instance
-      drop.to_liquid['articles'][0].to_liquid['category'].to_liquid['instance'].should == drop.instance
+      drop.should respond_to 'articles'
+      drop.articles.size.should     == 1
+      drop.articles[0].class.should == NestedDb::Instance
+      drop.articles[0].category.should == drop.instance
     end
     
     it "should return a drop for it's taxonomy" do
@@ -109,14 +109,14 @@ describe NestedDb::InstanceDrop do
     end
     
     it "should return nil for empty file fields" do
-      NestedDb::InstanceDrop.new(instance).to_liquid['image'].should be_nil
+      instance.to_liquid.image.should be_nil
     end
     
     it "should return a string for populated file fields" do
       inst = instance
       inst.update_attributes(:image => file('image')).should == true
       inst.image.url.should_not be_nil
-      NestedDb::InstanceDrop.new(inst).to_liquid['image'].should_not be_nil
+      inst.to_liquid.image.should_not be_nil
     end
   end
 end

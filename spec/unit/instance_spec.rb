@@ -302,7 +302,7 @@ describe NestedDb::Instance do
             }
           })
           inst.save
-          NestedDb::InstanceDrop.new(inst).to_liquid['articles'].should respond_to 'each'
+          inst.to_liquid.articles.should respond_to 'each'
         end
       end
     end
@@ -433,4 +433,5 @@ describe NestedDb::Instance do
       [NestedDb::InstanceDrop, Hash].should include inst.to_liquid.class
     end
   end
+
 end

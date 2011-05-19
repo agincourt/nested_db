@@ -12,41 +12,40 @@ module NestedDb
     delegate :taxonomy,            :to => "instance"
     
     def initialize(instance)
-      self.instance      = instance
+      self.instance = instance
     end
     
-    def to_liquid
-      # memoize
-      return @properties if defined?(@properties)
-      # load fields from taxonomy properties
-      @properties = instance.taxonomy.properties.inject({}) do |result,arr|
-        # load property from the array
-        property = arr[1]
-        
-        # load value based on it's data type
-        value = case property.data_type
-        when 'rich_text'
-          read_attribute("#{property.name}_rich_text_processed")
-        when 'image', 'file'
-          instance.send(property.name).try(:to_s)
-        else
-          instance.send(property.name)
-        end
-        
-        result.merge(property.name => value)
+    def id
+      auto_incremented_id
+    end
+    
+    def respond_to?(method)
+      taxonomy.has_property?(method) || super
+    end
+    
+    def method_missing(method)
+      if taxonomy.has_property?(method)
+        instance_value_for(method)
+      else
+        super
       end
-      
-      # merge some other properties
-      @properties.merge!({
-        'taxonomy'   => taxonomy,
-        'id'         => auto_incremented_id,
-        'created_at' => created_at,
-        'updated_at' => updated_at,
-        'instance'   => instance
-      })
-      
-      # return the properties
-      @properties
+    end
+    
+    private
+    def instance_value_for(method)
+      # load the property
+      property = taxonomy.properties[method.to_s]
+      # return nil if it wasn't found
+      return nil unless property
+      # typecast the value based on it's data type
+      case property.data_type
+      when 'rich_text'
+        read_attribute("#{property.name}_rich_text_processed")
+      when 'image', 'file'
+        instance.send(property.name).try(:to_s)
+      else
+        instance.send(property.name)
+      end
     end
   end
 end
