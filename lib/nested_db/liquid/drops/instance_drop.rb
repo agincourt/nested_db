@@ -31,6 +31,14 @@ module NestedDb
       end
     end
     
+    def before_method(method)
+      if taxonomy.has_property?(method)
+        instance_value_for(method)
+      else
+        super
+      end
+    end
+    
     private
     def instance_value_for(method)
       # load the property
