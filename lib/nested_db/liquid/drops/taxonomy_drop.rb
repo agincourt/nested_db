@@ -11,17 +11,11 @@ module NestedDb
     end
   
     def all
-      taxonomy.instances.limit(100).map { |i|
-        InstanceDrop.new(i, self)
-      }
+      taxonomy.instances.limit(100)
     end
     
     def count
       taxonomy.instances.count
-    end
-  
-    def fields
-      taxonomy.instances.build.fields.keys
     end
   end
 end

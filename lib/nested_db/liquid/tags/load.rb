@@ -32,18 +32,12 @@ module Liquid
       instances = apply_conditions(instances, context) if conditions?
       # if we only want one
       if @quantity == 'one'
-        # load the first
-        instance = instances.first
-        # if we found it, return it
-        return NestedDb::InstanceDrop.new(instance, taxonomy_drop(context)) if instance
-        # otherwise return nil
-        nil
+        # return the first only
+        instances.first
       # if we want many
       else
         # return an array of instances found
-        return instances.limit(@limit).map { |instance|
-          NestedDb::InstanceDrop.new(instance, taxonomy_drop(context))
-        }
+        instances.limit(@limit)
       end
     end
     

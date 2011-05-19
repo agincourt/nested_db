@@ -42,6 +42,8 @@ module NestedDb
           # callbacks
           before_validation :downcase_reference
         end
+        
+        base.send(:include, ::Liquidizable)
       end
       
       module ClassMethods

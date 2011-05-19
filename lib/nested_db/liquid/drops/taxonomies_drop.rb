@@ -2,21 +2,12 @@ module NestedDb
   class TaxonomiesDrop < ::Liquid::Drop
     def initialize(scope = nil)
       @scope = scope || Taxonomy.all
-      # loop through each taxonomy
-      @scope.each { |t|
-        # generate a method for it
-        self.class.send(:define_method, t.reference.to_sym) do
-          TaxonomyDrop.new(t)
-        end
-      }
-    end
-  
-    def count
-      @scope.count
     end
     
-    def all
-      @scope.map { |t| TaxonomyDrop.new(t) }
+    def to_liquid
+      @scope.inject({}) { |result,taxonomy|
+        result.merge(taxonomy.reference => t)
+      }
     end
   end
 end

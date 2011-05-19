@@ -7,4 +7,5 @@ require 'nested_db/nested_instances'
 require 'nested_db/dynamic_attributes'
 require 'nested_db/models'
 require 'nested_db/routes' if defined?(ActionDispatch)
+require 'nested_db/liquidizable' unless defined?(Liquidizable)
 require 'nested_db/liquid'

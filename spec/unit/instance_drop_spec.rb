@@ -97,15 +97,15 @@ describe NestedDb::InstanceDrop do
       drop = NestedDb::InstanceDrop.new(inst)
       drop.to_liquid.keys.should include('articles')
       drop.to_liquid['articles'].size.should     == 1
-      drop.to_liquid['articles'][0].class.should == NestedDb::InstanceDrop
-      drop.to_liquid['articles'][0].to_liquid['category'].instance.should == drop.instance
+      drop.to_liquid['articles'][0].class.should == NestedDb::Instance
+      drop.to_liquid['articles'][0].to_liquid['category'].to_liquid['instance'].should == drop.instance
     end
     
     it "should return a drop for it's taxonomy" do
       inst = instance
       drop = NestedDb::InstanceDrop.new(inst)
       drop.should respond_to 'taxonomy'
-      drop.taxonomy.class.should == NestedDb::TaxonomyDrop
+      drop.taxonomy.class.should == NestedDb::Taxonomy
     end
     
     it "should return nil for empty file fields" do

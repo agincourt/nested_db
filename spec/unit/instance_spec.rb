@@ -288,6 +288,23 @@ describe NestedDb::Instance do
         # ensure the article has the category set
         inst.articles.first.category.should == inst
       end
+      
+      context "liquid templating" do
+        it "should be able to reference associated instances" do
+          inst = taxonomy.instances.build
+          inst.write_attributes({
+            :title => 'Test',
+            :articles_attributes => {
+              '0' => {
+                'name'  => 'Test 2',
+                'image' => file('image')
+              }
+            }
+          })
+          inst.save
+          NestedDb::InstanceDrop.new(inst).to_liquid['articles'].should respond_to 'each'
+        end
+      end
     end
   end
   
@@ -383,4 +400,37 @@ describe NestedDb::Instance do
     end
   end
   
+  describe "liquid templating" do
+    let(:taxonomy) do
+      return @taxonomy if defined?(@taxonomy)
+      # wipe all taxonomies
+      NestedDb::Taxonomy.delete_all
+      # create the taxonomy
+      @taxonomy = NestedDb::Taxonomy.create!({
+        :name      => 'Category',
+        :reference => 'categories'
+      })
+      # add a normal property
+      @taxonomy.physical_properties.create!({
+        :name      => 'title',
+        :data_type => 'string'
+      })
+      # return
+      @taxonomy
+    end
+    
+    let(:instance) do
+      @instance ||= taxonomy.instances.create({ :title => 'Test' })
+    end
+    
+    it "should respond to liquidized methods" do
+      inst = instance
+      ['to_liquid', 'liquid_drop', 'liquid_drop_class'].each do |method|
+        inst.should respond_to method
+      end
+      inst.liquid_drop_class.should == NestedDb::InstanceDrop
+      inst.liquid_drop.class.should == NestedDb::InstanceDrop
+      [NestedDb::InstanceDrop, Hash].should include inst.to_liquid.class
+    end
+  end
 end

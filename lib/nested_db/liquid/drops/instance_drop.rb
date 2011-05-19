@@ -9,10 +9,10 @@ module NestedDb
     delegate :auto_incremented_id, :to => "instance"
     delegate :created_at,          :to => "instance"
     delegate :updated_at,          :to => "instance"
+    delegate :taxonomy,            :to => "instance"
     
-    def initialize(instance, taxonomy_drop = nil)
+    def initialize(instance)
       self.instance      = instance
-      self.taxonomy_drop = taxonomy_drop if taxonomy_drop
     end
     
     def to_liquid
@@ -27,11 +27,6 @@ module NestedDb
         value = case property.data_type
         when 'rich_text'
           read_attribute("#{property.name}_rich_text_processed")
-        when 'belongs_to'
-          assoc = instance.send(property.name)
-          assoc ? InstanceDrop.new(assoc) : nil
-        when 'has_many', 'has_and_belongs_to_many'
-          instance.send(property.name).map { |i| InstanceDrop.new(i) }
         when 'image', 'file'
           instance.send(property.name).try(:to_s)
         else
@@ -46,15 +41,12 @@ module NestedDb
         'taxonomy'   => taxonomy,
         'id'         => auto_incremented_id,
         'created_at' => created_at,
-        'updated_at' => updated_at
+        'updated_at' => updated_at,
+        'instance'   => instance
       })
       
       # return the properties
       @properties
-    end
-    
-    def taxonomy
-      self.taxonomy_drop ||= TaxonomyDrop.new(instance.taxonomy)
     end
   end
 end
