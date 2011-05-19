@@ -1,12 +1,14 @@
 module NestedDb
   class TaxonomiesDrop < ::Liquid::Drop
+    attr_accessor :taxonomy_scope
+    
     def initialize(scope = nil)
-      @scope = scope || Taxonomy.all
+      self.taxonomy_scope = scope || Taxonomy.all
     end
     
     def to_liquid
-      @scope.inject({}) { |result,taxonomy|
-        result.merge(taxonomy.reference => t)
+      taxonomy_scope.inject({}) { |result,taxonomy|
+        result.merge(taxonomy.reference => taxonomy)
       }
     end
   end
