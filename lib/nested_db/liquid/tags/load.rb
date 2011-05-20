@@ -91,7 +91,7 @@ module Liquid
         when '=='
           return scope.where({ field.to_sym => value })
         when 'in'
-          return scope.where({ field.to_sym.in => Array(value) })
+          return scope.where({ field.to_sym.in => value ? Array(value) : [] })
         when '>'
           return scope.where({ field.to_sym.gt => value })
         when '<'
