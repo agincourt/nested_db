@@ -13,7 +13,7 @@ module Liquid
         end
         @limit = [[(@attributes['limit'] || 100).to_i, 100].min, 0].max
       else
-        raise SyntaxError.new("Syntax Error in 'load' - Valid syntax: load <one|all> <reference> as <variable_name> [where: '<field> < ==|!=|>|< > <value>'] [limit: <quantity>]")
+        raise SyntaxError.new("Syntax Error in 'load' - Valid syntax: load <one|all> <reference> as <variable_name> [where: '<field> < in|==|!=|>|< > <value>'] [limit: <quantity>]")
       end
       
       super
@@ -65,7 +65,7 @@ module Liquid
     end
     
     def apply_conditions(scope, context)
-      if @attributes['where'] =~ /^['|"](.*)\s(==|!=|>|<)\s(.*)['|"]$/i
+      if @attributes['where'] =~ /^['|"](.*)\s(in|==|!=|>|<)\s(.*)['|"]$/i
         field, operand, value = $1, $2, $3
         
         # process the value
@@ -90,6 +90,8 @@ module Liquid
         case operand
         when '=='
           return scope.where({ field.to_sym => value })
+        when 'in'
+          return scope.where({ field.to_sym.in => value })
         when '>'
           return scope.where({ field.to_sym.gt => value })
         when '<'
