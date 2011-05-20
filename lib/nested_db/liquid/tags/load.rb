@@ -67,6 +67,7 @@ module Liquid
     def apply_conditions(scope, context)
       if @attributes['where'] =~ /^['|"](.*)\s(in|==|!=|>|<)\s(.*)['|"]$/i
         field, operand, value = $1, $2, $3
+        field = 'auto_incremented_id' if 'id' == field
         
         # process the value
         case value.strip
