@@ -18,6 +18,7 @@ module NestedDb
           :string     => String,
           :rich_text  => String,
           :plain_text => String,
+          :password   => String,
           :time       => Time,
           :file       => nil,
           :image      => nil,

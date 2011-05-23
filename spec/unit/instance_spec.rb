@@ -434,4 +434,67 @@ describe NestedDb::Instance do
     end
   end
 
+  describe "encrypted fields" do
+    let(:taxonomy) do
+      # wipe all taxonomies
+      NestedDb::Taxonomy.delete_all
+      # create the taxonomy
+      @taxonomy = NestedDb::Taxonomy.create!({
+        :name      => 'User',
+        :reference => 'users'
+      })
+      # add a normal property
+      @taxonomy.physical_properties.create!({
+        :name      => 'password',
+        :data_type => 'password'
+      })
+      # return
+      @taxonomy
+    end
+    
+    let(:instance) do
+      instance = taxonomy.instances.build
+      instance.write_attributes({ :password => 'Test', :password_confirmation => 'Test' })
+      instance
+    end
+    
+    it "should respond to the password getters/setters" do
+      inst = taxonomy.instances.build
+      inst.should respond_to 'password'
+      inst.should respond_to 'password='
+      inst.should respond_to 'password_confirmation'
+      inst.should respond_to 'password_confirmation='
+    end
+    
+    it "should set an instance variable to store the password on set" do
+      inst = taxonomy.instances.build
+      inst.password = 'hello'
+      inst.password.should == 'hello'
+      inst.instance_variable_get(:@password).should == 'hello'
+    end
+    
+    it "should set an instance variable to store the password_confirmation on set" do
+      inst = taxonomy.instances.build
+      inst.password_confirmation = 'world'
+      inst.password_confirmation.should == 'world'
+      inst.instance_variable_get(:@password_confirmation).should == 'world'
+    end
+    
+    it "should set the encrypted password and salt" do
+      inst = instance
+      inst.encrypted_password.should_not be_empty
+      inst.password_salt.should_not be_empty
+    end
+    
+    it "should return itself when successfully authenticating" do
+      inst = instance
+      inst.authenticate('password', 'Test').should == inst
+    end
+    
+    it "should return nil when unsuccessfully authenticating" do
+      inst = instance
+      inst.authenticate('password', 'Test2').should be_nil
+    end
+  end
+
 end

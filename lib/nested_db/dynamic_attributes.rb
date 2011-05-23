@@ -3,6 +3,8 @@ module NestedDb
     def self.included(base)
       base.extend ClassMethods
       base.send(:include, InstanceMethods)
+      base.send(:include, Encryption)
+      
       # setup our callbacks
       base.class_eval do
         
@@ -223,6 +225,11 @@ module NestedDb
             # mount carrierwave
             metaclass.class_eval <<-END
               mount_uploader :#{property.name}, NestedDb::InstanceImageUploader
+            END
+          # if it's a password property
+          when 'password'
+            metaclass.class_eval <<-END
+              password_field :#{property.name}
             END
           # if it's a normal property (string etc)
           else
