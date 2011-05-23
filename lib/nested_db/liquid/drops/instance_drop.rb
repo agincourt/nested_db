@@ -3,13 +3,10 @@ module NestedDb
     attr_accessor :instance
     attr_accessor :taxonomy_drop
     
-    delegate :read_attribute,      :to => "instance"
-    delegate :attribute_present?,  :to => "instance"
-    delegate :attributes,          :to => "instance"
-    delegate :auto_incremented_id, :to => "instance"
-    delegate :created_at,          :to => "instance"
-    delegate :updated_at,          :to => "instance"
-    delegate :taxonomy,            :to => "instance"
+    delegate :read_attribute, :attribute_present?, :attributes,
+      :auto_incremented_id, :created_at,  :updated_at, :taxonomy,
+      :persisted?, :new_record?,
+      :to => "instance"
     
     def initialize(instance)
       self.instance = instance
@@ -17,6 +14,14 @@ module NestedDb
     
     def id
       auto_incremented_id
+    end
+    
+    def errors
+      instance.errors.map do |field,messages|
+        messages.map do |message|
+          NestedDb::ErrorDrop.new(field,message)
+        end
+      end.flatten
     end
     
     def respond_to?(method)
