@@ -88,12 +88,6 @@ module NestedDb
             Array(virtual_properties)
           ).inject({}) { |hash,p| hash.merge(p.name => p.field) }
         end
-  
-        def validate_instance(instance)
-          physical_properties.each { |p|
-            p.validate_instance(instance)
-          }
-        end
         
         def properties
           (

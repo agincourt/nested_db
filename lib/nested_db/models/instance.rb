@@ -39,7 +39,6 @@ module NestedDb
           
           # validation
           validates_presence_of :taxonomy
-          validate :validate_against_taxonomy, :if => proc { |obj| obj.taxonomy.present? }
           
           # callbacks
           after_validation :generate_auto_incremented_id
@@ -109,10 +108,6 @@ module NestedDb
               write_attribute(vp.name, vp.value(self))
             end
           end
-        end
-        
-        def validate_against_taxonomy
-          taxonomy.validate_instance(self)
         end
       end
     end

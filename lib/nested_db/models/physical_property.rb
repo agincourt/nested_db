@@ -52,12 +52,6 @@ module NestedDb
       end
       
       module InstanceMethods
-        def validate_instance(instance)
-          if required? && instance.try(name).blank?
-            instance.errors.add(name, "cannot be blank")
-          end
-        end
-        
         def field
           Mongoid::Field.new(name, :type => self.class.data_types[data_type.to_sym], :required => required?)
         end

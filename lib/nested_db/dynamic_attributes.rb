@@ -261,7 +261,8 @@ module NestedDb
           when 'email'
             metaclass.class_eval <<-END
               validates_format_of :#{property.name},
-                :with => URI.regexp
+                :with    => URI.regexp,
+                :message => 'must be a valid email address'
             END
           end
         end # end loop through properties
