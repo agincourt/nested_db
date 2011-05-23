@@ -32,8 +32,8 @@ module Liquid
         context['passed?'] = false
         context['failed?'] = true
       end
-      # continue with render
-      super(context)
+      # render nothing
+      ''
     end
     
     protected
