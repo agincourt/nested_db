@@ -1,5 +1,5 @@
 module Liquid
-  class Authenticate < Tag
+  class AuthenticateTag < Tag
     Syntax = /as\s([^\s]+)\sagainst\s([^\s]+)\swhere\s([^\s]+)\s==\s([^\s]+)\sand\s([^\s]+)\s==\s([^\s]+)/
     
     def initialize(tag_name, markup, tokens)
@@ -57,4 +57,6 @@ module Liquid
       $1 || context[value]
     end
   end
+  
+  Template.register_tag('authenticate', AuthenticateTag)
 end

@@ -1,5 +1,5 @@
 module Liquid
-  class Load < Tag
+  class LoadTag < Tag
     Syntax = /(one|all)\s([^\s]+)\sas\s([^\s]+)/
     
     def initialize(tag_name, markup, tokens)
@@ -108,5 +108,5 @@ module Liquid
     end
   end
   
-  Template.register_tag('load', Load)
+  Template.register_tag('load', LoadTag)
 end
