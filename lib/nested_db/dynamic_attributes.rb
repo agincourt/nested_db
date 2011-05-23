@@ -6,6 +6,7 @@ module NestedDb
       base.extend ClassMethods
       base.send(:include, InstanceMethods)
       base.send(:include, Encryption)
+      base.send(:include, Validation)
       
       # setup our callbacks
       base.class_eval do
@@ -257,7 +258,7 @@ module NestedDb
           
           if property.unique?
             metaclass.class_eval <<-END
-              validates_uniqueness_of :#{property.name}
+              validates_uniqueness_within_taxonomy_of :#{property.name}
             END
           end
           
