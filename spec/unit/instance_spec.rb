@@ -497,4 +497,39 @@ describe NestedDb::Instance do
     end
   end
 
+  describe "unique fields" do
+    let(:taxonomy) do
+      # wipe all taxonomies
+      NestedDb::Taxonomy.delete_all
+      # create the taxonomy
+      @taxonomy = NestedDb::Taxonomy.create!({
+        :name      => 'User',
+        :reference => 'users'
+      })
+      # add a normal property
+      @taxonomy.physical_properties.create!({
+        :name      => 'username',
+        :data_type => 'string',
+        :unique    => true
+      })
+      # return
+      @taxonomy
+    end
+    
+    let(:instance) do
+      instance = taxonomy.instances.build
+      instance.write_attributes({ :username => 'one' })
+      instance.save
+      instance
+    end
+    
+    it "should should disallow creation of new instances with the same unique value" do
+      inst = instance
+      new_inst = inst.taxonomy.instances.build
+      new_inst.write_attributes({ :username => 'one' })
+      new_inst.save.should == false
+      new_inst.errors.keys.should include :username
+    end
+  end
+
 end

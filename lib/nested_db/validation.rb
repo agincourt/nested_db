@@ -15,19 +15,19 @@ module NestedDb
     
     module ClassMethods
       def validates_uniqueness_within_taxonomy_of(attr)
-        unique_taxonomy_attributes ||= []
-        unique_taxonomy_attributes  << attr
+        self.unique_taxonomy_attributes ||= []
+        self.unique_taxonomy_attributes  << attr
       end
     end
     
     module InstanceMethods
       private
       def validate_uniqueness_within_taxonomies
-        (self.class.unique_taxonomy_attributes || []).each do |attribute|
+        (self.class.unique_taxonomy_attributes || []).uniq.each do |attribute|
           errors.add(
             attribute,
             :taken,
-            { :value => value }
+            { :value => attributes[attribute] }
           ) unless valid_uniquely_within_taxonomy?(attribute)
         end
       end
