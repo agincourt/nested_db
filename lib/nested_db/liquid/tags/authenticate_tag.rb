@@ -25,7 +25,7 @@ module Liquid
       user = authenticate(context)
       # if the user was set
       if user
-        context[@var_name] = InstanceDrop.new(user)
+        context[@var_name] = NestedDb::InstanceDrop.new(user)
         context['passed?'] = true
         context['failed?'] = false
       else

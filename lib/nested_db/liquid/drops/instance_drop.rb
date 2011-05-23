@@ -51,6 +51,8 @@ module NestedDb
         read_attribute("#{property.name}_rich_text_processed")
       when 'image', 'file'
         instance.send(property.name).try(:to_s)
+      when 'password'
+        nil
       else
         instance.send(property.name)
       end
