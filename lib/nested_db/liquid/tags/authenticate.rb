@@ -45,11 +45,16 @@ module Liquid
         raise SyntaxError.new("Syntax Error in 'authenticate' - Taxonomy `#{@collection_name}` could not be found")
       end
       # find the instance
-      instance = taxonomy.instances.first(:conditions => { @condition_field => @condition_value })
+      instance = taxonomy.instances.first(:conditions => { @condition_field => contextual_value(@condition_value) })
       # return if we couldn't find the instance
       return unless instance
       # try to authenticate the instance
-      instance.authenticate(@password_field, @password_value)
+      instance.authenticate(@password_field, contextual_value(@password_value))
+    end
+    
+    def contextual_value(value)
+      value =~ /^["'](.*)["']$/
+      $1 || context[value]
     end
   end
 end
