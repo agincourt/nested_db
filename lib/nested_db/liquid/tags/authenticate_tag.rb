@@ -26,6 +26,7 @@ module Liquid
       # if the user was set
       if user
         context[@var_name] = NestedDb::InstanceDrop.new(user)
+        context['session.object']["authentication_token_#{@var_name}"] = user.id
         context['passed?'] = true
         context['failed?'] = false
       else
