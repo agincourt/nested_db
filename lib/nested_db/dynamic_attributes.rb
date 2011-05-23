@@ -257,8 +257,7 @@ module NestedDb
           
           if property.unique?
             metaclass.class_eval <<-END
-              validates_uniqueness_of :#{property.name},
-                :scope => :taxonomy
+              validates_uniqueness_of :#{property.name}
             END
           end
           
