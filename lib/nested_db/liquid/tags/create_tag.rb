@@ -15,7 +15,7 @@ module Liquid
           "         {% if user.persisted? %}<p>User saved!</p>{% endif %}",
           "         {% if user.new_record? %}",
           "           <p>User not saved!</p>",
-          "           <ul>{% for error in user.errors %}<li>{{ error.field }} {{ error.message }}</li>{% endfor %}</ul>"
+          "           <ul>{% for error in user.errors %}<li>{{ error.field }} {{ error.message }}</li>{% endfor %}</ul>",
           "         {% endif %}",
         ].join("\n"))
       end
