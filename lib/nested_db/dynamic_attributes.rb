@@ -9,8 +9,6 @@ module NestedDb
       
       # setup our callbacks
       base.class_eval do
-        EmailAddressRegex = /\A([-a-z0-9!\#$%&'*+\/=?^_`{|}~]+\.)*[-a-z0-9!\#$%&'*+\/=?^_`{|}~]+@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i
-        
         attr_accessor :extended_from_taxonomy,
                       :nested_instance_attributes
         
@@ -28,6 +26,12 @@ module NestedDb
         
         after_save :save_nested_attributes
         
+      end
+    end
+    
+    module ClassMethods
+      def email_regex
+        /\A([-a-z0-9!\#$%&'*+\/=?^_`{|}~]+\.)*[-a-z0-9!\#$%&'*+\/=?^_`{|}~]+@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i
       end
     end
     
@@ -262,7 +266,7 @@ module NestedDb
           when 'email'
             metaclass.class_eval <<-END
               validates_format_of :#{property.name},
-                :with        => EmailAddressRegex,
+                :with        => self.class.email_regex,
                 :message     => 'must be a valid email address',
                 :allow_blank => true
             END
