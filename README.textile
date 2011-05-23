@@ -1,0 +1,142 @@
+h1. NestedDb
+
+h2. Liquid Additions
+
+h3. Authentication
+
+Authentication uses 3 tags, authenticate, deauthenticate and sessionauthenticate.
+
+@{% authenticate %}@ is used to login a user, @{% deauthenticate %}@ is used to logout a user, and @{% sessionauthenticate %}@ is used to sustain authentication - once the user is logged in, this tag will log them in on further page requests without requiring form submission.
+
+h4. Authenticate Example
+
+<pre>
+{% authenticate as current_user against users where password == params.password and username == params.username %}
+
+{% if passed? %}
+  <p>Login successful as {{ current_user.username }}!</p>
+{% endif %}
+
+{% if failed? %}
+  <p>Login failed!</p>
+{% endif %}
+</pre>
+
+h4. Deauthenticate Example
+
+<pre>
+{% deauthenticate current_user %}
+</pre>
+
+h4. Sessionauthenticate Example
+
+<pre>
+{% sessionauthenticate current_user %}
+  <p>Session auth failed.</p>
+{% endsessionauthenticate %}
+
+{% if current_user %}
+  <p>Authentication accepted. {{ current_user.username }}.</p>
+{% else %}
+  <p>Authentication rejected.</p>
+{% endif %}
+</pre>
+
+h3. Form Processing
+
+Forms can be processed and accepted into instances, much like a typical form in Rails accepting input into objects of models. You should pass an array of fields, using a HTML form such as:
+
+<pre>
+<form action="/process" method="post">
+  <p>
+    <label for="username">Username:</label>
+    <input type="text" name="user[username]" id="username" />
+  </p>
+
+  <p>
+    <label for="password">Password:</label>
+    <input type="text" name="user[password]" id="password" />
+  </p>
+
+  <p><button type="submit">Sign Up &raquo;</button></p>
+</form>
+</pre>
+
+Then to process this submission, the @user@ parameter will be a hash of the username and password which can be entered into the database using the following example:
+
+<pre>
+{% create new user in users using params.user %}
+
+{% if user.persisted? %}
+
+  <p>Registration successful! <a href="/login">Login &raquo;</a></p>
+
+{% else %}
+
+  <p>Registration failed!</p>
+  <p>{{ user.errors.size }} error{% if user.errors.size > 1 %}s{% endif %}:</p>
+  <ul class="errors">
+    {% for error in user.errors %}
+      <li>{{ error.full_message }}</li>
+    {% endfor %}
+  </ul>
+
+{% endif %}
+</pre>
+
+h3. Loading instances from the database
+
+Instances can be loaded one at a time or multiple. Here are a few examples:
+
+<pre>
+load <one|all> <reference> as <variable_name> [where: '<field> < in|==|!=|>|< > <value>'] [limit: <quantity>]
+</pre>
+
+Load one user (from the taxonomy with reference @users@) where their username is "dave".
+
+<pre>
+{% load one users as user where: 'username == "dave"' %}
+
+{% if user %}
+  {{ user.username }} <!-- outputs: dave -->
+{% endif %}
+</pre>
+
+Load one user (from the taxonomy with reference @users@) with variable input.
+
+<pre>
+{% assign dynamic_email = 'test@example.com' %}
+{% load one users as user where: 'email == dynamic_email' %}
+
+{% if user %}
+  {{ user.email }} <!-- outputs: test@example.com -->
+{% endif %}
+</pre>
+
+Load upto 10 articles
+
+<pre>
+{% load all articles as articles limit: 10 %}
+
+<ul>
+  {% for article in articles %}
+    <li>{{ article.title }}</li>
+  {% endfor %}
+</ul>
+</pre>
+
+h3. Displaying images
+
+As you can specify multiple image versions in the back-end, these can be reflected in Liquid using the @variation@ filter as below (assuming you have loaded a product with an image attribute):
+
+<pre>
+<a href="{{ product.image | variation: 'large' }}" class="lightbox">
+  <img src="{{ product.image | variation: 'thumbnail' }}" width="60" height="60" alt="" />
+</a>
+</pre>
+
+Should you need the raw image, you can simply use @{{ product.image }}@.
+
+h2. License
+
+This project follows the MIT License. Copyright 2011 Ryan Townsend, Agincourt Technologies Limited "http://agincourt.co/":http://agincourt.co/
