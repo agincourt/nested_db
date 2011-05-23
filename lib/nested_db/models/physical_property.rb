@@ -12,12 +12,14 @@ module NestedDb
         
         base.class_eval do
           # fields
+          field :unique,               :type => Boolean
           field :required,             :type => Boolean
           field :table_display,        :type => Boolean, :default => true
           field :form_display,         :type => Boolean, :default => true
           field :index,                :type => Integer, :default => 0, :required => true
           field :association_taxonomy, :type => String
           field :association_property, :type => String
+          field :format,               :type => String
           
           # associations
           embedded_in :taxonomy,
@@ -37,6 +39,9 @@ module NestedDb
           # validation
           validates_inclusion_of :data_type,
             :in => available_data_types
+          validates_inclusion_of :format,
+            :in          => %w(email),
+            :allow_blank => true
           validate :validate_inclusion_of_association_taxonomy_in_taxonomies,
             :if => proc { |obj| ['belongs_to', 'has_many', 'has_and_belongs_to_many'].include?(obj.data_type) }
           validate :validate_association_property_in_association_taxonomy,

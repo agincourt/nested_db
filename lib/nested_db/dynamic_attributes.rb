@@ -1,3 +1,5 @@
+require 'uri'
+
 module NestedDb
   module DynamicAttributes
     def self.included(base)
@@ -229,7 +231,8 @@ module NestedDb
           # if it's a password property
           when 'password'
             metaclass.class_eval <<-END
-              password_field :#{property.name}
+              password_field :#{property.name},
+                :required => #{property.required? ? 'true' : 'false'}
             END
           # if it's a normal property (string etc)
           else
@@ -245,6 +248,21 @@ module NestedDb
                   :greater_than_or_equal_to => 0
               END
             end
+          end
+          
+          if property.unique?
+            metaclass.class_eval <<-END
+              validates_uniqueness_of :#{property.name},
+                :scope => :taxonomy_id
+            END
+          end
+          
+          case property.format
+          when 'email'
+            metaclass.class_eval <<-END
+              validates_format_of :#{property.name},
+                :with => URI.regexp
+            END
           end
         end # end loop through properties
         
