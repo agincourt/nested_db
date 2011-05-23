@@ -18,7 +18,7 @@ module NestedDb
     
     def errors
       instance.errors.map do |field,messages|
-        messages.map do |message|
+        Array(messages).map do |message|
           NestedDb::ErrorDrop.new(field,message)
         end
       end.flatten
