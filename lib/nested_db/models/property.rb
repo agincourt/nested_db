@@ -10,7 +10,7 @@ module NestedDb
           field :index, :type => Integer, :default => 0, :required => true
           
           # scopes
-          scope :ordered, order_by(:index.asc).order_by(:name.asc)
+          scope :ordered, order_by(:index.asc)
           
           # validation
           validates_presence_of   :name
