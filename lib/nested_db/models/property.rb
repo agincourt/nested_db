@@ -31,14 +31,6 @@ module NestedDb
       end
       
       module InstanceMethods
-        def unique?
-          false
-        end
-        
-        def required?
-          false
-        end
-        
         def field_type
           self.class.data_types[data_type.to_sym] || String
         end
