@@ -1,3 +1,5 @@
-class NestedDb::Taxonomy
-  include NestedDb::Models::Taxonomy
+module NestedDb
+  class Taxonomy
+    include NestedDb::Models::Taxonomy
+  end
 end

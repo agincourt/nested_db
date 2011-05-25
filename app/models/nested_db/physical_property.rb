@@ -1,3 +1,5 @@
-class NestedDb::PhysicalProperty
-  include NestedDb::Models::PhysicalProperty
+module NestedDb
+  class PhysicalProperty
+    include NestedDb::Models::PhysicalProperty
+  end
 end

@@ -1,3 +1,5 @@
-class NestedDb::ImageVersion
-  include NestedDb::Models::ImageVersion
+module NestedDb
+  class ImageVersion
+    include NestedDb::Models::ImageVersion
+  end
 end
