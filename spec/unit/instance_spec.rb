@@ -549,7 +549,7 @@ describe NestedDb::Instance do
         :required  => true
       })
       # add a normal property
-      @taxonomy.callbacks.create!({
+      @taxonomy.instance_callbacks.create!({
         :when         => 'after',
         :action       => 'create',
         :command      => 'webhook',

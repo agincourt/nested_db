@@ -30,7 +30,7 @@ module NestedDb
       
       def callback
         return @callback if defined?(@callback)
-        @callback = taxonomy.callbacks.find(callback_id)
+        @callback = taxonomy.instance_callbacks.find(callback_id)
       end
     end
   end

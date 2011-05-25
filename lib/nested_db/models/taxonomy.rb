@@ -31,8 +31,8 @@ module NestedDb
           embeds_many :virtual_properties,
             :class_name => "NestedDb::VirtualProperty",
             :inverse_of => :taxonomy
-          embeds_many :callbacks,
-            :class_name => "NestedDb::Callback",
+          embeds_many :instance_callbacks,
+            :class_name => "NestedDb::InstanceCallback",
             :inverse_of => :taxonomy
           has_many :instances,
             :class_name => "NestedDb::Instance",

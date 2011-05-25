@@ -40,7 +40,7 @@ module NestedDb
         end
         
         def run_taxonomy_callbacks(scope)
-          taxonomy.callbacks.send("only_#{scope}").each { |c| c.run(self) } if taxonomy
+          taxonomy.instance_callbacks.send("only_#{scope}").each { |c| c.run(self) } if taxonomy
         end
       end
     end

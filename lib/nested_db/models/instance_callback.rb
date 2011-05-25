@@ -1,6 +1,6 @@
 module NestedDb
   module Models
-    module Callback
+    module InstanceCallback
       def self.included(base)
         base.send(:include, ::Mongoid::Document)
         base.extend ClassMethods
@@ -24,7 +24,7 @@ module NestedDb
           
           # associations
           embedded_in :taxonomy,
-            :inverse_of => :callbacks,
+            :inverse_of => :instance_callbacks,
             :class_name => "NestedDb::Taxonomy"
             
           # validation
