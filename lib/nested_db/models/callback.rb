@@ -10,12 +10,12 @@ module NestedDb
           cattr_accessor :available_commands
           
           # scopes
-          scope :before_create, where(:when => 'before', :action => 'create')
-          scope :after_create,  where(:when => 'after', :action => 'create')
-          scope :before_update, where(:when => 'before', :action => 'update')
-          scope :after_update,  where(:when => 'after', :action => 'update')
-          scope :before_save,   where(:when => 'before', :action => 'save')
-          scope :after_save,    where(:when => 'after', :action => 'save')
+          scope :only_before_create, where(:when => 'before', :action => 'create')
+          scope :only_after_create,  where(:when => 'after', :action => 'create')
+          scope :only_before_update, where(:when => 'before', :action => 'update')
+          scope :only_after_update,  where(:when => 'after', :action => 'update')
+          scope :only_before_save,   where(:when => 'before', :action => 'save')
+          scope :only_after_save,    where(:when => 'after', :action => 'save')
           
           # fields
           field :when
