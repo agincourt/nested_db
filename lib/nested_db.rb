@@ -11,3 +11,4 @@ require 'nested_db/models'
 require 'nested_db/routes' if defined?(ActionDispatch)
 require 'nested_db/liquidizable' unless defined?(Liquidizable)
 require 'nested_db/liquid'
+require 'nested_db/callbacks'

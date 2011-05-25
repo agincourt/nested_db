@@ -532,4 +532,43 @@ describe NestedDb::Instance do
     end
   end
 
+  describe "callbacks" do
+    let(:taxonomy) do
+      # wipe all taxonomies
+      NestedDb::Taxonomy.delete_all
+      # create the taxonomy
+      @taxonomy = NestedDb::Taxonomy.create!({
+        :name      => 'User',
+        :reference => 'users'
+      })
+      # add a normal property
+      @taxonomy.physical_properties.create!({
+        :name      => 'username',
+        :data_type => 'string',
+        :unique    => true,
+        :required  => true
+      })
+      # add a normal property
+      @taxonomy.callbacks.create!({
+        :when         => 'after',
+        :action       => 'create',
+        :command      => 'webhook',
+        :web_hook_url => 'http://example.com/'
+      })
+      # return
+      @taxonomy
+    end
+    
+    let(:instance) do
+      instance = taxonomy.instances.build
+      instance.write_attributes({ :username => 'one' })
+      instance.save
+      instance
+    end
+    
+    it "should run the callbacks" do
+      instance
+    end
+  end
+
 end

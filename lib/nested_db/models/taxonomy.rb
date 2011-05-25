@@ -31,6 +31,9 @@ module NestedDb
           embeds_many :virtual_properties,
             :class_name => "NestedDb::VirtualProperty",
             :inverse_of => :taxonomy
+          embeds_many :callbacks,
+            :class_name => "NestedDb::Callback",
+            :inverse_of => :taxonomy
           has_many :instances,
             :class_name => "NestedDb::Instance",
             :inverse_of => :taxonomy,
@@ -38,6 +41,7 @@ module NestedDb
           
           accepts_nested_attributes_for :physical_properties, :allow_destroy => true, :reject_if => :all_blank
           accepts_nested_attributes_for :virtual_properties,  :allow_destroy => true, :reject_if => :all_blank
+          accepts_nested_attributes_for :callbacks,           :allow_destroy => true, :reject_if => :all_blank
           
           # callbacks
           before_validation :downcase_reference

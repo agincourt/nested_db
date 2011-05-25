@@ -7,6 +7,7 @@ module NestedDb
         base.send(:include, ::Mongoid::Paranoia)
         base.send(:include, ::Mongoid::MultiParameterAttributes)
         base.send(:include, ::Liquidizable)
+        base.send(:include, CallbackProcessing)
         
         base.class_eval do
           extend ClassMethods
@@ -60,6 +61,12 @@ module NestedDb
       end
       
       module InstanceMethods
+        def serializable_hash
+          super.delete_if { |k,v|
+            k.to_s =~ /^encrypted|salt$/
+          }
+        end
+        
         def ignore_errors_on(properties)
           self.ignore_errors ||= []
           self.ignore_errors +=  Array(properties)
