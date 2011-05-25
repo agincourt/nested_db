@@ -3,7 +3,7 @@ module NestedDb
     class WebHook < Base
       # set our reference
       reference :webhook
-
+      
       configure do
         # fields
         field :web_hook_url
