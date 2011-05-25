@@ -1,14 +1,15 @@
 module NestedDb
   module Callbacks
     class WebHook < Base
-      # defines custom fields
-      def self.fields
-        super.merge({
-          :web_hook_url => {
-            :type     => String,
-            :required => proc { |obj| 'webhook' == obj.command }
-          }
-        })
+      # set our reference
+      reference :webhook
+
+      configure do
+        # fields
+        field :web_hook_url
+        # validation
+        validates_presence_of :web_hook_url,
+          :if => proc { |obj| 'webhook' == obj.command }
       end
       
       # runs the callback

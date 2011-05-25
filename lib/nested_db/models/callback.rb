@@ -33,28 +33,24 @@ module NestedDb
           validate :command_included_in_avaialble_commands, :in => (available_commands || {}).keys
           
           # callback options
-          add_available_command(:webhook, NestedDb::Callbacks::WebHook)
+          add_available_command(NestedDb::Callbacks::WebHook)
         end
       end
       
       module ClassMethods
-        def add_available_command(key, klass)
-          # ensure the class responds to the run method
-          unless klass.respond_to?(:run)
-            raise StandardError, "#{klass.name} doesn't respond to :run"
-          end
-          # ensure the class responds to the run method
-          unless klass.respond_to?(:fields)
-            raise StandardError, "#{klass.name} doesn't respond to :fields"
+        def add_available_command(klass)
+          # check it conforms
+          [:run, :apply_to, :reference].each do |method|
+            unless klass.respond_to?(method)
+              raise StandardError, "#{klass.name} doesn't respond to :#{method}"
+            end
           end
           # append fields
-          klass.fields.each do |key,options|
-            field key, options
-          end
+          klass.apply_to(self)
           # setup a default hash
           self.available_commands ||= {}
           # merge in the new class
-          self.available_commands.merge!(key.to_sym => klass)
+          self.available_commands.merge!(klass.reference.to_sym => klass)
         end
       end
       
