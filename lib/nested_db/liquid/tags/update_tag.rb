@@ -1,5 +1,5 @@
 module Liquid
-  class Update < Tag
+  class UpdateTag < Tag
     Syntax = /([^\s]+)\sset\s([^\s]+)\s=\s([^\s]+)/
     
     def initialize(tag_name, markup, tokens)
