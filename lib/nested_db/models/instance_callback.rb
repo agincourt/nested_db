@@ -30,7 +30,7 @@ module NestedDb
           # validation
           validates_inclusion_of :when,    :in => %w( before after )
           validates_inclusion_of :action,  :in => %w( create update save )
-          validate :command_included_in_avaialble_commands, :in => (available_commands || {}).keys
+          validate :command_included_in_available_commands, :in => (available_commands || {}).keys
           
           # callback options
           add_available_command(NestedDb::Callbacks::WebHook)
@@ -68,7 +68,7 @@ module NestedDb
         end
         
         private
-        def command_included_in_avaialble_commands
+        def command_included_in_available_commands
           unless (available_commands || {}).keys.include?(command.try(:to_sym))
             self.errors.add(:command, "is not included in the list (#{(available_commands || {}).keys.join(', ')})")
           end
