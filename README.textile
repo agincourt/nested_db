@@ -125,6 +125,26 @@ Load upto 10 articles
 </ul>
 </pre>
 
+h3. Updating instances
+
+Once you've loaded an instance as above, you can update it's attributes individually using the @{% update %}@ tag:
+
+This can be static:
+
+<pre>
+{% load one orders as order where: 'id == 123' %}
+{% update order set 'status' = 'complete' %}
+</pre>
+
+Or dynamic:
+
+<pre>
+{% load one orders as order where: 'id == 123' %}
+{% assign attribute = 'status' %}
+{% assign value = 'complete' %}
+{% update order set attribute = value %}
+</pre>
+
 h3. Displaying images
 
 As you can specify multiple image versions in the back-end, these can be reflected in Liquid using the @variation@ filter as below (assuming you have loaded a product with an image attribute):
