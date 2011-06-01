@@ -75,6 +75,10 @@ GEM
     erubis (2.6.6)
       abstract (>= 1.0.0)
     excon (0.6.3)
+    factory_girl (2.0.0.beta2)
+    factory_girl_rails (1.1.beta1)
+      factory_girl (~> 2.0.0.beta)
+      rails (>= 3.0.0)
     ffi (1.0.9)
     fog (0.7.2)
       builder
@@ -140,6 +144,7 @@ GEM
       ffi (>= 1.0.7)
       json_pure
       rubyzip
+    shoulda-matchers (1.0.0.beta2)
     subexec (0.0.4)
     thor (0.14.6)
     treetop (1.4.9)
@@ -158,6 +163,8 @@ DEPENDENCIES
   bson_ext (>= 1.3.0)
   capybara (>= 0.4.0)
   carrierwave (>= 0.5.3)
+  factory_girl (= 2.0.0.beta2)
+  factory_girl_rails (= 1.1.beta1)
   fog (>= 0.7.2)
   haml (>= 3.1.0)
   liquid (>= 2.2.2)
@@ -169,5 +176,6 @@ DEPENDENCIES
   rails (>= 3.0.0)
   rake (= 0.8.7)
   rspec (>= 2.6)
+  shoulda-matchers (= 1.0.0.beta2)
   watchr (= 0.6)
   will_paginate (= 3.0.pre2)

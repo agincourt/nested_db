@@ -89,13 +89,23 @@ h3. Loading instances from the database
 Instances can be loaded one at a time or multiple. Here are a few examples:
 
 <pre>
-load <one|all> <reference> as <variable_name> [where: '<field> < in|==|!=|>|< > <value>'] [limit: <quantity>]
+{% find all products as products %}
+  {% where 'price' > 5 %}
+  {% where 'category' == 'fruit' %}
+  {% where dynamic_column == dynamic_value %}
+  {% order by 'name' %}
+  {% limit to 50 %}
+{% endfind %}
 </pre>
 
 Load one user (from the taxonomy with reference @users@) where their username is "dave".
 
 <pre>
 {% load one users as user where: 'username == "dave"' %}
+
+{% find first users as user %}
+  {% where 'username' == 'dave' %}
+{% endfind %}
 
 {% if user %}
   {{ user.username }} <!-- outputs: dave -->
@@ -106,7 +116,10 @@ Load one user (from the taxonomy with reference @users@) with variable input.
 
 <pre>
 {% assign dynamic_email = 'test@example.com' %}
-{% load one users as user where: 'email == dynamic_email' %}
+
+{% find first users as user %}
+  {% where 'username' == dynamic_email %}
+{% endfind %}
 
 {% if user %}
   {{ user.email }} <!-- outputs: test@example.com -->
@@ -116,7 +129,9 @@ Load one user (from the taxonomy with reference @users@) with variable input.
 Load upto 10 articles
 
 <pre>
-{% load all articles as articles limit: 10 %}
+{% find first articles as articles %}
+  {% limit to 10 %}
+{% endfind %}
 
 <ul>
   {% for article in articles %}

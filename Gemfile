@@ -25,4 +25,7 @@ gem 'will_paginate', '3.0.pre2'
 # Testing
 group :test do
   gem 'capybara', '>= 0.4.0'
+  gem 'shoulda-matchers',   '1.0.0.beta2'
+  gem 'factory_girl',       '2.0.0.beta2'
+  gem 'factory_girl_rails', '1.1.beta1'
 end

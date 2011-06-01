@@ -7,14 +7,18 @@ $LOAD_PATH.unshift(File.dirname(__FILE__))
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), "..", "lib"))
 
 MODELS = File.join(File.dirname(__FILE__), "models")
+FACTORIES = File.join(File.dirname(__FILE__), "factories")
 SUPPORT = File.join(File.dirname(__FILE__), "support")
 $LOAD_PATH.unshift(MODELS)
 $LOAD_PATH.unshift(SUPPORT)
+$LOAD_PATH.unshift(FACTORIES)
 
 require "rails"
 require "mongoid"
 require "mocha"
 require "rspec"
+require "factory_girl"
+require "factory_girl_rails"
 
 LOGGER = Logger.new($stdout)
 
@@ -32,6 +36,7 @@ end
 
 Dir[ File.join(MODELS, "*.rb") ].sort.each { |file| require File.basename(file) }
 Dir[ File.join(SUPPORT, "*.rb") ].each { |file| require File.basename(file) }
+Dir[ File.join(FACTORIES, "*.rb") ].each { |file| require File.basename(file) }
 
 Rspec.configure do |config|
   config.mock_with(:mocha)
