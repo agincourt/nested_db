@@ -147,14 +147,20 @@ Once you've loaded an instance as above, you can update it's attributes individu
 This can be static:
 
 <pre>
-{% load one orders as order where: 'id == 123' %}
+{% find first orders as order %}
+  {% where 'id' == 123 %}
+{% endfind %}
+
 {% update order set 'status' = 'complete' %}
 </pre>
 
 Or dynamic:
 
 <pre>
-{% load one orders as order where: 'id == 123' %}
+{% find first orders as order %}
+  {% where 'id' == 123 %}
+{% endfind %}
+
 {% assign attribute = 'status' %}
 {% assign value = 'complete' %}
 {% update order set attribute = value %}
