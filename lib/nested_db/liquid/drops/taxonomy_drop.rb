@@ -1,3 +1,5 @@
+require 'digest/md5'
+
 module NestedDb
   class TaxonomyDrop < ::Liquid::Drop
     attr_accessor :taxonomy
@@ -11,7 +13,7 @@ module NestedDb
     end
     
     def cache_key
-      id.to_s
+      Digest::MD5.hexdigest("#{id}-#{updated_at}")
     end
   
     def all

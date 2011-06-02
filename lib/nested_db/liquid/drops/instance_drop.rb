@@ -1,3 +1,5 @@
+require 'digest/md5'
+
 module NestedDb
   class InstanceDrop < ::Liquid::Drop
     attr_accessor :instance
@@ -17,7 +19,7 @@ module NestedDb
     end
     
     def cache_key
-      id.to_s
+      Digest::MD5.hexdigest("#{id}-#{updated_at}")
     end
     
     def errors
