@@ -13,7 +13,7 @@ module NestedDb
     end
     
     def cache_key
-      Digest::MD5.hexdigest("#{id}-#{updated_at}")
+      Digest::MD5.hexdigest("#{taxonomy.id}-#{taxonomy.updated_at}")
     end
   
     def all

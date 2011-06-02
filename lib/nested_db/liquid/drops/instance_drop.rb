@@ -19,7 +19,7 @@ module NestedDb
     end
     
     def cache_key
-      Digest::MD5.hexdigest("#{id}-#{updated_at}")
+      Digest::MD5.hexdigest("#{instance.id}-#{instance.updated_at}")
     end
     
     def errors
