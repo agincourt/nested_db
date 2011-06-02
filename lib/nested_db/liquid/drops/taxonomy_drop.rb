@@ -9,6 +9,10 @@ module NestedDb
     def name
       taxonomy.name
     end
+    
+    def cache_key
+      id.to_s
+    end
   
     def all
       taxonomy.instances.limit(100)

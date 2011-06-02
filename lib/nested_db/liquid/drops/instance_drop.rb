@@ -16,6 +16,10 @@ module NestedDb
       auto_incremented_id
     end
     
+    def cache_key
+      id.to_s
+    end
+    
     def errors
       instance.errors.map do |field,messages|
         Array(messages).map do |message|
