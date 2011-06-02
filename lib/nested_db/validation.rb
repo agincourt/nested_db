@@ -4,26 +4,23 @@ module NestedDb
   module Validation
     def self.included(base)
       base.send(:include, InstanceMethods)
-      base.extend ClassMethods
       base.class_eval do
-        cattr_accessor :unique_taxonomy_attributes
+        attr_accessor :unique_taxonomy_attributes
         
         validate :validate_uniqueness_within_taxonomies,
           :if => proc { |obj| obj.taxonomy.present? }
       end
     end
     
-    module ClassMethods
+    module InstanceMethods
+      private
       def validates_uniqueness_within_taxonomy_of(attr)
         self.unique_taxonomy_attributes ||= []
         self.unique_taxonomy_attributes  << attr
       end
-    end
-    
-    module InstanceMethods
-      private
+      
       def validate_uniqueness_within_taxonomies
-        (self.class.unique_taxonomy_attributes || []).uniq.each do |attribute|
+        (unique_taxonomy_attributes || []).uniq.each do |attribute|
           errors.add(
             attribute,
             :taken,
