@@ -1,6 +1,6 @@
 GIT
   remote: git@github.com:ryantownsend/mongoid.git
-  revision: ad8572fcbe17c66d2ffdab94f6efc546dd7edde3
+  revision: 7508f0c868bab4b65ce50ab7a8541dd1107e5f5b
   specs:
     mongoid (2.0.1)
       activemodel (~> 3.0)
@@ -139,7 +139,7 @@ GEM
     rspec-mocks (2.6.0)
     ruby-hmac (0.4.0)
     rubyzip (0.9.4)
-    selenium-webdriver (0.2.0)
+    selenium-webdriver (0.2.1)
       childprocess (>= 0.1.7)
       ffi (>= 1.0.7)
       json_pure

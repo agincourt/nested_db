@@ -107,6 +107,7 @@ module NestedDb
                   :taxonomy_id        => '#{target_taxonomy.id}',
                   :taxonomy_class     => '#{target_taxonomy.class.name}',
                   :source_id          => '#{id}',
+                  :conditions         => { :taxonomy_id => BSON::ObjectId('#{target_taxonomy.id}') },
                   :after_build        => proc { |obj|
                     # set the taxonomy
                     obj.taxonomy = #{target_taxonomy.class.name}.find('#{target_taxonomy.id}')
