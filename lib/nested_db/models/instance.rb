@@ -45,6 +45,8 @@ module NestedDb
           after_validation :generate_auto_incremented_id
           after_validation :process_rich_text
           after_validation :process_virtual_properties
+          after_save       :touch_taxonomy
+          after_destroy    :touch_taxonomy
         end
         
         base.send(:include, InstanceMethods)
@@ -115,6 +117,11 @@ module NestedDb
               write_attribute(vp.name, vp.value(self))
             end
           end
+        end
+        
+        # updates the taxonomy's updated_at time
+        def touch_taxonomy
+          taxonomy.save
         end
       end
     end
