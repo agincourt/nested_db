@@ -14,7 +14,7 @@ module NestedDb
                       :nested_instance_attributes
         
         # validation
-        validate :validate_nested_attributes
+        validate :check_nested_attributes
         
         # callbacks
         after_build do
@@ -284,7 +284,7 @@ module NestedDb
       protected
       # validates the nested_attributes and
       # adds an error to the root object if they are invalid
-      def validate_nested_attributes
+      def check_nested_attributes
         self.nested_instance_attributes.each { |k,v|
           self.errors.add(k, "are invalid") unless v.valid_as_nested?
         } if self.nested_instance_attributes
