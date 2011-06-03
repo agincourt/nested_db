@@ -118,6 +118,37 @@ describe NestedDb::Instance do
         @taxonomy
       end
       
+      let(:double_taxonomy) do
+        t = taxonomy
+         # create the third taxonomy to relate to
+        @taxonomy_three = NestedDb::Taxonomy.create!({
+          :name      => 'Image',
+          :reference => 'images'
+        })
+        # add a normal property to images
+        @taxonomy_three.physical_properties.create!({
+          :name      => 'title',
+          :data_type => 'string',
+          :required  => true
+        })
+        # add a belongs relation from taxonomy three to taxonomy one
+        @taxonomy_three.physical_properties.create!({
+          :name                 => 'category',
+          :data_type            => 'belongs_to',
+          :association_property => 'title',     # just used for display
+          :association_taxonomy => 'categories' # based on reference
+        })
+        # add a has_many relation from taxonomy one to taxonomy three
+        t.physical_properties.create!({
+          :name                 => 'images',
+          :data_type            => 'has_many',
+          :association_property => 'category', # used for relation
+          :association_taxonomy => 'images'    # based on reference
+        })
+        # return taxonomy one
+        t
+      end
+      
       let(:instance) do
         @instance ||= taxonomy.instances.create!({ :title => 'Test' })
       end
@@ -271,6 +302,47 @@ describe NestedDb::Instance do
         # inst.articles.size.should == 1
       end
       
+      it "should be able to update multiple related instances" do
+        # create our instance
+        inst = double_taxonomy.instances.create!(:title => 'sdf123')
+        # update the instance with an article
+        inst.update_attributes(:articles_attributes => {
+          '0' => {
+            'name'  => 'Test',
+            'image' => file('image')
+          },
+          '1' => {
+            'name'  => 'Test',
+            'image' => file('image')
+          }
+        }, :images_attributes => {
+          '0' => { 'title'  => 'Testing' },
+          '1' => { 'title'  => 'Testing' }
+        })
+        # ensure we have 2 articles
+        inst.articles.size.should == 2
+        inst.articles.first.persisted?.should == true
+        # ensure we have 2 images
+        inst.images.size.should == 2
+        inst.images.first.persisted?.should == true
+        # update the article
+        inst.update_attributes(:articles_attributes => {
+          '0' => {
+            'id'    => inst.articles.first.id,
+            'name'  => 'Test 2',
+            'image' => file('image')
+          },
+          '1' => {
+            'id'       => inst.articles.last.id,
+            '_destroy' => '1'
+          }
+        })
+        # ensure the article's name has changed
+        inst.articles.first.name.should == 'Test 2'
+        # TODO: ensure the second article was deleted
+        # inst.articles.size.should == 1
+      end
+      
       it "should be able to create nested instances during it's own creation" do
         inst = taxonomy.instances.build
         inst.write_attributes({
@@ -287,6 +359,31 @@ describe NestedDb::Instance do
         inst.articles.size.should == 1
         # ensure the article has the category set
         inst.articles.first.category.should == inst
+      end
+      
+      it "should be able to create multiple nested instances during it's own creation" do
+        inst = double_taxonomy.instances.build
+        inst.write_attributes({
+          :title => 'Test',
+          :articles_attributes => {
+            '0' => {
+              'name'  => 'Test 2',
+              'image' => file('image')
+            }
+          },
+          :images_attributes => {
+            '0' => { 'title' => 'test' }
+          }
+        })
+        inst.save
+        # ensure we have 1 article
+        inst.articles.size.should == 1
+        # ensure the article has the category set
+        inst.articles.first.category.should == inst
+        # ensure we have 1 image
+        inst.images.size.should == 1
+        # ensure the article has the image set
+        inst.images.first.category.should == inst
       end
       
       context "liquid templating" do

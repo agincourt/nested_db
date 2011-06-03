@@ -7,7 +7,7 @@ module NestedDb
       base.class_eval do
         attr_accessor :unique_taxonomy_attributes
         
-        validate :validate_uniqueness_within_taxonomies,
+        validate :ensure_uniqueness_within_taxonomies,
           :if => proc { |obj| obj.taxonomy.present? }
       end
     end
@@ -19,9 +19,9 @@ module NestedDb
         self.unique_taxonomy_attributes  << attr
       end
       
-      def validate_uniqueness_within_taxonomies
+      def ensure_uniqueness_within_taxonomies
         (unique_taxonomy_attributes || []).uniq.each do |attribute|
-          errors.add(
+          self.errors.add(
             attribute,
             :taken,
             { :value => attributes[attribute] }
