@@ -83,7 +83,7 @@ module NestedDb
     
     # allow one error, if it's on the association
     def valid_as_nested?
-      valid? || (errors.length == 1 && errors.has_key?(reverse_association))
+      valid? # || (errors.length == 1 && errors.has_key?(reverse_association))
     end
     
     # save each of the objects, or delete where required

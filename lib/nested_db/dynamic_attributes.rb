@@ -286,7 +286,7 @@ module NestedDb
       # adds an error to the root object if they are invalid
       def check_nested_attributes
         self.nested_instance_attributes.each { |k,v|
-          #self.errors.add(k, "are invalid") unless v.valid_as_nested?
+          self.errors.add(k, "are invalid") unless v.valid_as_nested?
         } if self.nested_instance_attributes
       end
       
