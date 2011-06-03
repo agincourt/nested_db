@@ -67,16 +67,16 @@ module NestedDb
     def valid?
       # setup hash to store errors
       self.errors = {}
+      puts "Processing objects: #{objects.size}"
       # validate each object and
       # merge in any errors
       objects.each do |object|
         puts "Testing object: #{object.inspect}"
-        # if it's invalid
-        unless object.valid?
-          # loop through errors and append
-          object.errors.each do |key,value|
-            self.errors.merge!(key => value)
-          end
+        # if it's valid, skip to next
+        next if object.valid?
+        # if it's invalid loop through errors and append
+        object.errors.each do |key,value|
+          self.errors.merge!(key => value)
         end
       end
       # valid?
