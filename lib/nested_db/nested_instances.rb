@@ -67,7 +67,7 @@ module NestedDb
     def valid?
       # setup hash to store errors
       self.errors = {}
-      puts "Processing objects within #{association}: #{objects.size}"
+      puts "Processing objects within #{association} from #{reverse_association}: #{objects.size}"
       # validate each object and
       # merge in any errors
       objects.each do |object|

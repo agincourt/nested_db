@@ -135,8 +135,9 @@ describe NestedDb::Instance do
         @taxonomy_three.physical_properties.create!({
           :name                 => 'category',
           :data_type            => 'belongs_to',
-          :association_property => 'title',     # just used for display
-          :association_taxonomy => 'categories' # based on reference
+          :association_property => 'title',      # just used for display
+          :association_taxonomy => 'categories', # based on reference
+          :required             => true
         })
         # add a has_many relation from taxonomy one to taxonomy three
         t.physical_properties.create!({
