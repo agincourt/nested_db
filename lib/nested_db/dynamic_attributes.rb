@@ -52,9 +52,9 @@ module NestedDb
         @metaclass
       end
       
-      def nested_attributes
-        super + (nested_instance_attributes || {}).map { |k,v| "#{k.to_s}_attributes=" }
-      end
+      #def nested_attributes
+      #  super + (nested_instance_attributes || {}).map { |k,v| "#{k.to_s}_attributes=" }
+      #end
       
       def uploaders
         metaclass.uploaders
