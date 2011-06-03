@@ -66,6 +66,7 @@ module NestedDb
       
       def taxonomy=(value)
         super(value)
+require File.dirname(__FILE__) + '/../../spec/unit/instance_callback_spec'
         extend_based_on_taxonomy
       end
       
@@ -286,6 +287,7 @@ module NestedDb
       # adds an error to the root object if they are invalid
       def check_nested_attributes
         self.nested_instance_attributes.each { |k,v|
+          puts "Checking nested instance attributes in #{taxonomy.name}"
           self.errors.add(k, "are invalid") unless v.valid_as_nested?
         } if self.nested_instance_attributes
       end
