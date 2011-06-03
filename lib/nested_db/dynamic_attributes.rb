@@ -286,6 +286,7 @@ require File.dirname(__FILE__) + '/../../spec/unit/instance_callback_spec'
       # validates the nested_attributes and
       # adds an error to the root object if they are invalid
       def check_nested_attributes
+        puts "#{taxonomy.name} has #{self.nested_instance_attributes.try(:size) || 0} nested instance attributes"
         self.nested_instance_attributes.each { |k,v|
           puts "Checking nested instance attributes in #{taxonomy.name}"
           self.errors.add(k, "are invalid") unless v.valid_as_nested?
