@@ -65,6 +65,8 @@ module NestedDb
     end
     
     def valid?
+      return true if defined?(@validated)
+      @validated = true
       # setup hash to store errors
       self.errors = {}
       puts "Processing objects within #{association} from #{reverse_association}: #{objects.size}"
