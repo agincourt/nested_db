@@ -69,11 +69,9 @@ module NestedDb
       @validated = true
       # setup hash to store errors
       self.errors = {}
-      puts "Processing objects within #{association} from #{reverse_association}: #{objects.size}"
       # validate each object and
       # merge in any errors
       objects.each do |object|
-        puts "Testing object: #{object.inspect}"
         # if it's valid, skip to next
         next if object.valid?
         # if it's invalid loop through errors and append
