@@ -70,13 +70,14 @@ module NestedDb
       # validate each object and
       # merge in any errors
       objects.each do |object|
+        puts "Testing object: #{object.inspect}"
         # if it's invalid
-        #unless object.valid?
-        #  # loop through errors and append
-        #  object.errors.each do |key,value|
-        #    self.errors.merge!(key => value)
-        #  end
-        #end
+        unless object.valid?
+          # loop through errors and append
+          object.errors.each do |key,value|
+            self.errors.merge!(key => value)
+          end
+        end
       end
       # valid?
       errors.empty?
