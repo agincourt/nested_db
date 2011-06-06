@@ -6,12 +6,12 @@ require 'fileutils'
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), "..", "lib"))
 
-MODELS = File.join(File.join(File.dirname(__FILE__), "..", "app", "models", "nested_db"))
+LIQUID_MODELS = File.join(File.join(File.dirname(__FILE__), "..", "app", "models", "nested_db", "liquid"))
+NESTED_DB_MODELS = File.join(File.join(File.dirname(__FILE__), "..", "app", "models", "nested_db"))
+MODELS = File.join(File.join(File.dirname(__FILE__), "..", "app", "models"))
+LIB = File.join(File.join(File.dirname(__FILE__), "..", "app", "lib"))
 FACTORIES = File.join(File.dirname(__FILE__), "factories")
 SUPPORT = File.join(File.dirname(__FILE__), "support")
-$LOAD_PATH.unshift(MODELS)
-$LOAD_PATH.unshift(SUPPORT)
-$LOAD_PATH.unshift(FACTORIES)
 
 require "rails"
 require "mongoid"
@@ -34,9 +34,10 @@ CarrierWave.configure do |config|
   config.enable_processing = true
 end
 
-Dir[ File.join(MODELS, "*.rb") ].sort.each { |file| require File.basename(file) }
-Dir[ File.join(SUPPORT, "*.rb") ].each { |file| require File.basename(file) }
-Dir[ File.join(FACTORIES, "*.rb") ].each { |file| require File.basename(file) }
+[LIB, LIQUID_MODELS, NESTED_DB_MODELS, MODELS, SUPPORT, FACTORIES].each do |set|
+  $LOAD_PATH.unshift(set)
+  Dir[ File.join(set, "*.rb") ].sort.each { |file| require File.basename(file) }
+end
 
 Rspec.configure do |config|
   config.mock_with(:mocha)
@@ -48,8 +49,10 @@ Rspec.configure do |config|
   end
   config.before(:suite) do
     # delete all taxonomies
+    Taxonomy.delete_all
     NestedDb::Taxonomy.delete_all
     # delete all instances
+    Instance.delete_all
     NestedDb::Instance.delete_all
   end
 end

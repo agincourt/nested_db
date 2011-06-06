@@ -1,15 +1,16 @@
 require "spec_helper"
 
-describe NestedDb::Instance do
-  
+describe Instance do
+
   describe "file uploads" do
     context "when the instance's taxonomy defines a file field" do
       let(:taxonomy) do
         return @taxonomy if defined?(@taxonomy)
         # wipe all taxonomies
+        Taxonomy.delete_all
         NestedDb::Taxonomy.delete_all
         # create the taxonomy
-        @taxonomy = NestedDb::Taxonomy.create!({
+        @taxonomy = Taxonomy.create!({
           :name      => 'Category',
           :reference => 'categories'
         })
@@ -26,28 +27,18 @@ describe NestedDb::Instance do
         # return
         @taxonomy
       end
-      
+
       let(:instance) do
         @instance ||= taxonomy.instances.build
       end
-      
-      it "should relay the uploaders from the metaclass" do
-        instance.should respond_to 'uploaders'
-        instance.uploaders.keys.should include :image
-      end
-      
-      it "should relay the uploader_options from the metaclass" do
-        instance.should respond_to 'uploader_options'
-        instance.uploaders.keys.should include :image
-      end
-      
+
       it "should respond to image methods" do
         instance.should respond_to 'image='
         instance.should respond_to 'image'
         instance.image.should respond_to 'url'
         instance.image.should respond_to 'versions'
       end
-      
+
       it "should have an image version called 'square' and one for the mounted_as property loaded from the instance model" do
         inst = instance
         inst.image.versions.keys.should include :square
@@ -56,7 +47,7 @@ describe NestedDb::Instance do
         inst.image.versions[:square].class.should == NestedDb::InstanceVersionUploader
         [String, NilClass].should include inst.image.url(:square).class
       end
-      
+
       it "should accept a new image" do
         file = File.join(File.dirname(__FILE__), 'image.png')
         File.exist?(file).should == true
@@ -64,15 +55,15 @@ describe NestedDb::Instance do
       end
     end
   end
-  
+
   describe "has_many relationships" do
     context "when the instance's taxonomy defines a has_many association" do
       let(:taxonomy) do
         return @taxonomy if defined?(@taxonomy)
         # wipe all taxonomies
-        NestedDb::Taxonomy.delete_all
+        Taxonomy.delete_all
         # create the taxonomy
-        @taxonomy = NestedDb::Taxonomy.create!({
+        @taxonomy = Taxonomy.create!({
           :name      => 'Category',
           :reference => 'categories'
         })
@@ -82,7 +73,7 @@ describe NestedDb::Instance do
           :data_type => 'string'
         })
         # create the second taxonomy to relate to
-        @taxonomy_two = NestedDb::Taxonomy.create!({
+        @taxonomy_two = Taxonomy.create!({
           :name      => 'Article',
           :reference => 'articles'
         })
@@ -117,11 +108,11 @@ describe NestedDb::Instance do
         })
         @taxonomy
       end
-      
+
       let(:double_taxonomy) do
         t = taxonomy
          # create the third taxonomy to relate to
-        @taxonomy_three = NestedDb::Taxonomy.create!({
+        @taxonomy_three = Taxonomy.create!({
           :name      => 'Image',
           :reference => 'images'
         })
@@ -149,75 +140,75 @@ describe NestedDb::Instance do
         # return taxonomy one
         t
       end
-      
+
       let(:instance) do
         @instance ||= taxonomy.instances.create!({ :title => 'Test' })
       end
-      
+
       def file(name)
         ActionDispatch::Http::UploadedFile.new(
-          :filename => "rails.png", 
-          :type => "image/png", 
+          :filename => "rails.png",
+          :type => "image/png",
           :head => "Content-Disposition: form-data;
-                    name=\"#{name}\"; 
-                    filename=\"rails.png\" 
+                    name=\"#{name}\";
+                    filename=\"rails.png\"
                     Content-Type: image/png\r\n",
           :tempfile => File.new(file_path)
         )
       end
-      
+
       let(:file_path) do
         File.join(File.dirname(__FILE__), 'image.png')
       end
-      
+
       it "should have a taxonomy with an articles property" do
         instance.taxonomy.has_property?(:articles).should == true
       end
-      
+
       it "should have been extended from the taxonomy" do
         instance.extended_from_taxonomy.should == true
       end
-      
+
       it "should respond to #articles" do
         instance.should respond_to :articles
       end
-      
+
       it "should have an association named 'articles' on the metaclass" do
         instance.metaclass.relations.keys.should include 'articles'
       end
-      
+
       it "should return the metadata for the relation" do
         # load the association metadata
         association = instance.metaclass.reflect_on_association(:articles)
         # check it
         association.should_not                == nil
-        association.class_name.should         == 'NestedDb::Instance'
+        association.class_name.should         == 'Instance'
         association.foreign_key.should        == 'category_id'
-        association.inverse_class_name.should == 'NestedDb::Instance'
-        association.taxonomy_class.should     == 'NestedDb::Taxonomy'
+        association.inverse_class_name.should == 'Instance'
+        association.taxonomy_class.should     == 'Taxonomy'
         association.taxonomy_id.should_not    be_blank
-        instance.metaclass.name.should        == 'NestedDb::Instance'
+        instance.metaclass.name.should        == 'Instance'
       end
-      
+
       it "should return a selection criteria for the relation" do
         instance.should respond_to 'articles'
         instance.articles.class.should == Array
       end
-      
+
       it "should pass on itself to new related instances" do
         inst = instance
         inst = inst.class.find(inst.id)
         article = inst.articles.build
         article.category.should == inst
       end
-      
+
       it "should pass the correct taxonomy to new related instances" do
         inst = instance
         article = inst.articles.build
         article.taxonomy.should_not be_nil
         article.taxonomy.reference.should == 'articles'
       end
-      
+
       it "should respond to the correct methods when built from a parent object" do
         article = instance.articles.build
         article.should respond_to 'name'
@@ -230,7 +221,7 @@ describe NestedDb::Instance do
         article.save
         article.errors.should be_empty
       end
-      
+
       it "should be able to create related instances" do
         # ensure the file is okay
         CarrierWave::SanitizedFile.new(file_path).should_not be_empty
@@ -267,7 +258,7 @@ describe NestedDb::Instance do
         }
         inst.errors.should == {}
       end
-      
+
       it "should be able to update related instances" do
         # create our instance
         inst = instance
@@ -302,10 +293,15 @@ describe NestedDb::Instance do
         # TODO: ensure the second article was deleted
         # inst.articles.size.should == 1
       end
-      
+
       it "should be able to update multiple related instances" do
         # create our instance
         inst = double_taxonomy.instances.create!(:title => 'sdf123')
+        # create one image
+        img  = inst.images.create!(:title => "Test")
+        # ensure we have 1 image
+        inst.images.size.should == 1
+        inst.images.first.persisted?.should == true
         # update the instance with an article
         inst.update_attributes(:articles_attributes => {
           '0' => {
@@ -317,7 +313,7 @@ describe NestedDb::Instance do
             'image' => file('image')
           }
         }, :images_attributes => {
-          '0' => { 'title'  => 'Testing' },
+          '0' => { 'title'  => 'Testing', 'id' => img.id },
           '1' => { 'title'  => 'Testing' }
         })
         # ensure we have 2 articles
@@ -325,7 +321,7 @@ describe NestedDb::Instance do
         inst.articles.first.persisted?.should == true
         # ensure we have 2 images
         inst.images.size.should == 2
-        inst.images.first.persisted?.should == true
+        inst.images.last.persisted?.should == true
         # update the article
         inst.update_attributes(:articles_attributes => {
           '0' => {
@@ -343,7 +339,7 @@ describe NestedDb::Instance do
         # TODO: ensure the second article was deleted
         # inst.articles.size.should == 1
       end
-      
+
       it "should be able to create nested instances during it's own creation" do
         inst = taxonomy.instances.build
         inst.write_attributes({
@@ -361,7 +357,7 @@ describe NestedDb::Instance do
         # ensure the article has the category set
         inst.articles.first.category.should == inst
       end
-      
+
       it "should be able to create multiple nested instances during it's own creation" do
         inst = double_taxonomy.instances.build
         inst.write_attributes({
@@ -386,7 +382,7 @@ describe NestedDb::Instance do
         # ensure the article has the image set
         inst.images.first.category.should == inst
       end
-      
+
       context "liquid templating" do
         it "should be able to reference associated instances" do
           inst = taxonomy.instances.build
@@ -405,15 +401,15 @@ describe NestedDb::Instance do
       end
     end
   end
-  
+
   describe "has_and_belongs_to_many relationships" do
     context "when the instance's taxonomy defines a has_and_belongs_to_many association" do
       let(:taxonomy) do
         return @taxonomy if defined?(@taxonomy)
         # wipe all taxonomies
-        NestedDb::Taxonomy.delete_all
+        Taxonomy.delete_all
         # create the taxonomy
-        @taxonomy = NestedDb::Taxonomy.create!({
+        @taxonomy = Taxonomy.create!({
           :name      => 'Category',
           :reference => 'categories'
         })
@@ -423,7 +419,7 @@ describe NestedDb::Instance do
           :data_type => 'string'
         })
         # create the second taxonomy to relate to
-        @taxonomy_two = NestedDb::Taxonomy.create!({
+        @taxonomy_two = Taxonomy.create!({
           :name      => 'Article',
           :reference => 'articles'
         })
@@ -447,11 +443,11 @@ describe NestedDb::Instance do
         })
         @taxonomy
       end
-      
+
       let(:instance) do
         @instance ||= taxonomy.instances.create!({ :name => 'Test' })
       end
-      
+
       it "should load the relation from the taxonomy" do
         inst = instance
         # create another instance in the same taxonomy
@@ -497,14 +493,14 @@ describe NestedDb::Instance do
       end
     end
   end
-  
+
   describe "liquid templating" do
     let(:taxonomy) do
       return @taxonomy if defined?(@taxonomy)
       # wipe all taxonomies
-      NestedDb::Taxonomy.delete_all
+      Taxonomy.delete_all
       # create the taxonomy
-      @taxonomy = NestedDb::Taxonomy.create!({
+      @taxonomy = Taxonomy.create!({
         :name      => 'Category',
         :reference => 'categories'
       })
@@ -516,28 +512,28 @@ describe NestedDb::Instance do
       # return
       @taxonomy
     end
-    
+
     let(:instance) do
       @instance ||= taxonomy.instances.create({ :title => 'Test' })
     end
-    
+
     it "should respond to liquidized methods" do
       inst = instance
       ['to_liquid', 'liquid_drop', 'liquid_drop_class'].each do |method|
         inst.should respond_to method
       end
-      inst.liquid_drop_class.should == NestedDb::InstanceDrop
-      inst.liquid_drop.class.should == NestedDb::InstanceDrop
-      [NestedDb::InstanceDrop, Hash].should include inst.to_liquid.class
+      inst.liquid_drop_class.should == NestedDb::Liquid::InstanceDrop
+      inst.liquid_drop.class.should == NestedDb::Liquid::InstanceDrop
+      [NestedDb::Liquid::InstanceDrop, Hash].should include inst.to_liquid.class
     end
   end
 
   describe "encrypted fields" do
     let(:taxonomy) do
       # wipe all taxonomies
-      NestedDb::Taxonomy.delete_all
+      Taxonomy.delete_all
       # create the taxonomy
-      @taxonomy = NestedDb::Taxonomy.create!({
+      @taxonomy = Taxonomy.create!({
         :name      => 'User',
         :reference => 'users'
       })
@@ -549,13 +545,13 @@ describe NestedDb::Instance do
       # return
       @taxonomy
     end
-    
+
     let(:instance) do
       instance = taxonomy.instances.build
       instance.write_attributes({ :password => 'Test', :password_confirmation => 'Test' })
       instance
     end
-    
+
     it "should respond to the password getters/setters" do
       inst = taxonomy.instances.build
       inst.should respond_to 'password'
@@ -563,32 +559,32 @@ describe NestedDb::Instance do
       inst.should respond_to 'password_confirmation'
       inst.should respond_to 'password_confirmation='
     end
-    
+
     it "should set an instance variable to store the password on set" do
       inst = taxonomy.instances.build
       inst.password = 'hello'
       inst.password.should == 'hello'
       inst.instance_variable_get(:@password).should == 'hello'
     end
-    
+
     it "should set an instance variable to store the password_confirmation on set" do
       inst = taxonomy.instances.build
       inst.password_confirmation = 'world'
       inst.password_confirmation.should == 'world'
       inst.instance_variable_get(:@password_confirmation).should == 'world'
     end
-    
+
     it "should set the encrypted password and salt" do
       inst = instance
       inst.encrypted_password.should_not be_empty
       inst.password_salt.should_not be_empty
     end
-    
+
     it "should return itself when successfully authenticating" do
       inst = instance
       inst.authenticate('password', 'Test').should == inst
     end
-    
+
     it "should return nil when unsuccessfully authenticating" do
       inst = instance
       inst.authenticate('password', 'Test2').should be_nil
@@ -598,9 +594,9 @@ describe NestedDb::Instance do
   describe "unique fields" do
     let(:taxonomy) do
       # wipe all taxonomies
-      NestedDb::Taxonomy.delete_all
+      Taxonomy.delete_all
       # create the taxonomy
-      @taxonomy = NestedDb::Taxonomy.create!({
+      @taxonomy = Taxonomy.create!({
         :name      => 'User',
         :reference => 'users'
       })
@@ -613,15 +609,15 @@ describe NestedDb::Instance do
       # return
       @taxonomy
     end
-    
+
     let(:instance) do
       instance = taxonomy.instances.build
       instance.write_attributes({ :username => 'one' })
       instance.save
       instance
     end
-    
-    it "should should disallow creation of new instances with the same unique value" do
+
+    it "should disallow creation of new instances with the same unique value" do
       inst = instance
       new_inst = inst.taxonomy.instances.build
       new_inst.write_attributes({ :username => 'one' })
@@ -633,9 +629,9 @@ describe NestedDb::Instance do
   describe "callbacks" do
     let(:taxonomy) do
       # wipe all taxonomies
-      NestedDb::Taxonomy.delete_all
+      Taxonomy.delete_all
       # create the taxonomy
-      @taxonomy = NestedDb::Taxonomy.create!({
+      @taxonomy = Taxonomy.create!({
         :name      => 'User',
         :reference => 'users'
       })
@@ -656,14 +652,14 @@ describe NestedDb::Instance do
       # return
       @taxonomy
     end
-    
+
     let(:instance) do
       instance = taxonomy.instances.build
       instance.write_attributes({ :username => 'one' })
       instance.save
       instance
     end
-    
+
     it "should run the callbacks" do
       instance
     end

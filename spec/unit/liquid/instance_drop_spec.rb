@@ -1,13 +1,13 @@
 require "spec_helper"
 
-describe NestedDb::InstanceDrop do
+describe NestedDb::Liquid::InstanceDrop do
   context "when an instance is ported to a drop" do
     let(:taxonomy) do
       return @taxonomy if defined?(@taxonomy)
       # wipe all taxonomies
-      NestedDb::Taxonomy.delete_all
+      Taxonomy.delete_all
       # create the taxonomy
-      @taxonomy = NestedDb::Taxonomy.create!({
+      @taxonomy = Taxonomy.create!({
         :name      => 'Category',
         :reference => 'categories'
       })
@@ -18,7 +18,7 @@ describe NestedDb::InstanceDrop do
         :required  => true
       })
       # create the second taxonomy to relate to
-      @taxonomy_two = NestedDb::Taxonomy.create!({
+      @taxonomy_two = Taxonomy.create!({
         :name      => 'Article',
         :reference => 'articles'
       })
@@ -54,36 +54,36 @@ describe NestedDb::InstanceDrop do
     end
 
     let(:instance) do
-      @instance ||= taxonomy.instances.create({ 
+      @instance ||= taxonomy.instances.create({
         :name => 'Test'
       })
     end
-    
+
     def file(name)
       ActionDispatch::Http::UploadedFile.new(
-        :filename => "rails.png", 
-        :type => "image/png", 
+        :filename => "rails.png",
+        :type => "image/png",
         :head => "Content-Disposition: form-data;
-                  name=\"#{name}\"; 
-                  filename=\"rails.png\" 
+                  name=\"#{name}\";
+                  filename=\"rails.png\"
                   Content-Type: image/png\r\n",
         :tempfile => File.new(file_path)
       )
     end
-    
+
     let(:file_path) do
-      File.join(File.dirname(__FILE__), 'image.png')
+      File.join(File.dirname(__FILE__), '../image.png')
     end
-    
+
     it "should load the properties from the taxonomy" do
       inst = instance
-      drop = NestedDb::InstanceDrop.new(inst)
+      drop = NestedDb::Liquid::InstanceDrop.new(inst)
       drop.should respond_to 'to_liquid'
       (inst.taxonomy.properties.keys + ['id', 'taxonomy', 'created_at', 'updated_at']).each do |key|
         drop.should respond_to key
       end
     end
-    
+
     it "should load the associations from the taxonomy" do
       inst = instance
       inst.update_attributes({
@@ -94,24 +94,24 @@ describe NestedDb::InstanceDrop do
       inst.articles.size.should == 1
       inst.articles.first.persisted?.should == true
       inst.articles.first.category.should == inst
-      drop = NestedDb::InstanceDrop.new(inst)
+      drop = NestedDb::Liquid::InstanceDrop.new(inst)
       drop.should respond_to 'articles'
       drop.articles.size.should     == 1
-      drop.articles[0].class.should == NestedDb::Instance
+      drop.articles[0].class.should == Instance
       drop.articles[0].category.should == drop.instance
     end
-    
+
     it "should return a drop for it's taxonomy" do
       inst = instance
-      drop = NestedDb::InstanceDrop.new(inst)
+      drop = NestedDb::Liquid::InstanceDrop.new(inst)
       drop.should respond_to 'taxonomy'
-      drop.taxonomy.class.should == NestedDb::Taxonomy
+      drop.taxonomy.class.should == Taxonomy
     end
-    
+
     it "should return nil for empty file fields" do
       instance.to_liquid.image.should be_nil
     end
-    
+
     it "should return a string for populated file fields" do
       inst = instance
       inst.update_attributes(:image => file('image')).should == true

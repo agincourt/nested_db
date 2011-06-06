@@ -3,11 +3,11 @@ require 'spec_helper'
 describe Liquid::FindTag do
   let(:liquid_context) do
     {
-      "taxonomies.articles" => NestedDb::TaxonomyDrop.new(Factory(:taxonomy)),
+      "taxonomies.articles" => NestedDb::Liquid::TaxonomyDrop.new(Factory(:taxonomy)),
       "dynamic_column"      => 'price'
     }
   end
-  
+
   it "should accept valid syntax" do
     lambda { Liquid::FindTag.new('find', "first articles as article", ['{% endfind %}']) }.should_not raise_error
     lambda { Liquid::FindTag.new('find', 'all articles as articles', ['{% endfind %}']) }.should_not raise_error
@@ -17,7 +17,7 @@ describe Liquid::FindTag do
     lambda { Liquid::FindTag.new('find', '10 articles as articles', ['{% endfind %}']) }.should raise_error
     lambda { Liquid::FindTag.new('find', 'all articles as articles', []) }.should raise_error
   end
-  
+
   it "should filter a taxonomy" do
     block = [
       "{% where 'price' > 5 %}",

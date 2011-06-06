@@ -1,8 +1,4 @@
 require 'liquid'
-require 'nested_db/liquid/drops/error_drop'
-require 'nested_db/liquid/drops/instance_drop'
-require 'nested_db/liquid/drops/taxonomies_drop'
-require 'nested_db/liquid/drops/taxonomy_drop'
 require 'nested_db/liquid/filters/attributes'
 require 'nested_db/liquid/filters/errors'
 require 'nested_db/liquid/filters/variations'
