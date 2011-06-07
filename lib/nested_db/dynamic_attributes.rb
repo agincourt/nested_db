@@ -25,14 +25,6 @@ module NestedDb
     end
 
     module ClassMethods
-      def identify(name)
-        self.class_name = name
-      end
-
-      def name
-        class_name || super
-      end
-
       def email_regex
         /\A([-a-z0-9!\#$%&'*+\/=?^_`{|}~]+\.)*[-a-z0-9!\#$%&'*+\/=?^_`{|}~]+@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i
       end
@@ -46,18 +38,26 @@ module NestedDb
       end
 
       def extend_from_taxonomy(taxonomy)
+        puts "Initializing #{self.name}"
+        puts "Defined? #{defined?(self.name) ? 'Yes' : 'No'}"
         taxonomy.properties.each do |name,property|
           case property.data_type
           when 'belongs_to'
+            puts "belongs_to => #{Instances.klass_name(property.taxonomy_id)}"
+            Instances.find_or_create(property.taxonomy_id)
             belongs_to property.name,
               :class_name  => Instances.klass_name(property.taxonomy_id),
               :taxonomy_id => property.taxonomy_id
           when 'has_many'
+            puts "has_many => #{Instances.klass_name(property.taxonomy_id)}"
+            Instances.find_or_create(property.taxonomy_id)
             has_many property.name,
               :class_name  => Instances.klass_name(property.taxonomy_id),
               :inverse_of  => property.association_property,
               :taxonomy_id => property.taxonomy_id
           when 'has_and_belongs_to_many'
+            puts "has_and_belongs_to_many => #{Instances.klass_name(property.taxonomy_id)}"
+            Instances.find_or_create(property.taxonomy_id)
             has_and_belongs_to_many property.name,
               :class_name  => Instances.klass_name(property.taxonomy_id),
               :inverse_of  => property.foreign_key,

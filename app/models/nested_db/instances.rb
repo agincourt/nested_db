@@ -11,6 +11,7 @@ module NestedDb
         else
           klass = klass(id)
           const_set(const_name(id), klass)
+          klass.extend_from_taxonomy(taxonomy(id))
           klass.build_associations
           klass
         end
@@ -34,10 +35,7 @@ module NestedDb
       end
 
       def klass(id)
-        klass = Class.new(::Instance)
-        klass.identify(klass_name(id))
-        klass.extend_from_taxonomy(taxonomy(id))
-        klass
+        Class.new(::Instance)
       end
     end
   end

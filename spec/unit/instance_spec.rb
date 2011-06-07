@@ -187,7 +187,7 @@ describe Instance do
 
       it "should return a selection criteria for the relation" do
         instance.should respond_to 'articles'
-        instance.articles.class.should == Array
+        instance.articles.class.should == Mongoid::Criteria
       end
 
       it "should pass on itself to new related instances" do
