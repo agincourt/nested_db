@@ -103,7 +103,7 @@ module NestedDb
     end
 
     def instance_class
-      Instances.find_or_create(id)
+      Instances::Klass.find_or_create(id)
     end
 
     private
@@ -112,7 +112,7 @@ module NestedDb
     end
 
     def remove_instance_class
-      Instances.delete(id)
+      Instances::Klass.delete(id)
     end
   end
 end

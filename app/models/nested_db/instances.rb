@@ -1,44 +1,55 @@
 module NestedDb
-  class Instances
-    class << self
-      def klass_regex
-        /^:{2}?NestedDb::Instances::Instance[a-f0-9]{24}$/
-      end
+  module Instances
+    class Klass
+      class << self
+        def klass_regex
+          /^:{2}?Instance([a-f0-9]{24})$/
+        end
 
-      def find_or_create(id)
-        if const_defined?(const_name(id))
-          const_get(const_name(id))
-        else
-          klass = klass(id)
-          const_set(const_name(id), klass)
-          klass.extend_from_taxonomy(taxonomy(id))
-          klass.build_associations
-          klass
+        def find_or_create(id)
+          if Object.const_defined?(const_name(id))
+            Object.const_get(const_name(id))
+          else
+            klass = klass(id)
+            Object.const_set(const_name(id), klass)
+            klass.extend_from_taxonomy(taxonomy(id))
+            klass
+          end
+        end
+
+        def delete(id)
+          Object.send(:remove_const, const_name(id)) if Object.const_defined?(const_name(id))
+        end
+
+        def klass_name(id)
+          const_name(id)
+        end
+
+        private
+        def taxonomy(id)
+          ::Taxonomy.find(id)
+        end
+
+        def const_name(id)
+          "Instance#{id.to_s}"
+        end
+
+        def klass(id)
+          Class.new(::Instance)
         end
       end
+    end
+  end
+end
 
-      def delete(id)
-        remove_const(const_name(id)) if const_defined?(const_name(id))
-      end
-
-      def klass_name(id)
-        find_or_create(id)
-        name = "NestedDb::Instances::#{const_name(id)}"
-        raise StandardError, "#{name} is undefined, even after find_or_create" unless defined?(name)
-        name
-      end
-
-      private
-      def taxonomy(id)
-        ::Taxonomy.find(id)
-      end
-
-      def const_name(id)
-        "Instance#{id.to_s}"
-      end
-
-      def klass(id)
-        Class.new(::Instance)
+class Object
+  class << self
+    alias_method :old_const_missing, :const_missing
+    def const_missing(name)
+      if name =~ NestedDb::Instances::Klass.klass_regex
+        NestedDb::Instances::Klass.find_or_create($1)
+      else
+        old_const_missing(name)
       end
     end
   end

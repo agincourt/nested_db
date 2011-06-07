@@ -17,12 +17,6 @@ module NestedDb
     # fields
     field :auto_incremented_id, :type => Integer
 
-    # associations
-    belongs_to :taxonomy
-
-    # validation
-    validates_presence_of :taxonomy
-
     # callbacks
     after_validation :generate_auto_incremented_id
     after_validation :process_rich_text
@@ -77,7 +71,17 @@ module NestedDb
       }
     end
 
+    def taxonomy
+      @taxonomy ||= taxonomy_from_class_name
+    end
+
     private
+    def taxonomy_from_class_name
+      if self.class.name =~ /([a-z0-9]{24})$/
+        ::Taxonomy.find($1)
+      end
+    end
+
     def generate_auto_incremented_id
       self.auto_incremented_id = (taxonomy.instances.order_by([[:auto_incremented_id, :desc]]).first.try(:auto_incremented_id) || 0) + 1 if new_record?
     end

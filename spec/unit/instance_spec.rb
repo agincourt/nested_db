@@ -179,14 +179,14 @@ describe Instance do
         association = inst.reflect_on_association(:articles)
         # check it
         association.should_not == nil
-        association.class_name.should =~ NestedDb::Instances.klass_regex
+        association.class_name.should =~ NestedDb::Instances::Klass.klass_regex
         association.foreign_key.should == 'category_id'
         association.inverse_class_name.should == inst.class.to_s
         lambda { association.class_name.constantize }.should_not raise_error
       end
 
       it "should return a selection criteria for the relation" do
-        instance.articles.class.should == Mongoid::Criteria
+        instance.articles.class.should == Array
       end
 
       it "should pass on itself to new related instances" do
@@ -269,23 +269,27 @@ describe Instance do
         })
         # ensure we have 2 articles
         inst.articles.size.should == 2
-        inst.articles.first.persisted?.should == true
+        # ensure both were persisted
+        inst.articles.select(&:persisted?).size.should == 2
         # update the article
         inst.update_attributes(:articles_attributes => {
           '0' => {
-            'id'    => inst.articles.first.id,
-            'name'  => 'Test 2',
-            'image' => file('image')
+            'id'    => inst.articles.first.id.to_s,
+            'name'  => 'Test 2'
           },
           '1' => {
-            'id'       => inst.articles.last.id,
+            'id'       => inst.articles.last.id.to_s,
             '_destroy' => '1'
           }
         })
+        # we should have no errors
+        inst.errors.should be_empty
+        # ensure the second article was deleted
+        inst.articles.size.should == 1
+        # ensure the article has no errors
+        inst.articles.first.errors.should == {}
         # ensure the article's name has changed
         inst.articles.first.name.should == 'Test 2'
-        # TODO: ensure the second article was deleted
-        # inst.articles.size.should == 1
       end
 
       it "should be able to update multiple related instances" do
