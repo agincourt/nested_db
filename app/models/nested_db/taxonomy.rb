@@ -116,7 +116,7 @@ module NestedDb
     end
 
     def new_instance_class
-      klass = Class.new(Instance)
+      klass = Class.new(::Instance)
       klass.extend_from_taxonomy(self)
       klass
     end
