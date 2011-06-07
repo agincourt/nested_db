@@ -15,7 +15,6 @@ module NestedDb
     end
 
     attr_accessor :source, :destination, :type
-    delegate      :find, :all, :first, :to => 'relation'
 
     # instance methods
     def initialize(source)
@@ -74,5 +73,10 @@ module NestedDb
     def habtm?;      'has_and_belongs_to_many' == type; end
     def many?;       'has_many' == type; end
     def belongs_to?; 'belongs_to' == type; end
+
+    # pass on missing methods to relation
+    def method_missing(name, *args, &block)
+      relation.send(name, *args, &block)
+    end
   end
 end
