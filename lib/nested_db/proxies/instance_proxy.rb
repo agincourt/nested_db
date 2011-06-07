@@ -5,7 +5,7 @@ module NestedDb
       def relation!
         super
         # load the instances by taxonomy
-        @instances = (options[:taxonomy] || source).instance_class.scoped
+        @instances = (options[:taxonomy] || taxonomy).instance_class.scoped
       end
 
       # load our taxonomy for the relation

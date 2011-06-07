@@ -4,7 +4,6 @@ module NestedDb
   module DynamicAttributes
     def self.included(base)
       base.extend ClassMethods
-      base.extend Associations
       base.send(:include, InstanceMethods)
       base.send(:include, Encryption)
       base.send(:include, Validation)
@@ -29,20 +28,40 @@ module NestedDb
         /\A([-a-z0-9!\#$%&'*+\/=?^_`{|}~]+\.)*[-a-z0-9!\#$%&'*+\/=?^_`{|}~]+@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i
       end
 
+      def build_associations
+        relations.each do |name,metadata|
+          if metadata.taxonomy_id.present?
+            Instances.find_or_create(metadata.taxonomy_id)
+          end
+        end
+      end
+
       def extend_from_taxonomy(taxonomy)
         taxonomy.properties.each do |name,property|
           case property.data_type
-          when 'belongs_to', 'has_many', 'has_and_belongs_to_many'
-            send("setup_#{property.data_type}_association", property)
+          when 'belongs_to'
+            belongs_to property.name,
+              :class_name  => Instances.klass_name(property.taxonomy_id),
+              :taxonomy_id => property.taxonomy_id
+          when 'has_many'
+            has_many property.name,
+              :class_name  => Instances.klass_name(property.taxonomy_id),
+              :foreign_key => property.foreign_key,
+              :taxonomy_id => property.taxonomy_id
+          when 'has_and_belongs_to_many'
+            has_and_belongs_to_many property.name,
+              :class_name  => Instances.klass_name(property.taxonomy_id),
+              :foreign_key => property.foreign_key,
+              :taxonomy_id => property.taxonomy_id
           when 'file'
-            mount_uploader property.name.to_sym, NestedDb::InstanceFileUploader
+            mount_uploader property.name, NestedDb::InstanceFileUploader
           when 'image'
-            mount_uploader property.name.to_sym, NestedDb::InstanceImageUploader
+            mount_uploader property.name, NestedDb::InstanceImageUploader
           when 'password'
             password_field property.name, :required => property.required?
           else
             field property.name,
-              :type     => property.field_type.name,
+              :type     => property.field_type,
               :required => property.required?
           end
 
@@ -66,87 +85,6 @@ module NestedDb
               :allow_blank => true
           end
         end
-      end
-    end
-
-    module Associations
-      def setup_belongs_to_association(property)
-        setup_proxy(property)
-
-        # getter
-        define_method(property.name) do
-          # try to load the cached variable
-          result = instance_variable_get("@#{property.name}")
-          # if we couldn't load it from the cache
-          unless result
-            # load the ID
-            id = read_attribute(property.name)
-            # try to find the association and cache
-            result = instance_variable_set("@#{property.name}", retrieve_proxy(property.name).find(id)) if id
-          end
-          # return the result
-          result
-        end
-
-        # setter
-        define_method("#{property.name}=") do |value|
-          self.write_attribute("#{property.name}_id", value.respond_to?(:id) ? value.id : value)
-        end
-      end
-
-      def setup_has_many_association(property)
-        setup_proxy(property)
-
-        # getter
-        define_method(property.name) do
-          retrieve_proxy(property.name).getter
-        end
-
-        # nested attributes
-        define_method("#{property.name}_attributes=") do |value|
-          retrieve_proxy(property.name).write_attributes(value)
-        end
-      end
-
-      def setup_has_and_belongs_to_many_association(property)
-        setup_proxy(property)
-
-        define_method("#{property.name}_ids=") do |ids|
-          # default to empty array
-          ids ||= []
-          # set the instance variable
-          instance_variable_set("@#{property.name}_ids", Array(ids))
-          # write the attribute
-          write_attribute("#{property.name}_ids", send("#{property.name}_ids"))
-        end
-
-        define_method("#{property.name}_ids") do
-          # load the IDs
-          ids = Array(
-            instance_variable_get("@#{property.name}_ids") ||
-            read_attribute("#{property.name}_ids")
-          )
-          # parse into BSON
-          ids.
-            delete_if { |id| !id.kind_of?(BSON::ObjectId) && !BSON::ObjectId.legal?(id) }.
-            map { |id| id.kind_of?(BSON::ObjectId) ? id : BSON::ObjectId(id) }.
-            uniq
-        end
-
-        define_method(property.name) do
-          retrieve_proxy(property.name).getter.any_in(:_id => send("#{property.name}_ids"))
-        end
-      end
-
-      def setup_proxy(property)
-        # setup default hash to store proxies
-        self.proxies ||= {}
-        # merge in this association
-        self.proxies.merge!({
-          property.name.to_sym => Proc.new { |obj|
-            Proxy.from(obj).to(property.name).using(property.data_type)
-          }
-        })
       end
     end
 

@@ -165,29 +165,22 @@ describe Instance do
         instance.taxonomy.has_property?(:articles).should == true
       end
 
-      it "should have been extended from the taxonomy" do
-        instance.extended_from_taxonomy.should == true
-      end
-
       it "should respond to #articles" do
         instance.should respond_to :articles
       end
 
       it "should have an association named 'articles' on the metaclass" do
-        instance.metaclass.relations.keys.should include 'articles'
+        instance.relations.keys.should include 'articles'
       end
 
       it "should return the metadata for the relation" do
         # load the association metadata
-        association = instance.metaclass.reflect_on_association(:articles)
+        association = instance.reflect_on_association(:articles)
         # check it
-        association.should_not                == nil
-        association.class_name.should         == 'Instance'
-        association.foreign_key.should        == 'category_id'
-        association.inverse_class_name.should == 'Instance'
-        association.taxonomy_class.should     == 'Taxonomy'
-        association.taxonomy_id.should_not    be_blank
-        instance.metaclass.name.should        == 'Instance'
+        association.should_not         == nil
+        association.class_name.should  =~ NestedDb::Instances.klass_regex
+        association.foreign_key.should == 'category'
+        lambda { association.class_name.constantize }.should_not raise_error
       end
 
       it "should return a selection criteria for the relation" do

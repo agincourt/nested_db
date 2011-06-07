@@ -1,25 +1,41 @@
 module NestedDb
   class Instances
     class << self
-      def find_or_create(taxonomy)
-        if const_defined?(klass_name(taxonomy))
-          const_get(klass_name(taxonomy))
+      def klass_regex
+        /^NestedDb::Instances::Instance[a-f0-9]{24}$/
+      end
+
+      def find_or_create(id)
+        if const_defined?(const_name(id))
+          const_get(const_name(id))
         else
-          const_set(klass_name(taxonomy), klass(taxonomy))
+          klass = klass(id)
+          const_set(const_name(id), klass)
+          klass.build_associations
+          klass
         end
       end
 
-      def delete(taxonomy)
-        remove_const(klass_name(taxonomy)) if const_defined?(klass_name(taxonomy))
+      def delete(id)
+        remove_const(const_name(id)) if const_defined?(const_name(id))
       end
 
-      def klass_name(taxonomy)
-        "Instance#{taxonomy.id.to_s}"
+      def klass_name(id)
+        "NestedDb::Instances::#{const_name(id)}"
       end
 
-      def klass(taxonomy)
+      private
+      def taxonomy(id)
+        ::Taxonomy.find(id)
+      end
+
+      def const_name(id)
+        "Instance#{id.to_s}"
+      end
+
+      def klass(id)
         klass = Class.new(::Instance)
-        klass.extend_from_taxonomy(taxonomy)
+        klass.extend_from_taxonomy(taxonomy(id))
         klass
       end
     end

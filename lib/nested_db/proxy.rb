@@ -3,10 +3,9 @@ module NestedDb
     # class methods
     class << self
       def from(source)
-        case source
-        when ::Taxonomy
+        if source.kind_of?(::Taxonomy)
           Proxies::TaxonomyProxy.new(source)
-        when ::Instance
+        elsif source.class.name =~ Instances.klass_regex
           Proxies::InstanceProxy.new(source)
         else
           raise StandardError, "Unrecognised class use in proxy: #{source.class.name}"
@@ -67,6 +66,11 @@ module NestedDb
     # load our taxonomy for the relation
     def taxonomy
       source
+    end
+
+    # return whether or not this association is valid
+    def valid?
+      true
     end
 
     # is this relation a HABTM?

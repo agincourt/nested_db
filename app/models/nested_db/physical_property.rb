@@ -48,6 +48,10 @@ module NestedDb
       taxonomy.global_scope.where(:reference => association_taxonomy).first
     end
 
+    def taxonomy_id
+      foreign_taxonomy.id
+    end
+
     def foreign_key
       association_property
     end
