@@ -19,7 +19,7 @@ module Liquid
     def render(context)
       if context['session.object']["authentication_token_#{@var_name}"]
         user = NestedDb::Instance.where(:_id => context['session.object']["authentication_token_#{@var_name}"]).first
-        context[@var_name] = NestedDb::InstanceDrop.new(user) if user
+        context[@var_name] = NestedDb::Liquid::InstanceDrop.new(user) if user
         context['passed?'] = !!user
         context['failed?'] = !user
       end

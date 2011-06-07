@@ -28,7 +28,7 @@ module Liquid
       instance.write_attributes(context[@parameters] || {})
       instance.save
       # store the instance
-      context[@var_name] = NestedDb::InstanceDrop.new(instance)
+      context[@var_name] = NestedDb::Liquid::InstanceDrop.new(instance)
       # render nothing
       ''
     end
