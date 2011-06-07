@@ -103,11 +103,7 @@ module NestedDb
     end
 
     def instance_class
-      if Instances.const_defined?("Instance#{id.to_s}")
-        Instances.const_get("Instance#{id.to_s}")
-      else
-        Instances.const_set("Instance#{id.to_s}", new_instance_class)
-      end
+      Instances.find_or_create(self)
     end
 
     private
@@ -115,16 +111,8 @@ module NestedDb
       self.reference.try(:downcase!)
     end
 
-    def new_instance_class
-      klass = Class.new(::Instance)
-      klass.extend_from_taxonomy(self)
-      klass
-    end
-
     def remove_instance_class
-      if Instances.const_defined?("Instance#{id.to_s}")
-        Instances.remove_const("Instance#{id.to_s}")
-      end
+      Instances.delete(self)
     end
   end
 end
