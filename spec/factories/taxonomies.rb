@@ -1,5 +1,5 @@
 FactoryGirl.define do
-  factory :taxonomy, :class => 'NestedDb::Taxonomy' do
+  factory :taxonomy do
     name        { Factory(:permalink) }
     reference   { Factory(:permalink) }
     after_create do |taxonomy|
@@ -7,8 +7,8 @@ FactoryGirl.define do
       taxonomy.physical_properties.create!({ :name => 'price', :data_type => 'money', :required => true })
     end
   end
-  
-  factory :instance, :class => 'NestedDb::Instance' do
+
+  factory :instance do
     taxonomy { Factory(:taxonomy) }
     title    'Test'
     price    12.34

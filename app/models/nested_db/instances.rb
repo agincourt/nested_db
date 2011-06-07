@@ -10,15 +10,21 @@ module NestedDb
           if Object.const_defined?(const_name(id))
             Object.const_get(const_name(id))
           else
-            klass = klass(id)
-            Object.const_set(const_name(id), klass)
-            klass.extend_from_taxonomy(taxonomy(id))
-            klass
+            create(id)
           end
         end
 
+        def create(id)
+          klass = klass(id)
+          Object.const_set(const_name(id), klass)
+          klass.extend_from_taxonomy(taxonomy(id))
+          klass
+        end
+
         def delete(id)
-          Object.send(:remove_const, const_name(id)) if Object.const_defined?(const_name(id))
+          if Object.const_defined?(const_name(id))
+            Object.send(:remove_const, const_name(id))
+          end
         end
 
         def klass_name(id)
@@ -47,7 +53,7 @@ class Object
     alias_method :old_const_missing, :const_missing
     def const_missing(name)
       if name =~ NestedDb::Instances::Klass.klass_regex
-        NestedDb::Instances::Klass.find_or_create($1)
+        NestedDb::Instances::Klass.create($1)
       else
         old_const_missing(name)
       end

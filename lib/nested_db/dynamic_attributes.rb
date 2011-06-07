@@ -31,7 +31,7 @@ module NestedDb
 
       def extend_from_taxonomy(taxonomy)
         # update the table where it's stored
-        #store_in "nested_db_taxonomy_#{taxonomy.id}_instances"
+        store_in "nested_db_taxonomy_#{taxonomy.id}_instances"
         # loop through each property
         taxonomy.properties.each do |name,property|
           # setup based on the type of property
@@ -70,7 +70,7 @@ module NestedDb
 
           # uniqueness
           if property.unique?
-            validate_uniqueness_of property.name
+            validates_uniqueness_of property.name
           end
 
           # formating

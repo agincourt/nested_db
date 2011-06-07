@@ -263,7 +263,7 @@ describe Instance do
             'image' => file('image')
           },
           '1' => {
-            'name'  => 'Test',
+            'name'  => 'Test 2',
             'image' => file('image')
           }
         })
@@ -271,14 +271,16 @@ describe Instance do
         inst.articles.size.should == 2
         # ensure both were persisted
         inst.articles.select(&:persisted?).size.should == 2
+        # they should also be relocatable
+        inst.reflect_on_association(:articles).class_name.constantize.count.should == 2
         # update the article
         inst.update_attributes(:articles_attributes => {
           '0' => {
-            'id'    => inst.articles.first.id.to_s,
-            'name'  => 'Test 2'
+            'id'    => inst.articles.first.id,
+            'name'  => 'Test 3'
           },
           '1' => {
-            'id'       => inst.articles.last.id.to_s,
+            'id'       => inst.articles.last.id,
             '_destroy' => '1'
           }
         })
@@ -289,7 +291,7 @@ describe Instance do
         # ensure the article has no errors
         inst.articles.first.errors.should == {}
         # ensure the article's name has changed
-        inst.articles.first.name.should == 'Test 2'
+        inst.articles.first.name.should == 'Test 3'
       end
 
       it "should be able to update multiple related instances" do

@@ -97,7 +97,7 @@ describe NestedDb::Liquid::InstanceDrop do
       drop = NestedDb::Liquid::InstanceDrop.new(inst)
       drop.should respond_to 'articles'
       drop.articles.size.should     == 1
-      drop.articles[0].class.should == Instance
+      drop.articles[0].class.name.should =~ NestedDb::Instances::Klass.klass_regex
       drop.articles[0].category.should == drop.instance
     end
 

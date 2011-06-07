@@ -5,7 +5,7 @@ module NestedDb
       def from(source)
         if source.kind_of?(::Taxonomy)
           Proxies::TaxonomyProxy.new(source)
-        elsif source.class.name =~ Instances.klass_regex
+        elsif source.class.name =~ Instances::Klass.klass_regex
           Proxies::InstanceProxy.new(source)
         else
           raise StandardError, "Unrecognised class use in proxy: #{source.class.name}"
