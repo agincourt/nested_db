@@ -1,5 +1,5 @@
 module NestedDb
-  class TaxonomiesController < ApplicationController
+  class InstancesController < ApplicationController
     include Controllers::Scoping
     include Controllers::Routing
 
