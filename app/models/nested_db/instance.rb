@@ -32,15 +32,6 @@ module NestedDb
 
     # class methods
     class << self
-      def search_on(property, options = {})
-        case options[:using]
-        when :match
-          where(property.to_sym.matches => options[:for])
-        else
-          where(property.to_sym => options[:for])
-        end
-      end
-
       def image_variation(input, variation = nil)
         input ||= ''
         input = input.url if input.kind_of?(CarrierWave::Uploader::Base)
