@@ -56,8 +56,6 @@ module NestedDb
     # load our relation and memoize
     def relation
       @instances ||= relation!
-      puts @instances.inspect
-      @instances
     end
     alias_method :getter, :relation
 
