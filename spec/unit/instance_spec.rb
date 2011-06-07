@@ -174,12 +174,14 @@ describe Instance do
       end
 
       it "should return the metadata for the relation" do
+        inst = instance
         # load the association metadata
-        association = instance.reflect_on_association(:articles)
+        association = inst.reflect_on_association(:articles)
         # check it
-        association.should_not         == nil
-        association.class_name.should  =~ NestedDb::Instances.klass_regex
-        association.foreign_key.should == 'category'
+        association.should_not == nil
+        association.class_name.should =~ NestedDb::Instances.klass_regex
+        association.foreign_key.should == 'category_id'
+        association.inverse_class_name.should == inst.class.to_s
         lambda { association.class_name.constantize }.should_not raise_error
       end
 

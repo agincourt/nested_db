@@ -34,7 +34,7 @@ module NestedDb
 
     # builds a new object
     def build(params = {})
-      relation.build(params.merge(:taxonomy => taxonomy))
+      relation.build((params || {}).merge(:taxonomy => taxonomy))
     end
 
     # creates a new object

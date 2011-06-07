@@ -35,6 +35,7 @@ module NestedDb
 
       def klass(id)
         klass = Class.new(::Instance)
+        klass.identify(klass_name(id))
         klass.extend_from_taxonomy(taxonomy(id))
         klass
       end

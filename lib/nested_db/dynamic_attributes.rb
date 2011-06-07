@@ -10,6 +10,7 @@ module NestedDb
 
       # setup our callbacks
       base.class_eval do
+        cattr_accessor :class_name
         cattr_accessor :proxies # raw procs
         attr_accessor  :processed_proxies # processed values
 
@@ -24,6 +25,14 @@ module NestedDb
     end
 
     module ClassMethods
+      def identify(name)
+        self.class_name = name
+      end
+
+      def name
+        class_name || super
+      end
+
       def email_regex
         /\A([-a-z0-9!\#$%&'*+\/=?^_`{|}~]+\.)*[-a-z0-9!\#$%&'*+\/=?^_`{|}~]+@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i
       end
@@ -46,12 +55,12 @@ module NestedDb
           when 'has_many'
             has_many property.name,
               :class_name  => Instances.klass_name(property.taxonomy_id),
-              :foreign_key => property.foreign_key,
+              :inverse_of  => property.association_property,
               :taxonomy_id => property.taxonomy_id
           when 'has_and_belongs_to_many'
             has_and_belongs_to_many property.name,
               :class_name  => Instances.klass_name(property.taxonomy_id),
-              :foreign_key => property.foreign_key,
+              :inverse_of  => property.foreign_key,
               :taxonomy_id => property.taxonomy_id
           when 'file'
             mount_uploader property.name, NestedDb::InstanceFileUploader
