@@ -165,12 +165,12 @@ describe Instance do
         instance.taxonomy.has_property?(:articles).should == true
       end
 
-      it "should respond to #articles" do
-        instance.should respond_to :articles
+      it "should have an association named 'articles'" do
+        instance.relations.keys.should include 'articles'
       end
 
-      it "should have an association named 'articles' on the metaclass" do
-        instance.relations.keys.should include 'articles'
+      it "should respond to #articles" do
+        instance.should respond_to :articles
       end
 
       it "should return the metadata for the relation" do
@@ -186,7 +186,6 @@ describe Instance do
       end
 
       it "should return a selection criteria for the relation" do
-        instance.should respond_to 'articles'
         instance.articles.class.should == Mongoid::Criteria
       end
 

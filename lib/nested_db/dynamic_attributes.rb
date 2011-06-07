@@ -38,30 +38,35 @@ module NestedDb
       end
 
       def extend_from_taxonomy(taxonomy)
+        puts ""
         puts "Initializing #{self.name}"
-        puts "Defined? #{defined?(self.name) ? 'Yes' : 'No'}"
         taxonomy.properties.each do |name,property|
           case property.data_type
           when 'belongs_to'
-            puts "belongs_to => #{Instances.klass_name(property.taxonomy_id)}"
-            Instances.find_or_create(property.taxonomy_id)
+            puts [
+              "  belongs_to '#{property.name}',",
+              "   :class_name  => ::NestedDb::Instances::Instance#{property.taxonomy_id}"
+            ].join("\n")
             belongs_to property.name,
-              :class_name  => Instances.klass_name(property.taxonomy_id),
-              :taxonomy_id => property.taxonomy_id
+              :class_name => Instances.klass_name(property.taxonomy_id)
           when 'has_many'
-            puts "has_many => #{Instances.klass_name(property.taxonomy_id)}"
-            Instances.find_or_create(property.taxonomy_id)
+            puts [
+              "  has_many '#{property.name}',",
+              "   :class_name  => ::NestedDb::Instances::Instance#{property.taxonomy_id},",
+              "   :inverse_of  => '#{property.foreign_key}'"
+            ].join("\n")
             has_many property.name,
-              :class_name  => Instances.klass_name(property.taxonomy_id),
-              :inverse_of  => property.association_property,
-              :taxonomy_id => property.taxonomy_id
+              :class_name => Instances.klass_name(property.taxonomy_id),
+              :inverse_of => property.association_property
           when 'has_and_belongs_to_many'
-            puts "has_and_belongs_to_many => #{Instances.klass_name(property.taxonomy_id)}"
-            Instances.find_or_create(property.taxonomy_id)
+            puts [
+              "  has_and_belongs_to_many '#{property.name}',",
+              "   :class_name  => ::NestedDb::Instances::Instance#{property.taxonomy_id},",
+              "   :inverse_of  => '#{property.foreign_key}'"
+            ].join("\n")
             has_and_belongs_to_many property.name,
-              :class_name  => Instances.klass_name(property.taxonomy_id),
-              :inverse_of  => property.foreign_key,
-              :taxonomy_id => property.taxonomy_id
+              :class_name => Instances.klass_name(property.taxonomy_id),
+              :inverse_of => property.foreign_key
           when 'file'
             mount_uploader property.name, NestedDb::InstanceFileUploader
           when 'image'

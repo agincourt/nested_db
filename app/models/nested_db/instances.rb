@@ -2,7 +2,7 @@ module NestedDb
   class Instances
     class << self
       def klass_regex
-        /^NestedDb::Instances::Instance[a-f0-9]{24}$/
+        /^:{2}?NestedDb::Instances::Instance[a-f0-9]{24}$/
       end
 
       def find_or_create(id)
@@ -22,7 +22,10 @@ module NestedDb
       end
 
       def klass_name(id)
-        "NestedDb::Instances::#{const_name(id)}"
+        find_or_create(id)
+        name = "NestedDb::Instances::#{const_name(id)}"
+        raise StandardError, "#{name} is undefined, even after find_or_create" unless defined?(name)
+        name
       end
 
       private
