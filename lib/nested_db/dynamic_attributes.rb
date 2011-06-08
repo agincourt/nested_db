@@ -10,6 +10,8 @@ module NestedDb
 
       # setup our callbacks
       base.class_eval do
+        store_in "nested_db_taxonomy_instances"
+
         cattr_accessor :class_name
         cattr_accessor :proxies # raw procs
         attr_accessor  :processed_proxies # processed values
@@ -30,25 +32,23 @@ module NestedDb
       end
 
       def extend_from_taxonomy(taxonomy)
-        # update the table where it's stored
-        store_in "nested_db_taxonomy_#{taxonomy.id}_instances"
         # loop through each property
         taxonomy.properties.each do |name,property|
           # setup based on the type of property
           case property.data_type
           when 'belongs_to'
             belongs_to property.name,
-              :class_name => Instances::Klass.klass_name(property.taxonomy_id)
+              :class_name => Instances::Klass.klass_name(property.taxonomy_id).constantize.to_s
           when 'has_many'
             has_many property.name,
-              :class_name => Instances::Klass.klass_name(property.taxonomy_id),
-              :inverse_of => property.association_property
+              :class_name => Instances::Klass.klass_name(property.taxonomy_id).constantize.to_s,
+              :inverse_of => property.foreign_key
             accepts_nested_attributes_for property.name,
               :allow_destroy => true,
               :reject_if     => :all_blank
           when 'has_and_belongs_to_many'
             has_and_belongs_to_many property.name,
-              :class_name => Instances::Klass.klass_name(property.taxonomy_id),
+              :class_name => Instances::Klass.klass_name(property.taxonomy_id).constantize.to_s,
               :inverse_of => property.foreign_key
           when 'file'
             mount_uploader property.name, NestedDb::InstanceFileUploader
