@@ -50,6 +50,15 @@ module NestedDb
             has_and_belongs_to_many property.name,
               :class_name => Instances::Klass.klass_name(property.taxonomy_id).constantize.to_s,
               :inverse_of => property.foreign_key
+            define_method("#{property.name}_ids=") do |ids|
+              # load the association
+              assoc = self.class.reflect_on_association(property.name)
+              # save the values
+              send("#{property.name}=", assoc.class_name.constantize.any_in(:_id => ids))
+            end
+            define_method("#{property.name}_ids") do
+              send("#{property.name.singularize}_ids")
+            end
           when 'file'
             mount_uploader property.name, NestedDb::InstanceFileUploader
           when 'image'

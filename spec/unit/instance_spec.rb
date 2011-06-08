@@ -457,20 +457,32 @@ describe Instance do
           :name                 => 'categories',
           :data_type            => 'has_and_belongs_to_many',
           :association_taxonomy => 'categories', # based on reference
-          :association_property => 'article_ids'
+          :association_property => 'articles'
         })
         # add a has_and_belongs_to_many relation from taxonomy one to taxonomy two
         @taxonomy.physical_properties.create!({
           :name                 => 'articles',
           :data_type            => 'has_and_belongs_to_many',
           :association_taxonomy => 'articles', # based on reference
-          :association_property => 'category_ids'
+          :association_property => 'categories'
         })
         @taxonomy
       end
 
       let(:instance) do
         @instance ||= taxonomy.instances.create!({ :name => 'Test' })
+      end
+
+      it "should return the metadata for the relation" do
+        inst = instance
+        # load the association metadata
+        association = inst.reflect_on_association(:articles)
+        # check it
+        association.should_not == nil
+        association.class_name.should =~ NestedDb::Instances::Klass.klass_regex
+        association.foreign_key.should == 'article_ids'
+        association.inverse_class_name.should == inst.class.to_s
+        lambda { association.class_name.constantize }.should_not raise_error
       end
 
       it "should load the relation from the taxonomy" do
@@ -482,26 +494,24 @@ describe Instance do
         inst.should respond_to 'articles='
         inst.should respond_to 'article_ids'
         inst.should respond_to 'article_ids='
+        inst.should respond_to 'articles_ids'
+        inst.should respond_to 'articles_ids='
         # build a sub-object
-        begin
-          article_one = inst.articles.create!({ :name => 'Test' })
-        rescue ArgumentError => e
-          puts e.backtrace
-          puts e.message
-          raise
-        end
-        # update the instance to contain this sub-object
-        inst.update_attributes(:article_ids => [article_one.id])
+        article_one = inst.articles.create!(:name => 'Test')
         # check it's in the list of ids
         inst.article_ids.should == [article_one.id]
         # check we have one correct sub-object
         inst.articles.to_a.should == [article_one]
         # create another sub-object that's unrelated
-        article_two = inst.articles.first.taxonomy.instances.create({ :name => 'Test 2' })
+        article_two = article_one.class.create!({ :name => 'Test 2' })
         # check we still only have one sub-object
-        inst.articles.size.should == 1
-        # load the sub object
-        sub_object = inst.articles.first
+        inst.articles.count.should == 1
+        # add the second article
+        inst.update_attributes(:articles_ids => [article_one.id, article_two.id])
+        # we should now have 2
+        inst.articles.size.should == 2
+        # load a sub object
+        sub_object = inst.articles.last
         # check the sub-object responds to the parent relationship methods
         sub_object.should respond_to 'categories'
         sub_object.should respond_to 'categories='
@@ -513,16 +523,12 @@ describe Instance do
         sub_object.categories.to_a.should == [inst]
         # update the instance to remove contain the sub-object
         inst.update_attributes(:articles_ids => [])
-         # check we not longer have any ids
-        inst.articles_ids.size.should == 0
         # check we have no sub-objects
-        inst.articles.to_a.size == 0
+        inst.articles.size == 0
         # reload the sub-object
         sub_object = sub_object.class.find(sub_object.id)
         # check the sub-object no longer has the instance in it's ids
-        sub_object.categories_ids.size.should == 0
-        # check the sub-object no longer has the instance
-        sub_object.categories.to_a.size.should == 0
+        sub_object.categories.should_not include inst
       end
     end
   end
