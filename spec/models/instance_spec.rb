@@ -189,7 +189,7 @@ describe Instance do
         association = inst.reflect_on_association(:articles)
         # check it
         association.should_not == nil
-        association.class_name.should =~ NestedDb::Instances::Klass.klass_regex
+        association.class_name.should =~ NestedDb::Instances.klass_regex
         association.foreign_key.should == 'category_id'
         association.inverse_class_name.should == inst.class.to_s
         lambda { association.class_name.constantize }.should_not raise_error
@@ -479,7 +479,7 @@ describe Instance do
         association = inst.reflect_on_association(:articles)
         # check it
         association.should_not == nil
-        association.class_name.should =~ NestedDb::Instances::Klass.klass_regex
+        association.class_name.should =~ NestedDb::Instances.klass_regex
         association.foreign_key.should == 'article_ids'
         association.inverse_class_name.should == inst.class.to_s
         lambda { association.class_name.constantize }.should_not raise_error
