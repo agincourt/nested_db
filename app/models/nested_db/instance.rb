@@ -97,7 +97,7 @@ module NestedDb
 
     # updates the taxonomy's updated_at time
     def touch_taxonomy
-      taxonomy.save
+      taxonomy.update_attribute(:updated_at, Time.now)
     end
   end
 end
