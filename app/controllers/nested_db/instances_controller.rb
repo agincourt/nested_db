@@ -72,6 +72,7 @@ module NestedDb
       rescue ActiveRecord::RecordNotFound => e
         Rails.logger.debug "#{e.class.name.to_s} => #{e.message}"
         loading_taxonomy_failed
+        return false
       end
 
       def load_instance
@@ -79,6 +80,7 @@ module NestedDb
       rescue ActiveRecord::RecordNotFound => e
         Rails.logger.debug "#{e.class.name.to_s} => #{e.message}"
         loading_instance_failed
+        return false
       end
 
       def not_found
