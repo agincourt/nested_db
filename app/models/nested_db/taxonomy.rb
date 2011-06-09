@@ -29,7 +29,7 @@ module NestedDb
       :class_name => "NestedDb::VirtualProperty",
       :inverse_of => :taxonomy
     embeds_many :instance_callbacks,
-      :class_name => "NestedDb::InstanceCallback",
+      :class_name => "::InstanceCallback",
       :inverse_of => :taxonomy
 
     accepts_nested_attributes_for :physical_properties, :allow_destroy => true, :reject_if => :all_blank
