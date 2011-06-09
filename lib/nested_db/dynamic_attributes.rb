@@ -12,7 +12,6 @@ module NestedDb
       base.class_eval do
         store_in "nested_db_taxonomy_instances"
 
-        cattr_accessor :class_name
         cattr_accessor :proxies # raw procs
         attr_accessor  :processed_proxies # processed values
 

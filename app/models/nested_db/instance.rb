@@ -8,8 +8,6 @@ module NestedDb
     include NestedDb::DynamicAttributes
     include Liquidizable
 
-    attr_accessor :ignore_errors
-
     # pagination
     cattr_reader :per_page
     @@per_page = 20
@@ -36,8 +34,9 @@ module NestedDb
 
     # instance methods
     # used by to_json to output user-viewable data
+    alias_method :unsanitized_serializable_hash, :serializable_hash
     def serializable_hash
-      super.delete_if { |k,v|
+      unsanitized_serializable_hash.delete_if { |k,v|
         k.to_s =~ /^encrypted|salt$/
       }
     end
@@ -46,18 +45,6 @@ module NestedDb
     # represent individual instances in liquid
     def liquid_drop_class
       NestedDb::Liquid::InstanceDrop
-    end
-
-    def ignore_errors_on(properties)
-      self.ignore_errors ||= []
-      self.ignore_errors +=  Array(properties)
-    end
-
-    def valid?(force = nil)
-      self.ignore_errors ||= []
-      self.ignore_errors.map!(&:to_sym)
-
-      super || self.errors.delete_if { |k,v| ignore_errors.include?(k.to_sym) }.size == 0
     end
 
     def versions(mounted_as)
@@ -89,8 +76,8 @@ module NestedDb
     # process the rich text fields into HTML
     def process_rich_text
       taxonomy.physical_properties.where(:data_type => 'rich_text').each do |pp|
-        if self.send(pp.name).present?
-          write_attribute("#{pp.name}_rich_text_processed", RedCloth.new(self.send(pp.name)).to_html)
+        if send(pp.name).present?
+          write_attribute("#{pp.name}_rich_text_processed", RedCloth.new(send(pp.name)).to_html)
         end
       end
     end
