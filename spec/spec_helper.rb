@@ -1,7 +1,9 @@
 require 'rubygems'
 require 'bundler/setup'
-require 'nested_db'
 require 'fileutils'
+require "action_controller/railtie"
+require "action_mailer/railtie"
+require 'nested_db'
 
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), "..", "lib"))
@@ -9,14 +11,16 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), "..", "lib"))
 LIQUID_MODELS = File.join(File.join(File.dirname(__FILE__), "..", "app", "models", "nested_db", "liquid"))
 NESTED_DB_MODELS = File.join(File.join(File.dirname(__FILE__), "..", "app", "models", "nested_db"))
 MODELS = File.join(File.join(File.dirname(__FILE__), "..", "app", "models"))
+NESTED_DB_CONTROLLERS = File.join(File.join(File.dirname(__FILE__), "..", "app", "controllers", "nested_db"))
+CONTROLLERS = File.join(File.join(File.dirname(__FILE__), "..", "app", "controllers"))
 LIB = File.join(File.join(File.dirname(__FILE__), "..", "app", "lib"))
 FACTORIES = File.join(File.dirname(__FILE__), "factories")
 SUPPORT = File.join(File.dirname(__FILE__), "support")
 
-require "rails"
+#require File.join(File.join(File.dirname(__FILE__), "support", "environment.rb"))
 require "mongoid"
 require "mocha"
-require "rspec"
+require "rspec/rails"
 require "factory_girl"
 require "factory_girl_rails"
 
@@ -34,7 +38,10 @@ CarrierWave.configure do |config|
   config.enable_processing = true
 end
 
-[LIB, LIQUID_MODELS, NESTED_DB_MODELS, MODELS, SUPPORT, FACTORIES].each do |set|
+[
+  LIB, NESTED_DB_MODELS, NESTED_DB_CONTROLLERS, LIQUID_MODELS,
+  MODELS, CONTROLLERS, FACTORIES #, SUPPORT
+].each do |set|
   $LOAD_PATH.unshift(set)
   Dir[ File.join(set, "*.rb") ].sort.each { |file| require File.basename(file) }
 end
