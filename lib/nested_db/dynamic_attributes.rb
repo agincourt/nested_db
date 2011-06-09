@@ -23,8 +23,8 @@ module NestedDb
               :class_name => Instances::Klass.klass_name(property.taxonomy_id).constantize.to_s
           when 'has_many'
             has_many property.name,
-              :class_name => Instances::Klass.klass_name(property.taxonomy_id).constantize.to_s,
-              :inverse_of => property.foreign_key
+              :class_name => Instances::Klass.klass_name(property.taxonomy_id).constantize.to_s #,
+              #:inverse_of => property.foreign_key
             accepts_nested_attributes_for property.name,
               :allow_destroy => true,
               :reject_if     => :all_blank
