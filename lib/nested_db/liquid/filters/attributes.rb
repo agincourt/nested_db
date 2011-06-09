@@ -4,4 +4,4 @@ module AttributeFilter
   end
 end
 
-Liquid::Template.register_filter(AttributeFilter)
+::Liquid::Template.register_filter(AttributeFilter)

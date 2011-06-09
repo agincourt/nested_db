@@ -8,4 +8,4 @@ module ErrorFilter
   end
 end
 
-Liquid::Template.register_filter(ErrorFilter)
+::Liquid::Template.register_filter(ErrorFilter)

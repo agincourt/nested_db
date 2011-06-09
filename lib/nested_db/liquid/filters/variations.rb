@@ -4,4 +4,4 @@ module ImageDisplayFilter
   end
 end
 
-Liquid::Template.register_filter(ImageDisplayFilter)
+::Liquid::Template.register_filter(ImageDisplayFilter)
