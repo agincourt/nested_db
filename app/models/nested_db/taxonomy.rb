@@ -66,7 +66,7 @@ module NestedDb
 
     # instance methods
     def instances
-      NestedDb::Proxy.from(self).to(:instances)
+      instance_class.scoped
     end
 
     # returns a scope for finding taxonomies

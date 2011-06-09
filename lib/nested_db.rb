@@ -12,6 +12,3 @@ require 'nested_db/routes' if defined?(ActionDispatch)
 require 'nested_db/liquidizable' unless defined?(Liquidizable)
 require 'nested_db/liquid'
 require 'nested_db/callbacks'
-require 'nested_db/proxy'
-require 'nested_db/proxies/instance_proxy'
-require 'nested_db/proxies/taxonomy_proxy'
