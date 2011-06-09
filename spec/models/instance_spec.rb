@@ -524,9 +524,7 @@ describe Instance do
         # update the instance to remove contain the sub-object
         inst.update_attributes(:articles_ids => [])
         # check we have no sub-objects
-        inst.articles.size == 0
-        # reload the sub-object
-        sub_object = sub_object.class.find(sub_object.id)
+        inst.articles.count == 0
         # check the sub-object no longer has the instance in it's ids
         sub_object.categories.should_not include inst
       end

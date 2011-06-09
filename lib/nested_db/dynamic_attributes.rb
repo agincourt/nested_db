@@ -4,25 +4,7 @@ module NestedDb
   module DynamicAttributes
     def self.included(base)
       base.extend ClassMethods
-      base.send(:include, InstanceMethods)
       base.send(:include, Encryption)
-      base.send(:include, Validation)
-
-      # setup our callbacks
-      base.class_eval do
-        store_in "nested_db_taxonomy_instances"
-
-        cattr_accessor :proxies # raw procs
-        attr_accessor  :processed_proxies # processed values
-
-        # validation
-        validate :proxies_should_be_valid
-
-        # callbacks
-        after_initialize :process_proxies
-        after_save       :update_remote_habtm_associations
-        after_destroy    :remove_from_all_remote_habtm_associations
-      end
     end
 
     module ClassMethods
@@ -50,14 +32,14 @@ module NestedDb
             has_and_belongs_to_many property.name,
               :class_name => Instances::Klass.klass_name(property.taxonomy_id).constantize.to_s,
               :inverse_of => property.foreign_key
-            define_method("#{property.name}_ids=") do |ids|
-              # load the association
-              assoc = self.class.reflect_on_association(property.name)
-              # save the values
-              send("#{property.name}=", assoc.class_name.constantize.any_in(:_id => ids))
-            end
-            define_method("#{property.name}_ids") do
-              send("#{property.name.singularize}_ids")
+            unless property.name == property.name.singularize
+              define_method("#{property.name}_ids=") do |ids|
+                # load the association
+                assoc = self.class.reflect_on_association(property.name)
+                # save the values
+                self.send("#{property.name}=", assoc.class_name.constantize.any_in(:_id => ids))
+              end
+              alias_method :"#{property.name}_ids", :"#{property.name.singularize}_ids"
             end
           when 'file'
             mount_uploader property.name, NestedDb::InstanceFileUploader
@@ -79,7 +61,7 @@ module NestedDb
 
           # uniqueness
           if property.unique?
-            validates_uniqueness_of property.name
+            validates_uniqueness_of property.name, :case_sensitive => false
           end
 
           # formating
@@ -90,51 +72,6 @@ module NestedDb
               :message     => 'must be a valid email address',
               :allow_blank => true
           end
-        end
-      end
-    end
-
-    module InstanceMethods
-      private
-      # returns a Proxy object for the passed name
-      def retrieve_proxy(name)
-        processed_proxies[name.to_sym]
-      end
-
-      def process_proxies
-        # setup default hash for proxy values
-        self.processed_proxies ||= {}
-        # loop through each proxy
-        (self.class.proxies || {}).each do |name,proxy|
-          # if it's a proc - call it
-          self.processed_proxies.merge!(name => proxy.call(self))
-        end
-      end
-
-      def proxies_should_be_valid
-        # loop through each proxy
-        processed_proxies.each do |name,proxy|
-          # if it's invalid
-          unless proxy.valid?
-            # add an error to this object
-            self.errors.add(name, "#{proxy.many? ? 'are' : 'is'} invalid")
-          end
-        end
-      end
-
-      # synchronises HABTM associations by removing or adding
-      # this object's id to remote objects
-      def update_remote_habtm_associations
-        processed_proxies.each do |name,proxy|
-          proxy.synchronise(send("#{name}_ids")) if proxy.habtm?
-        end
-      end
-
-      # removes this object's id from all remote HABTM
-      # used when an object is destroyed
-      def remove_from_all_remote_habtm_associations
-        processed_proxies.each do |name,proxy|
-          proxy.remove_from_all_remote_habtm_associations if proxy.habtm?
         end
       end
     end

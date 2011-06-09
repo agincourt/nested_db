@@ -8,6 +8,8 @@ module NestedDb
     include NestedDb::DynamicAttributes
     include Liquidizable
 
+    store_in "nested_db_taxonomy_instances"
+
     # pagination
     cattr_reader :per_page
     @@per_page = 20
