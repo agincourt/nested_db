@@ -15,12 +15,12 @@ module NestedDb
       end
 
       def show
-        @instances = @taxonomy.instances.
-          order_by(
-            params[:order] && params[:order][:column] && @taxonomy.has_property?(params[:order][:column]) ?
-            params[:order][:column].to_sym.send('asc' == params[:order][:direction] ? :asc : :desc) :
-            :created_at.desc).
-          paginate(:per_page => params[:per_page] || ::Instance.per_page, :page => params[:page])
+        @instances = @taxonomy.instances.paginate(:per_page => 20, :page => params[:page])
+          # order_by(
+          #   params[:order] && params[:order][:column] && @taxonomy.has_property?(params[:order][:column]) ?
+          #   params[:order][:column].to_sym.send('asc' == params[:order][:direction] ? :asc : :desc) :
+          #   :created_at.desc).
+          # paginate(:per_page => params[:per_page] || ::Instance.per_page, :page => params[:page])
       end
 
       def new
