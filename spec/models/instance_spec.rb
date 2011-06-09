@@ -162,7 +162,11 @@ describe Instance do
       end
 
       it "should be the same for different methods of locating the class" do
+        # load our klass
         klass  = instance.class
+        # check this klass is defined on the object level
+        Object.const_defined?(klass.name.to_s).should be_true
+        # ensure we can constantize it
         cklass = klass.name.to_s.constantize
 
         klass.fields.keys.should    == cklass.fields.keys
@@ -189,7 +193,7 @@ describe Instance do
         association = inst.reflect_on_association(:articles)
         # check it
         association.should_not == nil
-        association.class_name.should =~ NestedDb::Instances.klass_regex
+        association.class_name.should =~ NestedDb::Instances.regex
         association.foreign_key.should == 'category_id'
         association.inverse_class_name.should == inst.class.to_s
         lambda { association.class_name.constantize }.should_not raise_error
@@ -479,7 +483,7 @@ describe Instance do
         association = inst.reflect_on_association(:articles)
         # check it
         association.should_not == nil
-        association.class_name.should =~ NestedDb::Instances.klass_regex
+        association.class_name.should =~ NestedDb::Instances.regex
         association.foreign_key.should == 'article_ids'
         association.inverse_class_name.should == inst.class.to_s
         lambda { association.class_name.constantize }.should_not raise_error

@@ -36,12 +36,12 @@ module NestedDb
 
     # instance methods
     # used by to_json to output user-viewable data
-    alias_method :unsanitized_serializable_hash, :serializable_hash
-    def serializable_hash
-      unsanitized_serializable_hash.delete_if { |k,v|
-        k.to_s =~ /^encrypted|salt$/
-      }
-    end
+    # alias_method :unsanitized_serializable_hash, :serializable_hash
+    # def serializable_hash(options = nil)
+    #   unsanitized_serializable_hash(options).delete_if { |k,v|
+    #     k.to_s =~ /^encrypted|salt$/
+    #   }
+    # end
 
     # returns a class which will be used to
     # represent individual instances in liquid

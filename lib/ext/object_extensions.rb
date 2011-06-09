@@ -6,8 +6,9 @@ module NestedDb
     
     module ClassMethods
       def const_missing(name)
-        if name =~ NestedDb::Instances.klass_regex
-          NestedDb::Instances.create($1)
+        if name =~ NestedDb::Instances.regex
+          puts "const missing: #{name}"
+          NestedDb::Instances.find_or_create($1)
         else
           super(name)
         end
