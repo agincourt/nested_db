@@ -1,3 +1,7 @@
+#
+# Kills rails:
+#
+
 # module NestedDb
 #   module ObjectExtensions
 #     def self.included(base)

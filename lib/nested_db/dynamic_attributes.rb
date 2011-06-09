@@ -13,7 +13,6 @@ module NestedDb
       end
 
       def extend_from_taxonomy(taxonomy)
-        puts "Extending Instance#{taxonomy.id}"
         # loop through each property
         taxonomy.properties.each do |name,property|
           # setup based on the type of property

@@ -26,15 +26,11 @@ module NestedDb
       end
 
       def create(id)
-        puts "Defining Instance#{id.to_s}"
         klass = klass(id)
-        puts "Setting Instance#{id.to_s}"
         Object.const_set(const_name(id), klass)
-        klass.extend_from_taxonomy(taxonomy(id))
-        puts "Adding class to hash"
         self.defined_classes ||= {}
         self.defined_classes.merge!(const_name(id) => klass)
-        puts "Returning Instance#{id.to_s}"
+        klass.extend_from_taxonomy(taxonomy(id))
         klass
       end
 
