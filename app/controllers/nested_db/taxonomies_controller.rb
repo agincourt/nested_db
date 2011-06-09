@@ -15,7 +15,9 @@ module NestedDb
       end
 
       def show
+        puts "Loading instances"
         @instances = @taxonomy.instances.paginate(:per_page => 20, :page => params[:page])
+        puts "Loaded instances"
           # order_by(
           #   params[:order] && params[:order][:column] && @taxonomy.has_property?(params[:order][:column]) ?
           #   params[:order][:column].to_sym.send('asc' == params[:order][:direction] ? :asc : :desc) :
@@ -82,7 +84,9 @@ module NestedDb
 
       protected
       def load_taxonomy
+        puts "Loading taxonomy"
         @taxonomy = taxonomy_scope.find(params[:id])
+        puts "Loaded taxonomy"
       rescue ActiveRecord::RecordNotFound => e
         Rails.logger.debug "#{e.class.name.to_s} => #{e.message}"
         loading_taxonomy_failed
