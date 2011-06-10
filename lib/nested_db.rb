@@ -2,7 +2,7 @@ require 'mongoid'
 require 'engine' if defined?(Rails) && Rails::VERSION::MAJOR == 3
 require 'carrierwave'
 require 'ext/carrierwave'
-require 'ext/object_extensions'
+require 'ext/constantize'
 require 'nested_db/property'
 require 'nested_db/data_types'
 require 'nested_db/controllers'

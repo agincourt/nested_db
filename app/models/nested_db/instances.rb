@@ -15,9 +15,9 @@ module NestedDb
           # return it
           defined_classes[name]
         # if Object has it
-        elsif Object.const_defined?(name)
+        elsif Object.const_defined?(name, false)
           # return it
-          Object.const_get(name)
+          Object.const_get(name, false)
         # if nothing has it
         else
           # setup
@@ -38,7 +38,7 @@ module NestedDb
         if self.defined_classes
           self.defined_classes.delete(const_name(id))
         end
-        if Object.const_defined?(const_name(id))
+        if Object.const_defined?(const_name(id), false)
           Object.send(:remove_const, const_name(id))
         end
       end
