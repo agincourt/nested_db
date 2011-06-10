@@ -19,21 +19,18 @@ module NestedDb
           case property.data_type
           when 'belongs_to'
             belongs_to property.name,
-              :class_name => "Instance#{property.taxonomy_id}",
-              :validate   => false
+              :class_name => "Instance#{property.taxonomy_id}"
           when 'has_many'
             has_many property.name,
               :class_name => "Instance#{property.taxonomy_id}",
-              :inverse_of => property.foreign_key,
-              :validate   => false
-            accepts_nested_attributes_for property.name,
-              :allow_destroy => true,
-              :reject_if     => :all_blank
+              :inverse_of => property.foreign_key
+            #accepts_nested_attributes_for property.name,
+            #  :allow_destroy => true,
+            #  :reject_if     => :all_blank
           when 'has_and_belongs_to_many'
             has_and_belongs_to_many property.name,
               :class_name => "Instance#{property.taxonomy_id}",
-              :inverse_of => property.foreign_key,
-              :validate   => false
+              :inverse_of => property.foreign_key
             unless property.name == property.name.singularize
               define_method("#{property.name}_ids=") do |ids|
                 # load the association
